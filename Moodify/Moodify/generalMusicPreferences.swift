@@ -10,12 +10,13 @@ import SwiftUI
 struct generalMusicPreferencesView: View {
     var body: some View {
         VStack {
+            Spacer()
             Text("Thank you for completing the questionnaire!")
-                .font(.largeTitle)
+                .font(.headline)
                 .padding()
             Spacer()
         }
-        .navigationBarTitle("Next Page", displayMode: .inline)
+        .navigationBarTitle("MusicPreferences", displayMode: .inline)
     }
 }
 

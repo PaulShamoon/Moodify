@@ -8,7 +8,7 @@
 Filename: Questionnaire.swift
 Author: Mohammad Sulaiman
 Date: September 12, 2024
-Purpose: Questionnaire for the applications intitial setup.
+Purpose: Questionnaire for the application's initial setup.
 
 *******************************************/
 import Foundation
@@ -20,10 +20,12 @@ struct QuestionnaireView: View {
     @State private var age: Int = 18
     @State private var selectedGender: String = "Male"
     @State private var agreedToTerms: Bool = false
-    let genders = ["Male", "Female", "Perfer not to say"]
+    @State private var navigateToNextPage: Bool = false // New state variable to allow navigation
+    
+    let genders = ["Male", "Female", "Prefer not to say"]
     
     var body: some View {
-        NavigationView {
+        NavigationStack {
             VStack(alignment: .leading, spacing: 20) {
                 
                 // First name input
@@ -38,9 +40,10 @@ struct QuestionnaireView: View {
                 Text("Last Name")
                     .font(.headline)
                 
-                TextField("Enter your last namer", text: $lastname)
+                TextField("Enter your last name", text: $lastname)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .padding(.bottom)
+                
                 // Age scroll selection
                 Text("Age:")
                     .font(.headline)
@@ -68,6 +71,7 @@ struct QuestionnaireView: View {
                 Link("Read Terms of Service", destination: URL(string: "//")!)
                     .foregroundColor(.blue)
                     .padding(.top)
+                
                 // Terms of Service
                 Toggle(isOn: $agreedToTerms) {
                     Text("I agree to the Terms of Service")
@@ -75,7 +79,12 @@ struct QuestionnaireView: View {
                 .padding(.bottom)
                 
                 // Submit button
-                Button(action: submitForm) {
+                Button(action: {
+                    submitForm()
+                    if agreedToTerms {
+                        navigateToNextPage = true
+                    }
+                }) {
                     Text("Submit")
                         .foregroundColor(.white)
                         .padding()
@@ -83,21 +92,23 @@ struct QuestionnaireView: View {
                         .background(agreedToTerms ? Color.blue : Color.gray)
                         .cornerRadius(10)
                 }
-                // Disables button if terms are not agreed
-                .disabled(!agreedToTerms)
+                .disabled(!agreedToTerms) // Disable button if terms are not agreed
                 
                 Spacer()
             }
             .padding()
-            .navigationBarTitle("Questionnaire", displayMode: .inline)
+            .navigationBarTitle("Questionnaire")
+            .navigationDestination(isPresented: $navigateToNextPage) {
+                generalMusicPreferencesView() // Navigates to the NextPageView when the form is submitted
+            }
         }
     }
     
     // Handling for submission
     func submitForm() {
-        // Change submisssion logic
+        // Change submission logic
         print("First Name: \(firstname)")
-        print("Last Name\(lastname)")
+        print("Last Name: \(lastname)")
         print("Age: \(age)")
         print("Gender: \(selectedGender)")
         print("Agreed to Terms: \(agreedToTerms)")
@@ -108,8 +119,4 @@ struct QuestionnaireView_Previews: PreviewProvider {
     static var previews: some View {
         QuestionnaireView()
     }
-}
-
-#Preview {
-    QuestionnaireView()
 }
