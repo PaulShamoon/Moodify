@@ -99,7 +99,7 @@ struct QuestionnaireView: View {
             .padding()
             .navigationBarTitle("Questionnaire")
             .navigationDestination(isPresented: $navigateToNextPage) {
-                generalMusicPreferencesView() // Navigates to the NextPageView when the form is submitted
+                GeneralMusicPreferencesView() // Navigates to the generalMusicPreferencesView when the form is submitted
             }
         }
     }
