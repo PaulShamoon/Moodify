@@ -112,6 +112,7 @@ struct QuestionnaireView: View {
         print("Age: \(age)")
         print("Gender: \(selectedGender)")
         print("Agreed to Terms: \(agreedToTerms)")
+        //Backend logic here
     }
 }
 
