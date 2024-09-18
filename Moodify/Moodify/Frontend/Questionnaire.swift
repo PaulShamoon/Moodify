@@ -74,8 +74,8 @@ struct QuestionnaireView: View {
                 
                 // Submit button
                 Button(action: {
-                    submitForm()
                     if validateForm() {
+                        submitForm()
                         navigateToNextPage = true
                     }
                 }) {

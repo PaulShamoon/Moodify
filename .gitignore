@@ -1,0 +1,18 @@
+Moodify/Moodify/.DS_Store
+Moodify/Moodify.xcodeproj/project.xcworkspace/xcuserdata/mahdisulaiman.xcuserdatad/UserInterfaceState.xcuserstate
+# Ignore user-specific Xcode data
+Moodify.xcodeproj/project.xcworkspace/xcuserdata/
+
+xcuserdata/
+*.xcuserstate
+build/
+DerivedData/
+xcuserdata/**/xcdebugger/
+
+.DS_Store
+
+*.swp
+*.swo
+
+*.lock
+UserInterfaceState.xcuserstate
