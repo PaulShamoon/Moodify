@@ -1,9 +1,3 @@
-//
-//  Questionnaire.swift
-//  Moodify
-//
-//  Created by Mahdi Sulaiman on 9/12/24.
-//
 /**************************
 Filename: Questionnaire.swift
 Author: Mohammad Sulaiman
@@ -20,7 +14,7 @@ struct QuestionnaireView: View {
     @State private var age: Int = 18
     @State private var selectedGender: String = "Male"
     @State private var agreedToTerms: Bool = false
-    @State private var navigateToNextPage: Bool = false // New state variable to allow navigation
+    @State private var navigateToNextPage: Bool = false // State to control navigation
     
     let genders = ["Male", "Female", "Prefer not to say"]
     
@@ -81,7 +75,7 @@ struct QuestionnaireView: View {
                 // Submit button
                 Button(action: {
                     submitForm()
-                    if agreedToTerms {
+                    if validateForm() {
                         navigateToNextPage = true
                     }
                 }) {
@@ -89,30 +83,38 @@ struct QuestionnaireView: View {
                         .foregroundColor(.white)
                         .padding()
                         .frame(maxWidth: .infinity)
-                        .background(agreedToTerms ? Color.blue : Color.gray)
+                        .background(validateForm() ? Color.blue : Color.gray)
                         .cornerRadius(10)
                 }
-                .disabled(!agreedToTerms) // Disable button if terms are not agreed
+                .disabled(!validateForm()) // Disable button if form is not valid
                 
                 Spacer()
             }
             .padding()
             .navigationBarTitle("Questionnaire")
             .navigationDestination(isPresented: $navigateToNextPage) {
-                GeneralMusicPreferencesView() // Navigates to the generalMusicPreferencesView when the form is submitted
+                GeneralMusicPreferencesView() // Navigates to GeneralMusicPreferencesView when form is submitted
             }
         }
     }
     
-    // Handling for submission
+    // Validate form inputs
+    func validateForm() -> Bool {
+        return !firstname.isEmpty &&
+               !lastname.isEmpty &&
+               age > 0 && // Assuming age must be greater than 0
+               !selectedGender.isEmpty &&
+               agreedToTerms
+    }
+    
+    // Handle form submission
     func submitForm() {
-        // Change submission logic
         print("First Name: \(firstname)")
         print("Last Name: \(lastname)")
         print("Age: \(age)")
         print("Gender: \(selectedGender)")
         print("Agreed to Terms: \(agreedToTerms)")
-        //Backend logic here
+        // Backend logic here
     }
 }
 

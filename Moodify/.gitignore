@@ -1,3 +1,16 @@
 # Ignore user-specific Xcode data
 Moodify.xcodeproj/project.xcworkspace/xcuserdata/
 
+xcuserdata/
+*.xcuserstate
+build/
+DerivedData/
+xcuserdata/**/xcdebugger/
+
+.DS_Store
+
+*.swp
+*.swo
+
+*.lock
+UserInterfaceState.xcuserstate
