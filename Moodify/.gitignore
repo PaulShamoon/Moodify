@@ -1,0 +1,3 @@
+# Ignore user-specific Xcode data
+Moodify.xcodeproj/project.xcworkspace/xcuserdata/
+
