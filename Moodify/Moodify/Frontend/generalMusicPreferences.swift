@@ -11,12 +11,21 @@ import SwiftUI
 
 struct GeneralMusicPreferencesView: View {
     @State private var selectedGenres: Set<String> = [] // Allows storing multiple genres
+    @State private var firstname: String = "" // Holds the users first name
+    @State private var navigateToNextPage: Bool = false // State to control navigation
+
+
     
     let genres = ["Pop", "Classical", "Regional", "Hip Hop", "Country", "Dance"]
     
     var body: some View {
         NavigationStack {
             VStack {
+                // Display the first name
+                Text("Hello, \(firstname)!")
+                    .font(.headline)
+                    .padding(.vertical)
+                
                 Text("Thank you for completing the questionnaire!")
                     .font(.headline)
                     .padding(.vertical)
@@ -55,8 +64,10 @@ struct GeneralMusicPreferencesView: View {
                 Button(action: {
                     if selectedGenres.isEmpty {
                         print("Skipped genre selection")
+                        navigateToNextPage = true
                     } else {
                         submitGenres()
+                        navigateToNextPage = true
                     }
                 }) {
                     Text(selectedGenres.isEmpty ? "Skip" : "Next")
@@ -72,7 +83,18 @@ struct GeneralMusicPreferencesView: View {
             }
             .padding()
             .navigationTitle("Music Preferences")
+            .onAppear(perform: loadFirstName) // When the view appears, it will load the first name
+            .navigationDestination(isPresented: $navigateToNextPage) {
+                homePageView() // Navigates to GeneralMusicPreferencesView when form is submitted
+            }
         }
+    }
+    
+    // Load the users first name from UserDefaults
+    private func loadFirstName() {
+        firstname = UserDefaults.standard.string(forKey: "firstname") ?? "User"
+        print("Loaded First Name: \(firstname)") // Verify that the first name is loading
+
     }
     
     // Toggle genre selection

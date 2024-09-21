@@ -91,7 +91,6 @@ struct QuestionnaireView: View {
                 Spacer()
             }
             .padding()
-            .navigationBarTitle("Questionnaire")
             .navigationDestination(isPresented: $navigateToNextPage) {
                 GeneralMusicPreferencesView() // Navigates to GeneralMusicPreferencesView when form is submitted
             }
@@ -115,6 +114,12 @@ struct QuestionnaireView: View {
         print("Gender: \(selectedGender)")
         print("Agreed to Terms: \(agreedToTerms)")
         // Backend logic here
+        UserDefaults.standard.set(firstname, forKey: "firstname")
+        UserDefaults.standard.set(lastname, forKey: "lastname")
+        UserDefaults.standard.set(age, forKey: "age")
+        UserDefaults.standard.set(selectedGender, forKey: "gender")
+        UserDefaults.standard.set(agreedToTerms, forKey: "agreedToTerms")
+
     }
 }
 
