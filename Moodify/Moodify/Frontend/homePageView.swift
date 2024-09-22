@@ -7,7 +7,8 @@ struct homePageView: View {
     // using emoji holders for now to represent what AI would show
     @State private var currentMood: String = "😊"
     @State private var isDetectingMood: Bool = false
-    
+    @StateObject var spotifyController = SpotifyController()
+
     var body: some View {
         ZStack {
             Color.black
@@ -93,7 +94,7 @@ struct homePageView: View {
     
     // Placeholder: Spotify API Integration
     func connectSpotify() {
-        print("Connecting to Spotify...")
+        spotifyController.connect()
     }
 }
 
