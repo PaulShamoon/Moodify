@@ -8,8 +8,7 @@ struct homePageView: View {
     @State private var isDetectingMood: Bool = false
     @StateObject var spotifyController = SpotifyController()
     @State private var navigateToSpotify = false // Add state for navigation
-    
-    
+
     var body: some View {
         NavigationView {
             ZStack {
@@ -99,6 +98,11 @@ struct homePageView: View {
         let moods = ["😊", "😢", "😡", "😴", "😍", "😎", "🤔"]
         currentMood = moods.randomElement() ?? "😊"
         isDetectingMood = false
+    }
+    
+    // Placeholder: Spotify API Integration
+    func connectSpotify() {
+        spotifyController.connect()
     }
 }
 
