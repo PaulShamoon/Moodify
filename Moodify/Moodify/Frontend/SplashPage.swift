@@ -6,7 +6,7 @@ be rendered upon every launch of the application
  
  Created by Paul Shamoon on 9/24/24.
  */
-struct SplashScreenView: View {
+struct SplashPageView: View { 
     // Tracks whether to show the splash screen or navigate to the home page
     @State private var navigateToHomePage = false
     

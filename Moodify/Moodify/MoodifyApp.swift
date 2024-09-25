@@ -11,7 +11,7 @@ import SwiftUI
 struct MoodifyApp: App {
     var body: some Scene {
         WindowGroup {
-            SplashScreenView()
+            SplashPageView()
         }
     }
 }
