@@ -7,6 +7,8 @@ import SwiftUI
  Created by Paul Shamoon on 9/12/24.
  */
 struct ConnectToSpotifyDisplay: View {
+    @ObservedObject var spotifyController: SpotifyController
+    
     var body: some View {
         VStack(spacing: 20) {
             Text("Choose your streaming provider to continue")
@@ -15,7 +17,8 @@ struct ConnectToSpotifyDisplay: View {
                 .padding(.bottom, 10)
             
             Button(action: {
-                // This will be where we call some function to actually connect to spotify later
+                print("button pressed")
+                spotifyController.connect()
             }) {
                 HStack(spacing: 0) {
                     Text("Connect with")
@@ -35,5 +38,11 @@ struct ConnectToSpotifyDisplay: View {
             }
         }
         .padding()
+        
+         // This redirects users back to our application
+        .onOpenURL { url in
+            spotifyController.setAccessToken(from: url)
+        }
     }
 }
+
