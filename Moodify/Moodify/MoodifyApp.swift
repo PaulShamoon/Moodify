@@ -35,3 +35,4 @@ struct MoodifyApp: App {
         }
     }
 }
+//SplashPageView()

@@ -83,7 +83,6 @@ struct homePageView: View {
                         .background(Capsule().fill(Color.green))
                         .shadow(radius: 10)
                     }
-                    
                     Spacer()
                 }
                 .padding(.top, 60)
