@@ -89,7 +89,7 @@ struct homePageView: View {
                 .padding(.top, 60)
             }
             .navigationDestination(isPresented: $navigateToSpotify) {
-                ConnectToSpotifyDisplay() // Navigates to homePageView after submitting genres
+                ConnectToSpotifyDisplay(spotifyController: spotifyController) // Navigates to homePageView after submitting genres
             }
         }
     }

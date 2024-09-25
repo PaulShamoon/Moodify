@@ -1,12 +1,3 @@
-/**************************
- Filename: generalMusicPreferences.swift
- Author: Mohammad Sulaiman
- Date: September 13, 2024
- Purpose: Questionnaire for the application's initial setup.
- 
- Update September 16, 2024: Removed the toggles from the genres, instead used checkmarks
- *******************************************/
-
 import SwiftUI
 
 struct GeneralMusicPreferencesView: View {
@@ -14,104 +5,107 @@ struct GeneralMusicPreferencesView: View {
     @State private var isPlaying = false
     @State private var navigateToHomePage: Bool = false
     @State private var firstname: String = "" // Holds the user's first name
-    @State private var navigateToNextPage: Bool = false // State to control navigation
     
     let genres = ["Pop", "Classical", "Regional", "Hip Hop", "Country", "Dance"]
     
     var body: some View {
-        ZStack {
-            // Spotify-inspired dark mode background with gradient
-            LinearGradient(gradient: Gradient(colors: [Color.black, Color.gray.opacity(0.8)]), startPoint: .top, endPoint: .bottom)
-                .edgesIgnoringSafeArea(.all)
-            
-            VStack(spacing: 20) {
-                // Title
-                Text("What are your favorite genres?")
-                    .font(.system(size: 24, weight: .bold, design: .rounded))
-                    .foregroundColor(.white)
-                    .padding(.top, 20)
+        NavigationStack {
+            ZStack {
+                // Spotify-inspired dark mode background with gradient
+                LinearGradient(gradient: Gradient(colors: [Color.black, Color.gray.opacity(0.8)]), startPoint: .top, endPoint: .bottom)
+                    .edgesIgnoringSafeArea(.all)
                 
-                // Grid of genre cards with Spotify-like style
-                LazyVGrid(columns: [GridItem(.adaptive(minimum: 150), spacing: 20)], spacing: 20) {
-                    ForEach(genres, id: \.self) { genre in
-                        Button(action: {
-                            withAnimation {
-                                toggleGenreSelection(genre: genre)
-                            }
-                        }) {
-                            ZStack {
-                                // Card background
-                                RoundedRectangle(cornerRadius: 16)
-                                    .fill(selectedGenres.contains(genre) ? Color.green.opacity(0.8) : Color.gray.opacity(0.2))
-                                    .shadow(radius: 5)
-                                
-                                VStack {
-                                    // Genre text
-                                    Text(genre)
-                                        .font(.system(size: 18, weight: .semibold, design: .rounded))
-                                        .foregroundColor(.white)
+                VStack(spacing: 20) {
+                    // Title with the user's first name
+                    Text("\(firstname), what are your favorite genres?")
+                        .font(.system(size: 22, weight: .bold, design: .rounded))
+                        .foregroundColor(.white)
+                        .padding(.top, 20)
+                    
+                    // Grid of genre cards with Spotify-like style
+                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 150), spacing: 20)], spacing: 20) {
+                        ForEach(genres, id: \.self) { genre in
+                            Button(action: {
+                                withAnimation {
+                                    toggleGenreSelection(genre: genre)
+                                }
+                            }) {
+                                ZStack {
+                                    // Card background
+                                    RoundedRectangle(cornerRadius: 16)
+                                        .fill(selectedGenres.contains(genre) ? Color.green.opacity(0.8) : Color.gray.opacity(0.2))
+                                        .shadow(radius: 5)
                                     
-                                    // Checkmark for selected genres
-                                    if selectedGenres.contains(genre) {
-                                        Image(systemName: "checkmark.circle.fill")
+                                    VStack {
+                                        // Genre text
+                                        Text(genre)
+                                            .font(.system(size: 18, weight: .semibold, design: .rounded))
                                             .foregroundColor(.white)
-                                            .font(.system(size: 24))
-                                            .padding(.top, 10)
+                                        
+                                        // Checkmark for selected genres
+                                        if selectedGenres.contains(genre) {
+                                            Image(systemName: "checkmark.circle.fill")
+                                                .foregroundColor(.white)
+                                                .font(.system(size: 24))
+                                                .padding(.top, 10)
+                                        }
                                     }
                                 }
+                                .frame(height: 120)
                             }
-                            .frame(height: 120)
                         }
                     }
-                }
-                .padding(.horizontal, 20)
-                
-                // Display the selected genres
-                if !selectedGenres.isEmpty {
-                    Text("Selected Genres: \(selectedGenres.joined(separator: ", "))")
-                        .font(.system(size: 16, weight: .light, design: .rounded))
-                        .foregroundColor(.white.opacity(0.7))
-                        .padding(.top, 20)
-                }
-                
-                // Next/Skip button styled to match Spotify's premium look
-                Button(action: {
-                    if selectedGenres.isEmpty {
-                        print("Skipped genre selection")
-                        navigateToHomePage = true  // Navigate even if no genre is selected
-                    } else {
-                        submitGenres()
-                        navigateToHomePage = true  // Navigate after genres are selected
+                    .padding(.horizontal, 20)
+                    
+                    // Display the selected genres
+                    if !selectedGenres.isEmpty {
+                        Text("Selected Genres: \(selectedGenres.joined(separator: ", "))")
+                            .font(.system(size: 16, weight: .light, design: .rounded))
+                            .foregroundColor(.white.opacity(0.7))
+                            .padding(.top, 20)
                     }
-                }) {
-                    Text(selectedGenres.isEmpty ? "Skip" : "Next")
-                        .font(.system(size: 20, weight: .bold, design: .rounded))
-                        .foregroundColor(.black)
-                        .padding()
-                        .frame(maxWidth: .infinity)
-                        .background(LinearGradient(gradient: Gradient(colors: [Color.green, Color.green.opacity(0.8)]), startPoint: .leading, endPoint: .trailing))
-                        .cornerRadius(12)
-                        .shadow(radius: 10)
-                        .opacity(selectedGenres.isEmpty ? 0.7 : 1.0)
-                }
-                .padding(.horizontal)
-                .padding(.top, 30)
-                
-                Spacer()
-                
-                // Bottom music player bar to fill empty space
-                BottomMusicPlayer(isPlaying: $isPlaying)
+                    
+                    // Next/Skip button styled to match Spotify's premium look
+                    Button(action: {
+                        if selectedGenres.isEmpty {
+                            print("Skipped genre selection")
+                        } else {
+                            submitGenres()
+                        }
+                        navigateToHomePage = true  // Navigate after genres are selected or skipped
+                    }) {
+                        Text(selectedGenres.isEmpty ? "Skip" : "Next")
+                            .font(.system(size: 20, weight: .bold, design: .rounded))
+                            .foregroundColor(.black)
+                            .padding()
+                            .frame(maxWidth: .infinity)
+                            .background(LinearGradient(gradient: Gradient(colors: [Color.green, Color.green.opacity(0.8)]), startPoint: .leading, endPoint: .trailing))
+                            .cornerRadius(12)
+                            .shadow(radius: 10)
+                            .opacity(selectedGenres.isEmpty ? 0.7 : 1.0)
+                    }
                     .padding(.horizontal)
-                    .padding(.bottom, 10)
-            }
-            .padding()
-            .navigationDestination(isPresented: $navigateToHomePage) {
-                homePageView() // Navigates to homePageView after submitting genres
+                    .padding(.top, 30)
+                    
+                    Spacer()
+                    
+                    // Bottom music player bar to fill empty space
+                    BottomMusicPlayer(isPlaying: $isPlaying)
+                        .padding(.horizontal)
+                        .padding(.bottom, 10)
+                }
+                .padding()
+                .navigationDestination(isPresented: $navigateToHomePage) {
+                    homePageView() // Navigates to homePageView after submitting genres
+                }
+                .onAppear {
+                    loadFirstName() // Load the user's first name when the view appears
+                }
             }
         }
     }
-
-        private func loadFirstName() {
+    
+    private func loadFirstName() {
         firstname = UserDefaults.standard.string(forKey: "firstname") ?? "User"
         print("Loaded First Name: \(firstname)")
     }
@@ -127,7 +121,7 @@ struct GeneralMusicPreferencesView: View {
     // Submit the selected genres
     func submitGenres() {
         print("Selected Genres: \(selectedGenres.joined(separator: ", "))")
-        // Backend logic here
+        UserDefaults.standard.set(Array(selectedGenres), forKey: "selectedGenres")
     }
 }
 
@@ -164,7 +158,6 @@ struct BottomMusicPlayer: View {
                 }
                 Spacer()
                 
-               
                 Button(action: {
                     isPlaying.toggle()
                 }) {
@@ -177,9 +170,6 @@ struct BottomMusicPlayer: View {
             .padding(.horizontal)
         }
         .frame(height: 80)
-        // Backend logic here
-        UserDefaults.standard.set(Array(selectedGenres), forKey: "selectedGenres")
-
     }
 }
 
