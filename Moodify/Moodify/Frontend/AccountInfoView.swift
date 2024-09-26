@@ -35,6 +35,17 @@ struct AccountInfoView: View {
                 .font(.title2)
                 .foregroundColor(.white)
 
+            
+            VStack(alignment: .leading, spacing: 20) {
+                // Links to Questionnaire and Preferences
+                NavigationLink(destination: QuestionnaireView(navigateToMusicPreferences: .constant(false))) {
+                    Text("Edit User Information")
+                        .font(.title2.italic())
+                        .foregroundColor(.green)
+                        .padding(.leading, 50)
+                    
+                }
+            }
             Spacer()
         }
         .padding()
@@ -50,6 +61,11 @@ struct AccountInfoView: View {
         lastname = UserDefaults.standard.string(forKey: "lastname") ?? "Unknown"
         age = UserDefaults.standard.integer(forKey: "age")
         gender = UserDefaults.standard.string(forKey: "gender") ?? "Unknown"
+    }
+}
+struct AccountInfoView_Previews: PreviewProvider {
+    static var previews: some View {
+        AccountInfoView()
     }
 }
 

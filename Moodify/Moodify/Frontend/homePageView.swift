@@ -11,7 +11,7 @@ struct homePageView: View {
         ZStack {
             NavigationView {
                 ZStack {
-                    Color.black
+                    LinearGradient(gradient: Gradient(colors: [Color.black, Color.gray.opacity(0.8)]), startPoint: .top, endPoint: .bottom)
                         .edgesIgnoringSafeArea(.all)
 
                     VStack(spacing: 30) {
