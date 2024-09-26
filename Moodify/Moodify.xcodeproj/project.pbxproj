@@ -26,6 +26,8 @@
 		89FA8A432C9A6F39005480D8 /* generalMusicPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89FA8A422C9A6F39005480D8 /* generalMusicPreferences.swift */; };
 		89FA8A452C9A6F40005480D8 /* Questionnaire.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89FA8A442C9A6F40005480D8 /* Questionnaire.swift */; };
 		89FA8A472C9A6F4D005480D8 /* homePageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89FA8A462C9A6F4D005480D8 /* homePageView.swift */; };
+		BA3C79602CA501C800A02C86 /* EmotionClassifier.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = BA3C795F2CA501C800A02C86 /* EmotionClassifier.mlmodel */; };
+		BA6927902CA45D550082E840 /* EmotionDetection.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA69278E2CA45D550082E840 /* EmotionDetection.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -79,6 +81,8 @@
 		89FA8A422C9A6F39005480D8 /* generalMusicPreferences.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = generalMusicPreferences.swift; sourceTree = "<group>"; };
 		89FA8A442C9A6F40005480D8 /* Questionnaire.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Questionnaire.swift; sourceTree = "<group>"; };
 		89FA8A462C9A6F4D005480D8 /* homePageView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = homePageView.swift; sourceTree = "<group>"; };
+		BA3C795F2CA501C800A02C86 /* EmotionClassifier.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = EmotionClassifier.mlmodel; sourceTree = "<group>"; };
+		BA69278E2CA45D550082E840 /* EmotionDetection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmotionDetection.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -130,7 +134,11 @@
 		6934A10B2C8FDA840086CC91 /* Moodify */ = {
 			isa = PBXGroup;
 			children = (
+<<<<<<< HEAD
 				6EF2FC192CA36EAC0044C84D /* Info.plist */,
+=======
+				BA69278F2CA45D550082E840 /* AIModel */,
+>>>>>>> f035bc385a8986b5e58b11af5c0b5d5b5d9f9c55
 				694B6C002C9A4431002F0931 /* Frontend */,
 				6934A10C2C8FDA840086CC91 /* MoodifyApp.swift */,
 				6EA47A6F2C9E5199006FB5C6 /* SpotifyController.swift */,
@@ -178,6 +186,15 @@
 				89FA8A422C9A6F39005480D8 /* generalMusicPreferences.swift */,
 			);
 			path = Frontend;
+			sourceTree = "<group>";
+		};
+		BA69278F2CA45D550082E840 /* AIModel */ = {
+			isa = PBXGroup;
+			children = (
+				BA69278E2CA45D550082E840 /* EmotionDetection.swift */,
+				BA3C795F2CA501C800A02C86 /* EmotionClassifier.mlmodel */,
+			);
+			path = AIModel;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -318,8 +335,10 @@
 				89FA8A432C9A6F39005480D8 /* generalMusicPreferences.swift in Sources */,
 				694B6C012C9A4431002F0931 /* (null) in Sources */,
 				694B6C032C9A4483002F0931 /* (null) in Sources */,
+				BA6927902CA45D550082E840 /* EmotionDetection.swift in Sources */,
 				89FA8A472C9A6F4D005480D8 /* homePageView.swift in Sources */,
 				6934A10D2C8FDA840086CC91 /* MoodifyApp.swift in Sources */,
+				BA3C79602CA501C800A02C86 /* EmotionClassifier.mlmodel in Sources */,
 				89FA8A452C9A6F40005480D8 /* Questionnaire.swift in Sources */,
 				6EEDBF492CA3B94D0079295D /* SplashPage.swift in Sources */,
 				89AD20A72C93E39A00EC5BDB /* (null) in Sources */,
@@ -488,10 +507,14 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Moodify/Preview Content\"";
-				DEVELOPMENT_TEAM = 5RJHYK4MEZ;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+<<<<<<< HEAD
 				INFOPLIST_FILE = Moodify/Info.plist;
+=======
+				INFOPLIST_KEY_NSCameraUsageDescription = "Moodify uses your camera to detect your emotions";
+>>>>>>> f035bc385a8986b5e58b11af5c0b5d5b5d9f9c55
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -523,10 +546,14 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Moodify/Preview Content\"";
-				DEVELOPMENT_TEAM = 9RU82Q2W86;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+<<<<<<< HEAD
 				INFOPLIST_FILE = Moodify/Info.plist;
+=======
+				INFOPLIST_KEY_NSCameraUsageDescription = "Moodify uses your camera to detect your emotions";
+>>>>>>> f035bc385a8986b5e58b11af5c0b5d5b5d9f9c55
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
