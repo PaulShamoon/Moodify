@@ -8,7 +8,12 @@ struct QuestionnaireView: View {
     @State private var agreedToTerms: Bool = false
     @Binding var navigateToMusicPreferences: Bool // Binding to control navigation
     
+    @Environment(\.presentationMode) var presentationMode // Used to dismiss the view smoothly
+
     let genders = ["Male", "Female", "Prefer not to say"]
+    
+    // Determine if the user is editing through the hamburger menu (i.e., they've already agreed to terms)
+    @State private var hasAgreedToTerms: Bool = false // Flag to track if the user already agreed to terms
     
     var body: some View {
         ZStack {
@@ -23,12 +28,22 @@ struct QuestionnaireView: View {
                     .foregroundColor(.white)
                     .padding(.top, 20)
                 
+                Text("First Name:")
+                    .font(.system(size: 20, weight: .bold, design: .rounded))
+                    .foregroundColor(.white)
+                    .padding(.top, 7)
+                
                 // First name input
                 TextField("First Name", text: $firstname)
                     .padding()
                     .background(Color.gray.opacity(0.2))
                     .cornerRadius(10)
                     .foregroundColor(.white)
+                
+                Text("Last Name:")
+                    .font(.system(size: 20, weight: .bold, design: .rounded))
+                    .foregroundColor(.white)
+                    .padding(.top, 7)
                 
                 // Last name input
                 TextField("Last Name", text: $lastname)
@@ -37,9 +52,14 @@ struct QuestionnaireView: View {
                     .cornerRadius(10)
                     .foregroundColor(.white)
                 
+                Text("Age:")
+                    .font(.system(size: 20, weight: .bold, design: .rounded))
+                    .foregroundColor(.white)
+                    .padding(.top, 7)
+                
                 // Age picker
                 Picker("Age", selection: $age) {
-                    ForEach(8..<100) { age in
+                    ForEach(0..<100) { age in
                         Text("\(age)").tag(age)
                     }
                 }
@@ -56,17 +76,31 @@ struct QuestionnaireView: View {
                 .pickerStyle(SegmentedPickerStyle())
                 .foregroundColor(.white)
                 
-                // Terms of Service Toggle
-                Toggle(isOn: $agreedToTerms) {
-                    Text("I agree to the Terms of Service")
-                        .foregroundColor(.white)
+                // Only show Terms of Service toggle if they haven't agreed yet
+                if !hasAgreedToTerms {
+                    Toggle(isOn: $agreedToTerms) {
+                        Text("I agree to the Terms of Service")
+                            .foregroundColor(.white)
+                    }
+                }
+                
+                // Red warning text if form is incomplete
+                if !validateForm() {
+                    Text("All fields must be filled before submitting.")
+                        .font(.system(size: 14))
+                        .foregroundColor(.red)
+                        .padding(.top, 5)
                 }
                 
                 // Submit button
                 Button(action: {
                     if validateForm() {
                         submitForm()
+                        if !hasAgreedToTerms {
+                            UserDefaults.standard.set(true, forKey: "hasAgreedToTerms") // Save agreement
+                        }
                         navigateToMusicPreferences = true // Trigger navigation
+                        presentationMode.wrappedValue.dismiss() // Dismiss the view smoothly to return to the menu
                     }
                 }) {
                     Text("Submit")
@@ -84,16 +118,21 @@ struct QuestionnaireView: View {
                 Spacer()
             }
             .padding()
+            .onAppear {
+                loadFormData() // Load the saved data when the view appears
+                checkAgreedToTerms() // Check if the user already agreed to terms
+            }
         }
     }
     
     // Form validation
     func validateForm() -> Bool {
+        // Validate only if terms of service toggle is visible and terms are agreed
         return !firstname.isEmpty &&
                !lastname.isEmpty &&
                age > 0 &&
                !selectedGender.isEmpty &&
-               agreedToTerms
+               (hasAgreedToTerms || agreedToTerms)
     }
     
     // Form submission
@@ -108,7 +147,19 @@ struct QuestionnaireView: View {
         UserDefaults.standard.set(lastname, forKey: "lastname")
         UserDefaults.standard.set(age, forKey: "age")
         UserDefaults.standard.set(selectedGender, forKey: "gender")
-        UserDefaults.standard.set(agreedToTerms, forKey: "agreedToTerms")
+    }
+
+    // Load saved form data from UserDefaults
+    func loadFormData() {
+        firstname = UserDefaults.standard.string(forKey: "firstname") ?? ""
+        lastname = UserDefaults.standard.string(forKey: "lastname") ?? ""
+        age = UserDefaults.standard.integer(forKey: "age")
+        selectedGender = UserDefaults.standard.string(forKey: "gender") ?? "Male"
+    }
+    
+    // Check if the user has already agreed to the terms
+    func checkAgreedToTerms() {
+        hasAgreedToTerms = UserDefaults.standard.bool(forKey: "hasAgreedToTerms")
     }
 }
 

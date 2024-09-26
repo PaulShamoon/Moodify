@@ -5,6 +5,8 @@ struct GeneralMusicPreferencesView: View {
     @Binding var navigateToHomePage: Bool
     @State private var isPlaying = false
     @State private var firstname: String = ""
+    
+    @Environment(\.presentationMode) var presentationMode // Used to dismiss the view smoothly
 
     let genres = ["Pop", "Classical", "Regional", "Hip Hop", "Country", "Dance"]
 
@@ -64,8 +66,9 @@ struct GeneralMusicPreferencesView: View {
                         submitGenres()
                     }
                     navigateToHomePage = true // Navigate after genres are selected or skipped
+                    presentationMode.wrappedValue.dismiss() // Dismiss the view smoothly
                 }) {
-                    Text(selectedGenres.isEmpty ? "Skip" : "Next")
+                    Text(selectedGenres.isEmpty ? "Skip" : "Submit")
                         .font(.system(size: 20, weight: .bold, design: .rounded))
                         .foregroundColor(.black)
                         .padding()
@@ -83,6 +86,7 @@ struct GeneralMusicPreferencesView: View {
             .padding()
             .onAppear {
                 loadFirstName()
+                loadSelectedGenres() // Load selected genres when the view appears
             }
         }
     }
@@ -90,6 +94,13 @@ struct GeneralMusicPreferencesView: View {
     private func loadFirstName() {
         firstname = UserDefaults.standard.string(forKey: "firstname") ?? "User"
         print("Loaded First Name: \(firstname)")
+    }
+
+    private func loadSelectedGenres() {
+        if let savedGenres = UserDefaults.standard.array(forKey: "selectedGenres") as? [String] {
+            selectedGenres = Set(savedGenres)
+            print("Loaded Selected Genres: \(selectedGenres)")
+        }
     }
 
     private func toggleGenreSelection(genre: String) {
@@ -105,6 +116,7 @@ struct GeneralMusicPreferencesView: View {
         UserDefaults.standard.set(Array(selectedGenres), forKey: "selectedGenres")
     }
 }
+
 struct GeneralMusicPreferencesView_Previews: PreviewProvider {
     static var previews: some View {
         GeneralMusicPreferencesView(navigateToHomePage: .constant(false))

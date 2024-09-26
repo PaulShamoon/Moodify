@@ -26,7 +26,7 @@ struct MenuView: View {
                 VStack(alignment: .leading, spacing: 20) {
                     // Links to Questionnaire and Preferences
                     NavigationLink(destination: QuestionnaireView(navigateToMusicPreferences: .constant(false))) {
-                        Text("Questionnaire")
+                        Text("User Information")
                             .font(.title2)
                             .foregroundColor(.white)
                             .padding(.leading, 20)
