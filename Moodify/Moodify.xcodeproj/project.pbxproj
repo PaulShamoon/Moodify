@@ -21,6 +21,8 @@
 		6EA47A772C9E52D4006FB5C6 /* SpotifyiOS.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6EA47A752C9E52C7006FB5C6 /* SpotifyiOS.xcframework */; };
 		6EA47A782C9E52D4006FB5C6 /* SpotifyiOS.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 6EA47A752C9E52C7006FB5C6 /* SpotifyiOS.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		6EEDBF492CA3B94D0079295D /* SplashPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EEDBF482CA3B9470079295D /* SplashPage.swift */; };
+		8917A3D92CA4D11400253254 /* MenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8917A3D82CA4D10F00253254 /* MenuView.swift */; };
+		8917A3DB2CA4D87400253254 /* AccountInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8917A3DA2CA4D86100253254 /* AccountInfoView.swift */; };
 		89AD20A72C93E39A00EC5BDB /* (null) in Sources */ = {isa = PBXBuildFile; };
 		89AD20A92C9500C800EC5BDB /* (null) in Sources */ = {isa = PBXBuildFile; };
 		89FA8A432C9A6F39005480D8 /* generalMusicPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89FA8A422C9A6F39005480D8 /* generalMusicPreferences.swift */; };
@@ -77,6 +79,8 @@
 		6EA47A752C9E52C7006FB5C6 /* SpotifyiOS.xcframework */ = {isa = PBXFileReference; expectedSignature = "AppleDeveloperProgram:2FNC3A47ZF:Spotify"; lastKnownFileType = wrapper.xcframework; path = SpotifyiOS.xcframework; sourceTree = "<group>"; };
 		6EEDBF482CA3B9470079295D /* SplashPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashPage.swift; sourceTree = "<group>"; };
 		6EFE6C522C9E4AD40000DE46 /* Moodify-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Moodify-Bridging-Header.h"; sourceTree = "<group>"; };
+		8917A3D82CA4D10F00253254 /* MenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuView.swift; sourceTree = "<group>"; };
+		8917A3DA2CA4D86100253254 /* AccountInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountInfoView.swift; sourceTree = "<group>"; };
 		89FA8A422C9A6F39005480D8 /* generalMusicPreferences.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = generalMusicPreferences.swift; sourceTree = "<group>"; };
 		89FA8A442C9A6F40005480D8 /* Questionnaire.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Questionnaire.swift; sourceTree = "<group>"; };
 		89FA8A462C9A6F4D005480D8 /* homePageView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = homePageView.swift; sourceTree = "<group>"; };
@@ -174,6 +178,8 @@
 		694B6C002C9A4431002F0931 /* Frontend */ = {
 			isa = PBXGroup;
 			children = (
+				8917A3DA2CA4D86100253254 /* AccountInfoView.swift */,
+				8917A3D82CA4D10F00253254 /* MenuView.swift */,
 				6EEDBF482CA3B9470079295D /* SplashPage.swift */,
 				89FA8A462C9A6F4D005480D8 /* homePageView.swift */,
 				89FA8A442C9A6F40005480D8 /* Questionnaire.swift */,
@@ -326,8 +332,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				6EA47A702C9E5199006FB5C6 /* SpotifyController.swift in Sources */,
+				8917A3D92CA4D11400253254 /* MenuView.swift in Sources */,
 				6934A10F2C8FDA840086CC91 /* ConnectToSpotify.swift in Sources */,
 				89FA8A432C9A6F39005480D8 /* generalMusicPreferences.swift in Sources */,
+				8917A3DB2CA4D87400253254 /* AccountInfoView.swift in Sources */,
 				694B6C012C9A4431002F0931 /* (null) in Sources */,
 				694B6C032C9A4483002F0931 /* (null) in Sources */,
 				BA6927902CA45D550082E840 /* EmotionDetection.swift in Sources */,
@@ -519,7 +527,7 @@
 				);
 				MARKETING_VERSION = 1.0;
 				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_BUNDLE_IDENTIFIER = Capstone.Moodify;
+				PRODUCT_BUNDLE_IDENTIFIER = CapstoneMoodify;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "Moodify/Moodify-Bridging-Header.h";
@@ -555,7 +563,7 @@
 				);
 				MARKETING_VERSION = 1.0;
 				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_BUNDLE_IDENTIFIER = Capstone.Moodify;
+				PRODUCT_BUNDLE_IDENTIFIER = CapstoneMoodify;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "Moodify/Moodify-Bridging-Header.h";
