@@ -105,9 +105,13 @@ struct homePageView: View {
             .onChange(of: capturedImage) { newImage in
                 if let newImage = newImage {
                     isDetectingMood = false
-                    let emotion = model.detectEmotion(in: newImage)!.target
-                    currentMoodText = emotion.prefix(1).uppercased() + emotion.dropFirst()
-                    currentMood = emotionToEmoji(emotion)
+                    if let result = model.detectEmotion(in: newImage) {
+                        let emotion = result.target
+                        let probability = result.targetProbability
+                        currentMoodText = emotion.prefix(1).uppercased() + emotion.dropFirst()
+                        currentMood = emotionToEmoji(emotion)
+                        print(probability)
+                    }
                 }
             }
             .onChange(of: model.error) { newError in
