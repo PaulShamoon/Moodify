@@ -1,10 +1,17 @@
 import SwiftUI
+import AVFoundation
 
 struct homePageView: View {
-    @State private var currentMood: String = "😊"
+    @StateObject private var model = EmotionDetection()
+    @State private var showingCamera = false
+    @State private var showingAlert = false
+    @State private var alertMessage = ""
+    @State private var capturedImage: UIImage?
+    @State private var currentMood: String = "😶"
+    @State private var currentMoodText: String = ""
     @State private var isDetectingMood: Bool = false
     @StateObject var spotifyController = SpotifyController()
-    @State private var navigateToSpotify = false // Add state for navigation
+    @State private var navigateToSpotify = false // State for navigation
     @State private var showMenu = false // State to show/hide the side menu
 
     var body: some View {
@@ -15,7 +22,7 @@ struct homePageView: View {
                         .edgesIgnoringSafeArea(.all)
 
                     VStack(spacing: 30) {
-                        // Header
+                        // Header with menu button
                         HStack {
                             Spacer()
                             Button(action: {
@@ -62,16 +69,19 @@ struct homePageView: View {
                                     .padding()
                                     .background(Circle().fill(Color.gray.opacity(0.4)))
                                     .shadow(radius: 10)
+
+                                Text(currentMoodText)
+                                    .font(.system(size: 22, weight: .medium, design: .rounded))
+                                    .foregroundColor(.white)
                             }
                         }
 
                         // Detect Mood Button
                         Button(action: {
-                            isDetectingMood.toggle()
-                            detectMood()
+                            checkCameraPermission()
                         }) {
                             HStack {
-                                Image(systemName: "waveform.path.ecg")
+                                Image(systemName: "camera")
                                     .font(.title2)
                                     .foregroundColor(.black)
                                 Text(isDetectingMood ? "Detecting..." : "Detect Mood")
@@ -102,8 +112,6 @@ struct homePageView: View {
                         Spacer()
                     }
                     .padding(.top, 60)
-
-                    // Navigation Destination for Spotify Connect
                     .navigationDestination(isPresented: $navigateToSpotify) {
                         ConnectToSpotifyDisplay(spotifyController: spotifyController)
                     }
@@ -113,21 +121,119 @@ struct homePageView: View {
             // Overlay the Menu if showMenu is true
             if showMenu {
                 MenuView(showMenu: $showMenu)
-                    .transition(.move(edge: .trailing)) // Slide in from the left
+                    .transition(.move(edge: .trailing)) // Slide in from the right
+            }
+        }
+        .sheet(isPresented: $showingCamera) {
+            CameraView(image: $capturedImage)
+        }
+        .alert(isPresented: $showingAlert) {
+            Alert(title: Text("Error"), message: Text(alertMessage), dismissButton: .default(Text("OK")))
+        }
+        .onChange(of: capturedImage) { newImage in
+            if let newImage = newImage {
+                isDetectingMood = false
+                if let result = model.detectEmotion(in: newImage) {
+                    let emotion = result.target
+                    let probability = result.targetProbability
+                    currentMoodText = emotion.prefix(1).uppercased() + emotion.dropFirst()
+                    currentMood = emotionToEmoji(emotion)
+                    print(probability)
+                }
+            }
+        }
+        .onChange(of: model.error) { newError in
+            if let error = newError {
+                alertMessage = error
+                showingAlert = true
+                isDetectingMood = false
             }
         }
     }
 
-    // Detect Mood Logic
-    func detectMood() {
-        let moods = ["😊", "😢", "😡", "😴", "😍", "😎", "🤔"]
-        currentMood = moods.randomElement() ?? "😊"
-        isDetectingMood = false
+    private func checkCameraPermission() {
+        switch AVCaptureDevice.authorizationStatus(for: .video) {
+        case .authorized:
+            showingCamera = true
+        case .notDetermined:
+            AVCaptureDevice.requestAccess(for: .video) { granted in
+                if granted {
+                    showingCamera = true
+                } else {
+                    alertMessage = "Camera access is required to detect mood."
+                    showingAlert = true
+                }
+            }
+        case .denied, .restricted:
+            alertMessage = "Camera access is required to detect mood. Please enable it in Settings."
+            showingAlert = true
+        @unknown default:
+            alertMessage = "Unexpected error occurred while accessing the camera."
+            showingAlert = true
+        }
+    }
+
+    private func emotionToEmoji(_ emotion: String) -> String {
+        switch emotion.lowercased() {
+        case "happy":
+            return "😊"
+        case "sad":
+            return "😢"
+        case "angry":
+            return "😡"
+        case "neutral":
+            return "😐"
+        default:
+            return "🤔"
+        }
+    }
+
+    // Placeholder: Spotify API Integration
+    func connectSpotify() {
+        spotifyController.connect()
     }
 }
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         homePageView()
+    }
+}
+
+struct CameraView: UIViewControllerRepresentable {
+    @Binding var image: UIImage?
+    @Environment(\.presentationMode) private var presentationMode
+    
+    func makeUIViewController(context: Context) -> UIImagePickerController {
+        let picker = UIImagePickerController()
+        picker.sourceType = .camera
+        picker.cameraDevice = .front
+        picker.delegate = context.coordinator
+        return picker
+    }
+    
+    func updateUIViewController(_ uiViewController: UIImagePickerController, context: Context) {}
+
+    func makeCoordinator() -> Coordinator {
+        Coordinator(self)
+    }
+
+    class Coordinator: NSObject, UINavigationControllerDelegate, UIImagePickerControllerDelegate {
+        let parent: CameraView
+        
+        init(_ parent: CameraView) {
+            self.parent = parent
+        }
+        
+        func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+            if let image = info[.originalImage] as? UIImage {
+                parent.image = image
+            }
+            parent.presentationMode.wrappedValue.dismiss()
+        }
+        
+        func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+            parent.presentationMode.wrappedValue.dismiss()
+        }
     }
 }
