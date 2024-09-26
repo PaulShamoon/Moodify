@@ -105,3 +105,8 @@ struct GeneralMusicPreferencesView: View {
         UserDefaults.standard.set(Array(selectedGenres), forKey: "selectedGenres")
     }
 }
+struct GeneralMusicPreferencesView_Previews: PreviewProvider {
+    static var previews: some View {
+        GeneralMusicPreferencesView(navigateToHomePage: .constant(false))
+    }
+}
