@@ -1,4 +1,5 @@
 import SwiftUI
+import PDFKit
 
 struct QuestionnaireView: View {
     @State private var firstname: String = ""
@@ -10,9 +11,11 @@ struct QuestionnaireView: View {
     
     @Environment(\.presentationMode) var presentationMode // Used to dismiss the view smoothly
 
-    let genders = ["Male", "Female", "Prefer not to say"]
+    @State private var showingPDF = false
     
-    // Determine if the user is editing through the hamburger menu (i.e., they've already agreed to terms)
+    let genders = ["Male", "Female", "Prefer not to say"]
+
+    // Determine if the user is editing through the hamburger menu
     @State private var hasAgreedToTerms: Bool = false // Flag to track if the user already agreed to terms
     
     var body: some View {
@@ -76,6 +79,16 @@ struct QuestionnaireView: View {
                 .pickerStyle(SegmentedPickerStyle())
                 .foregroundColor(.white)
                 
+                // "Read Terms of Service" Button
+                Button(action: {
+                    showingPDF = true // Show the PDF when button is clicked
+                }) {
+                    Text("Read Terms of Service")
+                        .font(.system(size: 18))
+                        .foregroundColor(.green)
+                        .padding(.top)
+                }
+
                 // Only show Terms of Service toggle if they haven't agreed yet
                 if !hasAgreedToTerms {
                     Toggle(isOn: $agreedToTerms) {
@@ -122,6 +135,10 @@ struct QuestionnaireView: View {
                 loadFormData() // Load the saved data when the view appears
                 checkAgreedToTerms() // Check if the user already agreed to terms
             }
+            // Present the PDF viewer in a sheet
+            .sheet(isPresented: $showingPDF) {
+                PDFViewerView()
+            }
         }
     }
     
@@ -161,6 +178,31 @@ struct QuestionnaireView: View {
     func checkAgreedToTerms() {
         hasAgreedToTerms = UserDefaults.standard.bool(forKey: "hasAgreedToTerms")
     }
+}
+
+// PDF Viewer to display the PDF file
+struct PDFViewerView: View {
+    var body: some View {
+        if let pdfURL = Bundle.main.url(forResource: "TermsofService", withExtension: "pdf") {
+            PDFKitView(url: pdfURL)
+        } else {
+            Text("PDF not found")
+        }
+    }
+}
+
+// PDFKit View for displaying PDFs
+struct PDFKitView: UIViewRepresentable {
+    let url: URL
+    
+    func makeUIView(context: Context) -> PDFView {
+        let pdfView = PDFView()
+        pdfView.document = PDFDocument(url: url)
+        pdfView.autoScales = true
+        return pdfView
+    }
+    
+    func updateUIView(_ uiView: PDFView, context: Context) {}
 }
 
 struct QuestionnaireView_Previews: PreviewProvider {
