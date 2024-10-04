@@ -2,20 +2,14 @@ import SwiftUI
 import PDFKit
 
 struct QuestionnaireView: View {
-    @State private var firstname: String = ""
-    @State private var lastname: String = ""
+    @State private var name: String = ""
     @State private var age: Int = 18
-    @State private var selectedGender: String = "Male"
     @State private var agreedToTerms: Bool = false
     @Binding var navigateToMusicPreferences: Bool // Binding to control navigation
-    
+
     @Environment(\.presentationMode) var presentationMode // Used to dismiss the view smoothly
-
     @State private var showingPDF = false
-    
-    let genders = ["Male", "Female", "Prefer not to say"]
-
-    // Determine if the user is editing through the hamburger menu
+    @State private var showingTooltip = false // State to control showing tooltip for the name
     @State private var hasAgreedToTerms: Bool = false // Flag to track if the user already agreed to terms
     
     var body: some View {
@@ -25,36 +19,49 @@ struct QuestionnaireView: View {
                 .edgesIgnoringSafeArea(.all)
             
             VStack(alignment: .leading, spacing: 20) {
+                
                 // Title
-                Text("User Information")
-                    .font(.system(size: 24, weight: .bold, design: .rounded))
-                    .foregroundColor(.white)
-                    .padding(.top, 20)
-                
-                Text("First Name:")
-                    .font(.system(size: 20, weight: .bold, design: .rounded))
-                    .foregroundColor(.white)
-                    .padding(.top, 7)
-                
-                // First name input
-                TextField("First Name", text: $firstname)
+                HStack(spacing: 0) {
+                    Text("M")
+                        .font(.system(size: 30, weight: .bold, design: .rounded))
+                        .foregroundColor(Color(red: 0.0, green: 0.5, blue: 0.2))
+                    Text("oodify")
+                        .font(.system(size: 30, weight: .bold, design: .rounded))
+                        .foregroundColor(Color(red: 0.96, green: 0.87, blue: 0.70))
+                    
+                }
+                HStack {
+                    // Name input with info button
+                    Text("Name:")
+                        .font(.system(size: 20, weight: .bold, design: .rounded))
+                        .foregroundColor(.white)
+                        .padding(.top, 7)
+                    
+                    Button(action: {
+                        showingTooltip.toggle() // Toggle tooltip visibility
+                    }) {
+                        Image(systemName: "questionmark.circle")
+                            .foregroundColor(.gray)
+                    }
+                    
+                    // Tooltip text
+                    if showingTooltip {
+                        Text("We use your name for personalization and to provide a better interactive experience within the app.")
+                            .font(.system(size: 12))
+                            .foregroundColor(.white)
+                            .padding(.leading, 10)
+                            .frame(maxWidth: .infinity)
+                    }
+                }
+
+                // Name input
+                TextField("Enter your name", text: $name)
                     .padding()
                     .background(Color.gray.opacity(0.2))
                     .cornerRadius(10)
                     .foregroundColor(.white)
                 
-                Text("Last Name:")
-                    .font(.system(size: 20, weight: .bold, design: .rounded))
-                    .foregroundColor(.white)
-                    .padding(.top, 7)
-                
-                // Last name input
-                TextField("Last Name", text: $lastname)
-                    .padding()
-                    .background(Color.gray.opacity(0.2))
-                    .cornerRadius(10)
-                    .foregroundColor(.white)
-                
+                // Age input
                 Text("Age:")
                     .font(.system(size: 20, weight: .bold, design: .rounded))
                     .foregroundColor(.white)
@@ -68,15 +75,6 @@ struct QuestionnaireView: View {
                 }
                 .pickerStyle(WheelPickerStyle())
                 .frame(height: 100)
-                .foregroundColor(.white)
-                
-                // Gender selection
-                Picker("Gender", selection: $selectedGender) {
-                    ForEach(genders, id: \.self) { gender in
-                        Text(gender).tag(gender)
-                    }
-                }
-                .pickerStyle(SegmentedPickerStyle())
                 .foregroundColor(.white)
                 
                 // "Read Terms of Service" Button
@@ -145,33 +143,23 @@ struct QuestionnaireView: View {
     // Form validation
     func validateForm() -> Bool {
         // Validate only if terms of service toggle is visible and terms are agreed
-        return !firstname.isEmpty &&
-               !lastname.isEmpty &&
-               age > 0 &&
-               !selectedGender.isEmpty &&
-               (hasAgreedToTerms || agreedToTerms)
+        return !name.isEmpty && age > 0 && (hasAgreedToTerms || agreedToTerms)
     }
     
     // Form submission
     func submitForm() {
-        print("First Name: \(firstname)")
-        print("Last Name: \(lastname)")
+        print("Name: \(name)")
         print("Age: \(age)")
-        print("Gender: \(selectedGender)")
         print("Agreed to Terms: \(agreedToTerms)")
         // Save form data to UserDefaults
-        UserDefaults.standard.set(firstname, forKey: "firstname")
-        UserDefaults.standard.set(lastname, forKey: "lastname")
+        UserDefaults.standard.set(name, forKey: "name")
         UserDefaults.standard.set(age, forKey: "age")
-        UserDefaults.standard.set(selectedGender, forKey: "gender")
     }
 
     // Load saved form data from UserDefaults
     func loadFormData() {
-        firstname = UserDefaults.standard.string(forKey: "firstname") ?? ""
-        lastname = UserDefaults.standard.string(forKey: "lastname") ?? ""
+        name = UserDefaults.standard.string(forKey: "name") ?? ""
         age = UserDefaults.standard.integer(forKey: "age")
-        selectedGender = UserDefaults.standard.string(forKey: "gender") ?? "Male"
     }
     
     // Check if the user has already agreed to the terms
