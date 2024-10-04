@@ -3,15 +3,28 @@ import PDFKit
 
 struct QuestionnaireView: View {
     @State private var name: String = ""
-    @State private var age: Int = 18
+    @State private var dateOfBirth = Date() // State for date of birth
     @State private var agreedToTerms: Bool = false
     @Binding var navigateToMusicPreferences: Bool // Binding to control navigation
 
     @Environment(\.presentationMode) var presentationMode // Used to dismiss the view smoothly
     @State private var showingPDF = false
-    @State private var showingTooltip = false // State to control showing tooltip for the name
+    @State private var showingTooltip = false
+    @State private var showingTooltip1 = false
+
     @State private var hasAgreedToTerms: Bool = false // Flag to track if the user already agreed to terms
     
+    // Constant for minimum age requirement
+    let minimumAgeRequirement = 13
+
+    // Error states
+    @State private var nameError: String? = nil
+    @State private var ageError: String? = nil
+    @State private var termsError: String? = nil
+    
+    // Flag to show errors only after hitting the submit button
+    @State private var showErrorMessages = false
+
     var body: some View {
         ZStack {
             // Dark background with gradient
@@ -19,7 +32,6 @@ struct QuestionnaireView: View {
                 .edgesIgnoringSafeArea(.all)
             
             VStack(alignment: .leading, spacing: 20) {
-                
                 // Title
                 HStack(spacing: 0) {
                     Text("M")
@@ -28,25 +40,23 @@ struct QuestionnaireView: View {
                     Text("oodify")
                         .font(.system(size: 30, weight: .bold, design: .rounded))
                         .foregroundColor(Color(red: 0.96, green: 0.87, blue: 0.70))
-                    
                 }
+                
+                // Name input with tooltip
                 HStack {
-                    // Name input with info button
                     Text("Name:")
                         .font(.system(size: 20, weight: .bold, design: .rounded))
                         .foregroundColor(.white)
-                        .padding(.top, 7)
                     
                     Button(action: {
                         showingTooltip.toggle() // Toggle tooltip visibility
                     }) {
                         Image(systemName: "questionmark.circle")
-                            .foregroundColor(.gray)
+                            .foregroundColor(.green)
                     }
                     
-                    // Tooltip text
                     if showingTooltip {
-                        Text("We use your name for personalization and to provide a better interactive experience within the app.")
+                        Text("We use your name for personalization and to provide a better interactive experience.")
                             .font(.system(size: 12))
                             .foregroundColor(.white)
                             .padding(.leading, 10)
@@ -61,21 +71,50 @@ struct QuestionnaireView: View {
                     .cornerRadius(10)
                     .foregroundColor(.white)
                 
-                // Age input
-                Text("Age:")
-                    .font(.system(size: 20, weight: .bold, design: .rounded))
-                    .foregroundColor(.white)
-                    .padding(.top, 7)
-                
-                // Age picker
-                Picker("Age", selection: $age) {
-                    ForEach(0..<100) { age in
-                        Text("\(age)").tag(age)
+                // Name error message
+                if showErrorMessages, let nameError = nameError {
+                    Text(nameError)
+                        .font(.system(size: 14))
+                        .foregroundColor(.red)
+                }
+
+                // Date of Birth input with tooltip
+                HStack {
+                    Text("Date of Birth:")
+                        .font(.system(size: 20, weight: .bold, design: .rounded))
+                        .foregroundColor(.white)
+                    
+                    Button(action: {
+                        showingTooltip1.toggle()
+                    }) {
+                        Image(systemName: "questionmark.circle")
+                            .foregroundColor(.green)
+                    }
+                    
+                    if showingTooltip1 {
+                        Text("You must be at least 13 years old to use this app.")
+                            .font(.system(size: 12))
+                            .foregroundColor(.white)
+                            .padding(.leading, 10)
+                            .frame(maxWidth: .infinity)
                     }
                 }
-                .pickerStyle(WheelPickerStyle())
-                .frame(height: 100)
-                .foregroundColor(.white)
+
+                // DatePicker for Date of Birth
+                DatePicker("", selection: $dateOfBirth, in: ...Date(), displayedComponents: .date)
+                    .datePickerStyle(WheelDatePickerStyle())
+                    .labelsHidden()
+                    .frame(height: 100)
+                    .foregroundColor(.white)
+                    .padding(.vertical, 25) // Restore spacing
+                    .padding(.leading, 25) // Restore left padding
+                
+                // Age error message
+                if showErrorMessages, let ageError = ageError {
+                    Text(ageError)
+                        .font(.system(size: 14))
+                        .foregroundColor(.red)
+                }
                 
                 // "Read Terms of Service" Button
                 Button(action: {
@@ -84,34 +123,30 @@ struct QuestionnaireView: View {
                     Text("Read Terms of Service")
                         .font(.system(size: 18))
                         .foregroundColor(.green)
-                        .padding(.top)
                 }
 
-                // Only show Terms of Service toggle if they haven't agreed yet
+                // Terms of Service toggle (only if the user hasn't agreed yet)
                 if !hasAgreedToTerms {
                     Toggle(isOn: $agreedToTerms) {
                         Text("I agree to the Terms of Service")
                             .foregroundColor(.white)
                     }
+                    
+                    // Terms error message
+                    if showErrorMessages, let termsError = termsError {
+                        Text(termsError)
+                            .font(.system(size: 14))
+                            .foregroundColor(.red)
+                    }
                 }
-                
-                // Red warning text if form is incomplete
-                if !validateForm() {
-                    Text("All fields must be filled before submitting.")
-                        .font(.system(size: 14))
-                        .foregroundColor(.red)
-                        .padding(.top, 5)
-                }
-                
+
                 // Submit button
                 Button(action: {
+                    showErrorMessages = true // Show errors when the user clicks Submit
                     if validateForm() {
                         submitForm()
-                        if !hasAgreedToTerms {
-                            UserDefaults.standard.set(true, forKey: "hasAgreedToTerms") // Save agreement
-                        }
                         navigateToMusicPreferences = true // Trigger navigation
-                        presentationMode.wrappedValue.dismiss() // Dismiss the view smoothly to return to the menu
+                        presentationMode.wrappedValue.dismiss() // Dismiss the view smoothly
                     }
                 }) {
                     Text("Submit")
@@ -122,53 +157,83 @@ struct QuestionnaireView: View {
                         .background(LinearGradient(gradient: Gradient(colors: [Color.green, Color.green.opacity(0.8)]), startPoint: .leading, endPoint: .trailing))
                         .cornerRadius(12)
                         .shadow(radius: 10)
-                        .opacity(validateForm() ? 1.0 : 0.7)
                 }
-                .disabled(!validateForm())
                 
                 Spacer()
             }
             .padding()
             .onAppear {
-                loadFormData() // Load the saved data when the view appears
+                loadFormData() // Load saved data
                 checkAgreedToTerms() // Check if the user already agreed to terms
             }
-            // Present the PDF viewer in a sheet
             .sheet(isPresented: $showingPDF) {
                 PDFViewerView()
             }
         }
     }
-    
-    // Form validation
+
+    // Validation Function
     func validateForm() -> Bool {
-        // Validate only if terms of service toggle is visible and terms are agreed
-        return !name.isEmpty && age > 0 && (hasAgreedToTerms || agreedToTerms)
-    }
-    
-    // Form submission
-    func submitForm() {
-        print("Name: \(name)")
-        print("Age: \(age)")
-        print("Agreed to Terms: \(agreedToTerms)")
-        // Save form data to UserDefaults
-        UserDefaults.standard.set(name, forKey: "name")
-        UserDefaults.standard.set(age, forKey: "age")
+        var isValid = true
+        
+        // Name Validation
+        if name.isEmpty {
+            nameError = "Name is required."
+            isValid = false
+        } else {
+            nameError = nil
+        }
+        
+        // Age Validation
+        if !ageRestriction() {
+            ageError = "You must be at least 13 years old."
+            isValid = false
+        } else {
+            ageError = nil
+        }
+        
+        // Terms of Service Validation
+        if !agreedToTerms && !hasAgreedToTerms {
+            termsError = "You must agree to the Terms of Service."
+            isValid = false
+        } else {
+            termsError = nil
+        }
+        
+        return isValid
     }
 
-    // Load saved form data from UserDefaults
+    // Check if the user is at least 13 years old
+    func ageRestriction() -> Bool {
+        let calendar = Calendar.current
+        let age = calendar.dateComponents([.year], from: dateOfBirth, to: Date()).year ?? 0
+        return age >= minimumAgeRequirement
+    }
+
+    // Submit Form Data
+    func submitForm() {
+        print("Name: \(name)")
+        print("Date of Birth: \(dateOfBirth)")
+        print("Agreed to Terms: \(agreedToTerms)")
+        UserDefaults.standard.set(name, forKey: "name")
+        UserDefaults.standard.set(dateOfBirth, forKey: "dateOfBirth")
+        UserDefaults.standard.set(true, forKey: "hasAgreedToTerms") // Save that the user agreed to terms
+    }
+
+    // Load saved form data
     func loadFormData() {
         name = UserDefaults.standard.string(forKey: "name") ?? ""
-        age = UserDefaults.standard.integer(forKey: "age")
+        dateOfBirth = UserDefaults.standard.object(forKey: "dateOfBirth") as? Date ?? Date()
     }
-    
-    // Check if the user has already agreed to the terms
+
+    // Check if the user already agreed to terms
     func checkAgreedToTerms() {
         hasAgreedToTerms = UserDefaults.standard.bool(forKey: "hasAgreedToTerms")
+        agreedToTerms = hasAgreedToTerms // Make sure the toggle reflects the agreement state
     }
 }
 
-// PDF Viewer to display the PDF file
+// PDF Viewer
 struct PDFViewerView: View {
     var body: some View {
         if let pdfURL = Bundle.main.url(forResource: "TermsofService", withExtension: "pdf") {
@@ -192,6 +257,7 @@ struct PDFKitView: UIViewRepresentable {
     
     func updateUIView(_ uiView: PDFView, context: Context) {}
 }
+
 
 struct QuestionnaireView_Previews: PreviewProvider {
     static var previews: some View {

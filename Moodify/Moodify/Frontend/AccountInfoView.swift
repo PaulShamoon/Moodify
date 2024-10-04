@@ -1,16 +1,9 @@
-//
-//  AccountInfoView.swift
-//  Moodify
-//
-//  Created by Mahdi Sulaiman on 9/25/24.
-//
 import SwiftUI
 
 struct AccountInfoView: View {
-    @State private var firstname: String = ""
-    @State private var lastname: String = ""
-    @State private var age: Int = 0
-    @State private var gender: String = ""
+    @State private var name: String = ""
+    @State private var dateOfBirth = Date() // Store the date of birth
+    @State private var calculatedAge: Int = 0 // Calculated age from dateOfBirth
 
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
@@ -19,23 +12,14 @@ struct AccountInfoView: View {
                 .foregroundColor(.white)
                 .padding(.top, 20)
 
-            Text("First Name: \(firstname)")
+            Text("Name: \(name)")
                 .font(.title2)
                 .foregroundColor(.white)
 
-            Text("Last Name: \(lastname)")
+            Text("Age: \(calculatedAge)")
                 .font(.title2)
                 .foregroundColor(.white)
 
-            Text("Age: \(age)")
-                .font(.title2)
-                .foregroundColor(.white)
-
-            Text("Gender: \(gender)")
-                .font(.title2)
-                .foregroundColor(.white)
-
-            
             VStack(alignment: .leading, spacing: 20) {
                 // Links to Questionnaire and Preferences
                 NavigationLink(destination: QuestionnaireView(navigateToMusicPreferences: .constant(false))) {
@@ -43,7 +27,6 @@ struct AccountInfoView: View {
                         .font(.title2.italic())
                         .foregroundColor(.green)
                         .padding(.leading, 50)
-                    
                 }
             }
             Spacer()
@@ -51,21 +34,27 @@ struct AccountInfoView: View {
         .padding()
         .background(Color.black.edgesIgnoringSafeArea(.all))
         .onAppear {
-            loadUserData()
+            loadUserData() // Load saved user data
         }
     }
 
     // Function to load data from UserDefaults
     func loadUserData() {
-        firstname = UserDefaults.standard.string(forKey: "firstname") ?? "Unknown"
-        lastname = UserDefaults.standard.string(forKey: "lastname") ?? "Unknown"
-        age = UserDefaults.standard.integer(forKey: "age")
-        gender = UserDefaults.standard.string(forKey: "gender") ?? "Unknown"
+        name = UserDefaults.standard.string(forKey: "name") ?? "Unknown"
+        dateOfBirth = UserDefaults.standard.object(forKey: "dateOfBirth") as? Date ?? Date()
+        calculatedAge = calculateAge(from: dateOfBirth) // Calculate age based on dateOfBirth
+    }
+
+    // Function to calculate age from date of birth
+    func calculateAge(from date: Date) -> Int {
+        let calendar = Calendar.current
+        let ageComponents = calendar.dateComponents([.year], from: date, to: Date())
+        return ageComponents.year ?? 0
     }
 }
+
 struct AccountInfoView_Previews: PreviewProvider {
     static var previews: some View {
         AccountInfoView()
     }
 }
-
