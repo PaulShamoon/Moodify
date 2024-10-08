@@ -2,6 +2,7 @@ import SwiftUI
 import AVFoundation
 
 struct homePageView: View {
+    var profile: Profile // Accept a profile as a parameter
     @StateObject private var model = EmotionDetection()
     @State private var showingCamera = false
     @State private var showingAlert = false
@@ -37,9 +38,14 @@ struct homePageView: View {
                             .padding()
                         }
 
+                        // Display profile info
+                        Text("Welcome, \(profile.name)")
+                            .font(.title)
+                            .foregroundColor(.white)
+                            .padding()
+
                         // Title and Mood Display
                         VStack(spacing: 30) {
-                            // App Title
                             HStack(spacing: 0) {
                                 Text("M")
                                     .font(.system(size: 48, weight: .bold, design: .rounded))
@@ -194,9 +200,9 @@ struct homePageView: View {
     }
 }
 
-struct ContentView_Previews: PreviewProvider {
+struct homePageView_Previews: PreviewProvider {
     static var previews: some View {
-        homePageView()
+        homePageView(profile: Profile(name: "Test User", dateOfBirth: Date(), favoriteGenres: ["Pop", "Rock"])) // Mock profile for preview
     }
 }
 

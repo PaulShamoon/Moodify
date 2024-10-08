@@ -2,37 +2,31 @@ import SwiftUI
 import PDFKit
 
 struct QuestionnaireView: View {
-    @State private var name: String = ""
-    @State private var dateOfBirth = Date() // State for date of birth
+    @EnvironmentObject var profileManager: ProfileManager // Inject ProfileManager
     @State private var agreedToTerms: Bool = false
     @Binding var navigateToMusicPreferences: Bool // Binding to control navigation
 
-    @Environment(\.presentationMode) var presentationMode // Used to dismiss the view smoothly
+    @Environment(\.presentationMode) var presentationMode
     @State private var showingPDF = false
     @State private var showingTooltip = false
     @State private var showingTooltip1 = false
 
-    @State private var hasAgreedToTerms: Bool = false // Flag to track if the user already agreed to terms
+    @State private var hasAgreedToTerms: Bool = false // Track terms agreement
     
-    // Constant for minimum age requirement
-    let minimumAgeRequirement = 13
-
     // Error states
     @State private var nameError: String? = nil
     @State private var ageError: String? = nil
     @State private var termsError: String? = nil
     
-    // Flag to show errors only after hitting the submit button
+    // Show errors only after submit attempt
     @State private var showErrorMessages = false
 
     var body: some View {
         ZStack {
-            // Dark background with gradient
             LinearGradient(gradient: Gradient(colors: [Color.black, Color.gray.opacity(0.8)]), startPoint: .top, endPoint: .bottom)
                 .edgesIgnoringSafeArea(.all)
             
             VStack(alignment: .leading, spacing: 20) {
-                // Title
                 HStack(spacing: 0) {
                     Text("M")
                         .font(.system(size: 30, weight: .bold, design: .rounded))
@@ -56,7 +50,7 @@ struct QuestionnaireView: View {
                     }
                     
                     if showingTooltip {
-                        Text("We use your name for personalization and to provide a better interactive experience.")
+                        Text("We use your name for personalization.")
                             .font(.system(size: 12))
                             .foregroundColor(.white)
                             .padding(.leading, 10)
@@ -64,14 +58,13 @@ struct QuestionnaireView: View {
                     }
                 }
 
-                // Name input
-                TextField("Enter your name", text: $name)
+                TextField("Enter your name", text: $profileManager.tempName)
                     .padding()
                     .background(Color.gray.opacity(0.2))
                     .cornerRadius(10)
                     .foregroundColor(.white)
                 
-                // Name error message
+                // Show error if name is missing
                 if showErrorMessages, let nameError = nameError {
                     Text(nameError)
                         .font(.system(size: 14))
@@ -100,39 +93,38 @@ struct QuestionnaireView: View {
                     }
                 }
 
-                // DatePicker for Date of Birth
-                DatePicker("", selection: $dateOfBirth, in: ...Date(), displayedComponents: .date)
+                DatePicker("", selection: $profileManager.tempDateOfBirth, in: ...Date(), displayedComponents: .date)
                     .datePickerStyle(WheelDatePickerStyle())
                     .labelsHidden()
                     .frame(height: 100)
                     .foregroundColor(.white)
-                    .padding(.vertical, 25) // Restore spacing
-                    .padding(.leading, 25) // Restore left padding
+                    .padding(.vertical, 25)
+                    .padding(.leading, 25)
                 
-                // Age error message
+                // Show error if age is less than 13
                 if showErrorMessages, let ageError = ageError {
                     Text(ageError)
                         .font(.system(size: 14))
                         .foregroundColor(.red)
                 }
-                
-                // "Read Terms of Service" Button
+
+                // Terms of Service button and toggle
                 Button(action: {
-                    showingPDF = true // Show the PDF when button is clicked
+                    showingPDF = true // Show the PDF when clicked
                 }) {
                     Text("Read Terms of Service")
                         .font(.system(size: 18))
                         .foregroundColor(.green)
                 }
 
-                // Terms of Service toggle (only if the user hasn't agreed yet)
-                if !hasAgreedToTerms {
+                // Show the terms toggle only if the user hasn't agreed
+                if !profileManager.tempHasAgreedToTerms {
                     Toggle(isOn: $agreedToTerms) {
                         Text("I agree to the Terms of Service")
                             .foregroundColor(.white)
                     }
                     
-                    // Terms error message
+                    // Show error if terms are not agreed
                     if showErrorMessages, let termsError = termsError {
                         Text(termsError)
                             .font(.system(size: 14))
@@ -142,11 +134,12 @@ struct QuestionnaireView: View {
 
                 // Submit button
                 Button(action: {
-                    showErrorMessages = true // Show errors when the user clicks Submit
+                    showErrorMessages = true
                     if validateForm() {
-                        submitForm()
-                        navigateToMusicPreferences = true // Trigger navigation
-                        presentationMode.wrappedValue.dismiss() // Dismiss the view smoothly
+                        profileManager.tempHasAgreedToTerms = agreedToTerms || profileManager.tempHasAgreedToTerms // Save the terms agreement status only if applicable
+                        profileManager.saveProfile() // Save profile before moving to next page
+                        navigateToMusicPreferences = true // Go to music preferences after questionnaire
+                        presentationMode.wrappedValue.dismiss()
                     }
                 }) {
                     Text("Submit")
@@ -163,8 +156,8 @@ struct QuestionnaireView: View {
             }
             .padding()
             .onAppear {
-                loadFormData() // Load saved data
-                checkAgreedToTerms() // Check if the user already agreed to terms
+                loadProfileData() // Load the current profile's data when editing
+                checkAgreedToTerms()
             }
             .sheet(isPresented: $showingPDF) {
                 PDFViewerView()
@@ -172,28 +165,27 @@ struct QuestionnaireView: View {
         }
     }
 
-    // Validation Function
+    // Validation function
     func validateForm() -> Bool {
         var isValid = true
         
-        // Name Validation
-        if name.isEmpty {
+        if profileManager.tempName.isEmpty {
             nameError = "Name is required."
             isValid = false
         } else {
             nameError = nil
         }
         
-        // Age Validation
-        if !ageRestriction() {
+        let calendar = Calendar.current
+        let age = calendar.dateComponents([.year], from: profileManager.tempDateOfBirth, to: Date()).year ?? 0
+        if age < 13 {
             ageError = "You must be at least 13 years old."
             isValid = false
         } else {
             ageError = nil
         }
         
-        // Terms of Service Validation
-        if !agreedToTerms && !hasAgreedToTerms {
+        if !agreedToTerms && !profileManager.tempHasAgreedToTerms {
             termsError = "You must agree to the Terms of Service."
             isValid = false
         } else {
@@ -203,33 +195,17 @@ struct QuestionnaireView: View {
         return isValid
     }
 
-    // Check if the user is at least 13 years old
-    func ageRestriction() -> Bool {
-        let calendar = Calendar.current
-        let age = calendar.dateComponents([.year], from: dateOfBirth, to: Date()).year ?? 0
-        return age >= minimumAgeRequirement
+    func loadProfileData() {
+        if let profile = profileManager.currentProfile {
+            profileManager.tempName = profile.name
+            profileManager.tempDateOfBirth = profile.dateOfBirth
+            hasAgreedToTerms = profile.hasAgreedToTerms // Load whether the user has agreed to the terms
+        }
     }
 
-    // Submit Form Data
-    func submitForm() {
-        print("Name: \(name)")
-        print("Date of Birth: \(dateOfBirth)")
-        print("Agreed to Terms: \(agreedToTerms)")
-        UserDefaults.standard.set(name, forKey: "name")
-        UserDefaults.standard.set(dateOfBirth, forKey: "dateOfBirth")
-        UserDefaults.standard.set(true, forKey: "hasAgreedToTerms") // Save that the user agreed to terms
-    }
-
-    // Load saved form data
-    func loadFormData() {
-        name = UserDefaults.standard.string(forKey: "name") ?? ""
-        dateOfBirth = UserDefaults.standard.object(forKey: "dateOfBirth") as? Date ?? Date()
-    }
-
-    // Check if the user already agreed to terms
     func checkAgreedToTerms() {
-        hasAgreedToTerms = UserDefaults.standard.bool(forKey: "hasAgreedToTerms")
-        agreedToTerms = hasAgreedToTerms // Make sure the toggle reflects the agreement state
+        hasAgreedToTerms = profileManager.tempHasAgreedToTerms // Check if the terms were already agreed upon
+        agreedToTerms = hasAgreedToTerms // Set the agreed toggle appropriately
     }
 }
 
@@ -258,9 +234,19 @@ struct PDFKitView: UIViewRepresentable {
     func updateUIView(_ uiView: PDFView, context: Context) {}
 }
 
-
 struct QuestionnaireView_Previews: PreviewProvider {
+    @State static var navigateToMusicPreferences = false
+
     static var previews: some View {
-        QuestionnaireView(navigateToMusicPreferences: .constant(false))
+        NavigationView {
+            if navigateToMusicPreferences {
+                GeneralMusicPreferencesView(navigateToHomePage: .constant(false))
+                    .environmentObject(ProfileManager()) // Mock ProfileManager for preview
+            } else {
+                QuestionnaireView(navigateToMusicPreferences: $navigateToMusicPreferences)
+                    .environmentObject(ProfileManager()) // Mock ProfileManager for preview
+            }
+        }
     }
 }
+

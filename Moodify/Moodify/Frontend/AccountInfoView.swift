@@ -1,9 +1,7 @@
 import SwiftUI
 
 struct AccountInfoView: View {
-    @State private var name: String = ""
-    @State private var dateOfBirth = Date() // Store the date of birth
-    @State private var calculatedAge: Int = 0 // Calculated age from dateOfBirth
+    @EnvironmentObject var profileManager: ProfileManager
 
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
@@ -12,49 +10,46 @@ struct AccountInfoView: View {
                 .foregroundColor(.white)
                 .padding(.top, 20)
 
-            Text("Name: \(name)")
-                .font(.title2)
-                .foregroundColor(.white)
+            if let profile = profileManager.currentProfile {
+                Text("Name: \(profile.name)")
+                    .font(.title2)
+                    .foregroundColor(.white)
 
-            Text("Age: \(calculatedAge)")
-                .font(.title2)
-                .foregroundColor(.white)
+                Text("Age: \(calculateAge(from: profile.dateOfBirth))")
+                    .font(.title2)
+                    .foregroundColor(.white)
 
-            VStack(alignment: .leading, spacing: 20) {
-                // Links to Questionnaire and Preferences
-                NavigationLink(destination: QuestionnaireView(navigateToMusicPreferences: .constant(false))) {
-                    Text("Edit User Information")
-                        .font(.title2.italic())
-                        .foregroundColor(.green)
-                        .padding(.leading, 50)
+                if !profile.favoriteGenres.isEmpty {
+                    Text("Favorite Genres: \(profile.favoriteGenres.joined(separator: ", "))")
+                        .font(.title2)
+                        .foregroundColor(.white)
+                } else {
+                    Text("Favorite Genres: Not Set")
+                        .font(.title2)
+                        .foregroundColor(.white)
                 }
+
+                VStack(alignment: .leading, spacing: 20) {
+                    NavigationLink(destination: QuestionnaireView(navigateToMusicPreferences: .constant(true)).environmentObject(profileManager)) {
+                        Text("Edit User Information")
+                            .font(.title2.italic())
+                            .foregroundColor(.green)
+                            .padding(.leading, 50)
+                    }
+                }
+            } else {
+                Text("No Profile Selected")
+                    .foregroundColor(.red)
             }
             Spacer()
         }
         .padding()
         .background(Color.black.edgesIgnoringSafeArea(.all))
-        .onAppear {
-            loadUserData() // Load saved user data
-        }
     }
 
-    // Function to load data from UserDefaults
-    func loadUserData() {
-        name = UserDefaults.standard.string(forKey: "name") ?? "Unknown"
-        dateOfBirth = UserDefaults.standard.object(forKey: "dateOfBirth") as? Date ?? Date()
-        calculatedAge = calculateAge(from: dateOfBirth) // Calculate age based on dateOfBirth
-    }
-
-    // Function to calculate age from date of birth
     func calculateAge(from date: Date) -> Int {
         let calendar = Calendar.current
         let ageComponents = calendar.dateComponents([.year], from: date, to: Date())
         return ageComponents.year ?? 0
-    }
-}
-
-struct AccountInfoView_Previews: PreviewProvider {
-    static var previews: some View {
-        AccountInfoView()
     }
 }
