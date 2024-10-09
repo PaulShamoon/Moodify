@@ -200,11 +200,6 @@ struct homePageView: View {
     }
 }
 
-struct homePageView_Previews: PreviewProvider {
-    static var previews: some View {
-        homePageView(profile: Profile(name: "Test User", dateOfBirth: Date(), favoriteGenres: ["Pop", "Rock"])) // Mock profile for preview
-    }
-}
 
 struct CameraView: UIViewControllerRepresentable {
     @Binding var image: UIImage?

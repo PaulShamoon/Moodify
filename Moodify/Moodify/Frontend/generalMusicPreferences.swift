@@ -16,7 +16,7 @@ struct GeneralMusicPreferencesView: View {
                 .edgesIgnoringSafeArea(.all)
             
             VStack(spacing: 20) {
-                Text("\(profileManager.tempName), what are your favorite genres?")
+                Text("\(profileManager.currentProfile?.name ?? "User"), what are your favorite genres?")
                     .font(.system(size: 24, weight: .bold, design: .rounded))
                     .foregroundColor(.white)
                     .padding(.top, 20)
@@ -58,19 +58,21 @@ struct GeneralMusicPreferencesView: View {
                 }
 
                 Button(action: {
-                    if !selectedGenres.isEmpty {
-                        profileManager.tempSelectedGenres = Array(selectedGenres) // Save selected genres to profile
-                        profileManager.saveProfile() // Save the profile after genre selection
+                    // Always save the profile with the selected genres
+                    if let currentProfile = profileManager.currentProfile {
+                        profileManager.updateProfile(profile: currentProfile, name: currentProfile.name, dateOfBirth: currentProfile.dateOfBirth, favoriteGenres: Array(selectedGenres), hasAgreedToTerms: currentProfile.hasAgreedToTerms)
                     }
+                    
                     navigateToHomePage = true
                     presentationMode.wrappedValue.dismiss()
                 }) {
-                    Text("Submit")
+                    // Button label and color based on genre selection
+                    Text(selectedGenres.isEmpty ? "Skip" : "Submit")
                         .font(.system(size: 20, weight: .bold))
                         .foregroundColor(.black)
                         .padding()
                         .frame(maxWidth: .infinity)
-                        .background(LinearGradient(gradient: Gradient(colors: [Color.green, Color.green.opacity(0.8)]), startPoint: .leading, endPoint: .trailing))
+                        .background(LinearGradient(gradient: Gradient(colors: selectedGenres.isEmpty ? [Color.gray, Color.gray.opacity(0.8)] : [Color.green, Color.green.opacity(0.8)]), startPoint: .leading, endPoint: .trailing))
                         .cornerRadius(12)
                         .shadow(radius: 10)
                 }
@@ -87,6 +89,7 @@ struct GeneralMusicPreferencesView: View {
     }
 
     private func loadSelectedGenres() {
+        // Load the favorite genres from the current profile
         selectedGenres = Set(profileManager.currentProfile?.favoriteGenres ?? [])
         print("Loaded selected genres: \(selectedGenres)")
     }

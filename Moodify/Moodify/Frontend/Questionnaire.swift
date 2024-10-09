@@ -11,7 +11,9 @@ struct QuestionnaireView: View {
     @State private var showingTooltip = false
     @State private var showingTooltip1 = false
 
-    @State private var hasAgreedToTerms: Bool = false // Track terms agreement
+    // Form fields for the new profile
+    @State private var name: String = ""
+    @State private var dateOfBirth: Date = Date()
     
     // Error states
     @State private var nameError: String? = nil
@@ -25,6 +27,7 @@ struct QuestionnaireView: View {
                 .edgesIgnoringSafeArea(.all)
             
             VStack(alignment: .leading, spacing: 20) {
+                // App title
                 HStack(spacing: 0) {
                     Text("M")
                         .font(.system(size: 30, weight: .bold, design: .rounded))
@@ -56,7 +59,7 @@ struct QuestionnaireView: View {
                     }
                 }
 
-                TextField("Enter your name", text: $profileManager.tempName)
+                TextField("Enter your name", text: $name)
                     .padding()
                     .background(Color.gray.opacity(0.2))
                     .cornerRadius(10)
@@ -91,7 +94,7 @@ struct QuestionnaireView: View {
                     }
                 }
 
-                DatePicker("", selection: $profileManager.tempDateOfBirth, in: ...Date(), displayedComponents: .date)
+                DatePicker("", selection: $dateOfBirth, in: ...Date(), displayedComponents: .date)
                     .datePickerStyle(WheelDatePickerStyle())
                     .labelsHidden()
                     .frame(height: 100)
@@ -115,7 +118,7 @@ struct QuestionnaireView: View {
                 }
 
                 // Show the terms toggle only if the user hasn't agreed
-                if !profileManager.tempHasAgreedToTerms {
+                if !(profileManager.currentProfile?.hasAgreedToTerms ?? false) {
                     Toggle(isOn: $agreedToTerms) {
                         Text("I agree to the Terms of Service")
                             .foregroundColor(.white)
@@ -133,9 +136,14 @@ struct QuestionnaireView: View {
                 Button(action: {
                     showErrorMessages = true
                     if validateForm() {
-                        profileManager.tempHasAgreedToTerms = agreedToTerms || profileManager.tempHasAgreedToTerms // Save the terms agreement status only if applicable
-                        profileManager.saveProfile() // Save profile before moving to next page
-                        print("Saved profile after questionnaire: \(profileManager.currentProfile)")
+                        // Save or update the profile based on whether we're creating or editing
+                        if let profile = profileManager.currentProfile {
+                            profileManager.updateProfile(profile: profile, name: name, dateOfBirth: dateOfBirth, favoriteGenres: profile.favoriteGenres, hasAgreedToTerms: agreedToTerms)
+                        } else {
+                            profileManager.createProfile(name: name, dateOfBirth: dateOfBirth, favoriteGenres: [], hasAgreedToTerms: agreedToTerms)
+                        }
+                        
+                        print("Saved profile: \(profileManager.currentProfile?.name ?? "New Profile")")
                         navigateToMusicPreferences = true // Go to music preferences after questionnaire
                         presentationMode.wrappedValue.dismiss()
                     }
@@ -155,7 +163,6 @@ struct QuestionnaireView: View {
             .padding()
             .onAppear {
                 loadProfileData() // Load the current profile's data when editing
-                checkAgreedToTerms()
             }
             .sheet(isPresented: $showingPDF) {
                 PDFViewerView()
@@ -163,13 +170,13 @@ struct QuestionnaireView: View {
         }
     }
 
-
+    // Load data into the form fields from currentProfile, if it exists
     func loadProfileData() {
         if let profile = profileManager.currentProfile {
-            profileManager.tempName = profile.name
-            profileManager.tempDateOfBirth = profile.dateOfBirth
+            name = profile.name
+            dateOfBirth = profile.dateOfBirth
             agreedToTerms = profile.hasAgreedToTerms
-            print("Loaded profile data: \(profile)")
+            print("Loaded profile data: \(profile.name)")
         }
     }
 
@@ -177,7 +184,7 @@ struct QuestionnaireView: View {
     func validateForm() -> Bool {
         var isValid = true
         
-        if profileManager.tempName.isEmpty {
+        if name.isEmpty {
             nameError = "Name is required."
             isValid = false
         } else {
@@ -185,7 +192,7 @@ struct QuestionnaireView: View {
         }
         
         let calendar = Calendar.current
-        let age = calendar.dateComponents([.year], from: profileManager.tempDateOfBirth, to: Date()).year ?? 0
+        let age = calendar.dateComponents([.year], from: dateOfBirth, to: Date()).year ?? 0
         if age < 13 {
             ageError = "You must be at least 13 years old."
             isValid = false
@@ -193,7 +200,7 @@ struct QuestionnaireView: View {
             ageError = nil
         }
         
-        if !agreedToTerms && !profileManager.tempHasAgreedToTerms {
+        if !agreedToTerms && !(profileManager.currentProfile?.hasAgreedToTerms ?? false) {
             termsError = "You must agree to the Terms of Service."
             isValid = false
         } else {
@@ -201,13 +208,6 @@ struct QuestionnaireView: View {
         }
         
         return isValid
-    }
-
-
-    func checkAgreedToTerms() {
-        hasAgreedToTerms = profileManager.tempHasAgreedToTerms // Check if the terms were already agreed upon
-        agreedToTerms = hasAgreedToTerms // Set the agreed toggle appropriately
-        print("Agreed to terms: \(agreedToTerms)")
     }
 }
 
@@ -241,14 +241,8 @@ struct QuestionnaireView_Previews: PreviewProvider {
 
     static var previews: some View {
         NavigationView {
-            if navigateToMusicPreferences {
-                GeneralMusicPreferencesView(navigateToHomePage: .constant(false))
-                    .environmentObject(ProfileManager()) // Mock ProfileManager for preview
-            } else {
-                QuestionnaireView(navigateToMusicPreferences: $navigateToMusicPreferences)
-                    .environmentObject(ProfileManager()) // Mock ProfileManager for preview
-            }
+            QuestionnaireView(navigateToMusicPreferences: $navigateToMusicPreferences)
+                .environmentObject(ProfileManager()) // Mock ProfileManager for preview
         }
     }
 }
-

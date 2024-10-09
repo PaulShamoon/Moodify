@@ -11,6 +11,7 @@ struct AccountInfoView: View {
                 .padding(.top, 20)
 
             if let profile = profileManager.currentProfile {
+                // Display the profile's name and age
                 Text("Name: \(profile.name)")
                     .font(.title2)
                     .foregroundColor(.white)
@@ -19,6 +20,7 @@ struct AccountInfoView: View {
                     .font(.title2)
                     .foregroundColor(.white)
 
+                // Display the profile's favorite genres
                 if !profile.favoriteGenres.isEmpty {
                     Text("Favorite Genres: \(profile.favoriteGenres.joined(separator: ", "))")
                         .font(.title2)
@@ -29,6 +31,7 @@ struct AccountInfoView: View {
                         .foregroundColor(.white)
                 }
 
+                // Navigation link to edit user information
                 VStack(alignment: .leading, spacing: 20) {
                     NavigationLink(destination: QuestionnaireView(navigateToMusicPreferences: .constant(true)).environmentObject(profileManager)) {
                         Text("Edit User Information")
@@ -38,6 +41,7 @@ struct AccountInfoView: View {
                     }
                 }
             } else {
+                // Handle the case when no profile is selected
                 Text("No Profile Selected")
                     .foregroundColor(.red)
             }
@@ -47,9 +51,11 @@ struct AccountInfoView: View {
         .background(Color.black.edgesIgnoringSafeArea(.all))
     }
 
+    // Calculate age based on the date of birth
     func calculateAge(from date: Date) -> Int {
+        let now = Date()
         let calendar = Calendar.current
-        let ageComponents = calendar.dateComponents([.year], from: date, to: Date())
+        let ageComponents = calendar.dateComponents([.year], from: date, to: now)
         return ageComponents.year ?? 0
     }
 }

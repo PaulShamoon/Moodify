@@ -539,7 +539,7 @@
 				);
 				MARKETING_VERSION = 1.0;
 				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_BUNDLE_IDENTIFIER = CapstoneMoodify123;
+				PRODUCT_BUNDLE_IDENTIFIER = CapstoneMoodify;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "Moodify/Moodify-Bridging-Header.h";
@@ -575,7 +575,7 @@
 				);
 				MARKETING_VERSION = 1.0;
 				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_BUNDLE_IDENTIFIER = CapstoneMoodify123;
+				PRODUCT_BUNDLE_IDENTIFIER = CapstoneMoodify;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "Moodify/Moodify-Bridging-Header.h";
