@@ -17,8 +17,6 @@ struct QuestionnaireView: View {
     @State private var nameError: String? = nil
     @State private var ageError: String? = nil
     @State private var termsError: String? = nil
-    
-    // Show errors only after submit attempt
     @State private var showErrorMessages = false
 
     var body: some View {
@@ -104,7 +102,6 @@ struct QuestionnaireView: View {
                 // Show error if age is less than 13
                 if showErrorMessages, let ageError = ageError {
                     Text(ageError)
-                        .font(.system(size: 14))
                         .foregroundColor(.red)
                 }
 
@@ -138,6 +135,7 @@ struct QuestionnaireView: View {
                     if validateForm() {
                         profileManager.tempHasAgreedToTerms = agreedToTerms || profileManager.tempHasAgreedToTerms // Save the terms agreement status only if applicable
                         profileManager.saveProfile() // Save profile before moving to next page
+                        print("Saved profile after questionnaire: \(profileManager.currentProfile)")
                         navigateToMusicPreferences = true // Go to music preferences after questionnaire
                         presentationMode.wrappedValue.dismiss()
                     }
@@ -162,6 +160,16 @@ struct QuestionnaireView: View {
             .sheet(isPresented: $showingPDF) {
                 PDFViewerView()
             }
+        }
+    }
+
+
+    func loadProfileData() {
+        if let profile = profileManager.currentProfile {
+            profileManager.tempName = profile.name
+            profileManager.tempDateOfBirth = profile.dateOfBirth
+            agreedToTerms = profile.hasAgreedToTerms
+            print("Loaded profile data: \(profile)")
         }
     }
 
@@ -195,17 +203,11 @@ struct QuestionnaireView: View {
         return isValid
     }
 
-    func loadProfileData() {
-        if let profile = profileManager.currentProfile {
-            profileManager.tempName = profile.name
-            profileManager.tempDateOfBirth = profile.dateOfBirth
-            hasAgreedToTerms = profile.hasAgreedToTerms // Load whether the user has agreed to the terms
-        }
-    }
 
     func checkAgreedToTerms() {
         hasAgreedToTerms = profileManager.tempHasAgreedToTerms // Check if the terms were already agreed upon
         agreedToTerms = hasAgreedToTerms // Set the agreed toggle appropriately
+        print("Agreed to terms: \(agreedToTerms)")
     }
 }
 

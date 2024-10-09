@@ -87,9 +87,8 @@ struct GeneralMusicPreferencesView: View {
     }
 
     private func loadSelectedGenres() {
-        if let profileGenres = profileManager.currentProfile?.favoriteGenres {
-            selectedGenres = Set(profileGenres)
-        }
+        selectedGenres = Set(profileManager.currentProfile?.favoriteGenres ?? [])
+        print("Loaded selected genres: \(selectedGenres)")
     }
 
     private func toggleGenreSelection(genre: String) {
@@ -98,6 +97,7 @@ struct GeneralMusicPreferencesView: View {
         } else {
             selectedGenres.insert(genre)
         }
+        print("Current genres: \(selectedGenres)")
     }
 }
 
