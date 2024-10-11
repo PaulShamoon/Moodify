@@ -3,7 +3,9 @@ import SwiftUI
 struct ProfileSelectionView: View {
     @EnvironmentObject var profileManager: ProfileManager
     @Binding var navigateToHomePage: Bool
+    @Binding var isCreatingNewProfile: Bool // Binding to track new profile creation
     @State private var showingQuestionnaire = false
+    @State private var navigateToMusicPreferences = false
 
     var body: some View {
         VStack {
@@ -26,7 +28,8 @@ struct ProfileSelectionView: View {
 
             // Button to add a new profile
             Button(action: {
-                showingQuestionnaire = true
+                isCreatingNewProfile = true  // Mark that we're creating a new profile
+                showingQuestionnaire = true  // Open questionnaire for adding a new profile
             }) {
                 Text("Add Profile")
                     .font(.headline)
@@ -36,8 +39,15 @@ struct ProfileSelectionView: View {
                     .cornerRadius(8)
             }
             .sheet(isPresented: $showingQuestionnaire) {
-                QuestionnaireView(navigateToMusicPreferences: .constant(false))
+                QuestionnaireView(navigateToMusicPreferences: $navigateToMusicPreferences)
                     .environmentObject(profileManager)
+            }
+        }
+        .onChange(of: navigateToMusicPreferences) { value in
+            if value {
+                // Navigate to music preferences after completing the questionnaire
+                navigateToHomePage = false
+                showingQuestionnaire = false
             }
         }
     }
@@ -47,12 +57,5 @@ struct ProfileSelectionView: View {
             let profile = profileManager.profiles[index]
             profileManager.deleteProfile(profile: profile)
         }
-    }
-}
-
-struct ProfileSelectionView_Previews: PreviewProvider {
-    static var previews: some View {
-        ProfileSelectionView(navigateToHomePage: .constant(false))
-            .environmentObject(ProfileManager()) // Provide a mock ProfileManager for preview
     }
 }
