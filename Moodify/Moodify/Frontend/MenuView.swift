@@ -3,6 +3,7 @@ import SwiftUI
 struct MenuView: View {
     @Binding var showMenu: Bool
     @EnvironmentObject var profileManager: ProfileManager // Use the existing profile manager
+    @Binding var navigateToHomePage: Bool // navigation to home
 
     var body: some View {
         ZStack {
@@ -46,6 +47,19 @@ struct MenuView: View {
                                 .foregroundColor(.white)
                                 .padding(.leading, 20)
                         }
+
+                        // Switch User Button
+                        Button(action: {
+                            profileManager.currentProfile = nil // Clear current profile
+                            navigateToHomePage = false // Go back to profile selection
+                            showMenu = false // Close menu
+                        }) {
+                            Text("Switch User")
+                                .font(.title2)
+                                .foregroundColor(.white)
+                                .padding(.leading, 20)
+                        }
+
                         Spacer()
                     }
                     .padding(.top, 40)

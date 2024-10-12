@@ -14,6 +14,8 @@ struct homePageView: View {
     @StateObject var spotifyController = SpotifyController()
     @State private var navigateToSpotify = false // State for navigation
     @State private var showMenu = false // State to show/hide the side menu
+    @Binding var navigateToHomePage: Bool // This will be passed from outside
+
 
     var body: some View {
         ZStack {
@@ -126,7 +128,7 @@ struct homePageView: View {
 
             // Overlay the Menu if showMenu is true
             if showMenu {
-                MenuView(showMenu: $showMenu)
+                MenuView(showMenu: $showMenu, navigateToHomePage: $navigateToHomePage)
                     .transition(.move(edge: .trailing)) // Slide in from the right
             }
         }
