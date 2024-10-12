@@ -42,10 +42,10 @@ struct MoodifyApp: App {
                         // For existing profiles, go to the home page or profile selection
                         if navigateToHomePage, let currentProfile = profileManager.currentProfile {
                             // Navigate to Home Page or main app content once the profile is selected
-                            homePageView(profile: currentProfile, navigateToHomePage: $navigateToHomePage)  // Pass profile to home page
+                            homePageView(profile: currentProfile, navigateToHomePage: $navigateToHomePage, isCreatingProfile: $isCreatingNewProfile, navigateToMusicPreferences: $navigateToMusicPreferences)  // Pass profile to home page
                                 .environmentObject(profileManager)
                         } else {
-                            ProfileSelectionView(navigateToHomePage: $navigateToHomePage, isCreatingNewProfile: $isCreatingNewProfile)
+                            ProfileSelectionView(navigateToHomePage: $navigateToHomePage, isCreatingNewProfile: $isCreatingNewProfile, navigateToMusicPreferences: $navigateToMusicPreferences)
                                 .environmentObject(profileManager)
                         }
                     }

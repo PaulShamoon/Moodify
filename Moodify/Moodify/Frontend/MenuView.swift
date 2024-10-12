@@ -4,6 +4,9 @@ struct MenuView: View {
     @Binding var showMenu: Bool
     @EnvironmentObject var profileManager: ProfileManager // Use the existing profile manager
     @Binding var navigateToHomePage: Bool // navigation to home
+    @Binding var isCreatingNewProfile: Bool
+    @Binding var navigateToMusicPreferences: Bool
+
 
     var body: some View {
         ZStack {
@@ -50,9 +53,8 @@ struct MenuView: View {
 
                         // Switch User Button
                         Button(action: {
-                            profileManager.currentProfile = nil // Clear current profile
-                            navigateToHomePage = false // Go back to profile selection
-                            showMenu = false // Close menu
+                            switchUser() // Call the switch user function
+                            showMenu = false
                         }) {
                             Text("Switch User")
                                 .font(.title2)
@@ -70,5 +72,13 @@ struct MenuView: View {
             }
         }
         .navigationBarHidden(true)
+    }
+
+    private func switchUser() {
+        // Reset the app states to ensure proper navigation
+        profileManager.currentProfile = nil
+        isCreatingNewProfile = false
+        navigateToHomePage = false
+        navigateToMusicPreferences = false
     }
 }

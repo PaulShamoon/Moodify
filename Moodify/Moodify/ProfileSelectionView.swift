@@ -5,7 +5,7 @@ struct ProfileSelectionView: View {
     @Binding var navigateToHomePage: Bool
     @Binding var isCreatingNewProfile: Bool // Binding to track new profile creation
     @State private var showingQuestionnaire = false
-    @State private var navigateToMusicPreferences = false
+    @Binding var navigateToMusicPreferences: Bool
 
     var body: some View {
         VStack {
@@ -28,7 +28,7 @@ struct ProfileSelectionView: View {
 
             // Button to add a new profile
             Button(action: {
-                isCreatingNewProfile = true  // Mark that we're creating a new profile
+                resetProfileCreationState()
                 showingQuestionnaire = true  // Open questionnaire for adding a new profile
             }) {
                 Text("Add Profile")
@@ -57,5 +57,11 @@ struct ProfileSelectionView: View {
             let profile = profileManager.profiles[index]
             profileManager.deleteProfile(profile: profile)
         }
+    }
+
+    private func resetProfileCreationState() {
+        isCreatingNewProfile = true
+        navigateToHomePage = false
+        navigateToMusicPreferences = false
     }
 }
