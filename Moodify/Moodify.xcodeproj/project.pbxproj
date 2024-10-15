@@ -23,6 +23,7 @@
 		6EEDBF492CA3B94D0079295D /* SplashPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EEDBF482CA3B9470079295D /* SplashPage.swift */; };
 		8917A3D92CA4D11400253254 /* MenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8917A3D82CA4D10F00253254 /* MenuView.swift */; };
 		8917A3DB2CA4D87400253254 /* AccountInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8917A3DA2CA4D86100253254 /* AccountInfoView.swift */; };
+		898A9D5C2CBF14F900F941C4 /* TermsofService.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 898A9D5B2CBF14F900F941C4 /* TermsofService.pdf */; };
 		89AD05632CB083B8004D8FAD /* Profile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89AD05622CB083B3004D8FAD /* Profile.swift */; };
 		89AD05652CB08452004D8FAD /* ProfileManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89AD05642CB08439004D8FAD /* ProfileManager.swift */; };
 		89AD05672CB0847D004D8FAD /* ProfileSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89AD05662CB08474004D8FAD /* ProfileSelectionView.swift */; };
@@ -84,6 +85,7 @@
 		6EFE6C522C9E4AD40000DE46 /* Moodify-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Moodify-Bridging-Header.h"; sourceTree = "<group>"; };
 		8917A3D82CA4D10F00253254 /* MenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuView.swift; sourceTree = "<group>"; };
 		8917A3DA2CA4D86100253254 /* AccountInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountInfoView.swift; sourceTree = "<group>"; };
+		898A9D5B2CBF14F900F941C4 /* TermsofService.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = TermsofService.pdf; path = Moodify/TermsofService.pdf; sourceTree = "<group>"; };
 		89AD05622CB083B3004D8FAD /* Profile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Profile.swift; sourceTree = "<group>"; };
 		89AD05642CB08439004D8FAD /* ProfileManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileManager.swift; sourceTree = "<group>"; };
 		89AD05662CB08474004D8FAD /* ProfileSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileSelectionView.swift; sourceTree = "<group>"; };
@@ -123,6 +125,7 @@
 		6934A1002C8FDA830086CC91 = {
 			isa = PBXGroup;
 			children = (
+				898A9D5B2CBF14F900F941C4 /* TermsofService.pdf */,
 				6934A10B2C8FDA840086CC91 /* Moodify */,
 				6934A11C2C8FDA850086CC91 /* MoodifyTests */,
 				6934A1262C8FDA850086CC91 /* MoodifyUITests */,
@@ -313,6 +316,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				898A9D5C2CBF14F900F941C4 /* TermsofService.pdf in Resources */,
 				6934A1142C8FDA840086CC91 /* Preview Assets.xcassets in Resources */,
 				6EA47A6C2C9E50D3006FB5C6 /* Moodify.plist in Resources */,
 				6934A1112C8FDA840086CC91 /* Assets.xcassets in Resources */,
