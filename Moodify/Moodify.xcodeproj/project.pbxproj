@@ -143,7 +143,6 @@
 		6934A10B2C8FDA840086CC91 /* Moodify */ = {
 			isa = PBXGroup;
 			children = (
-				89AD05662CB08474004D8FAD /* ProfileSelectionView.swift */,
 				89AD05642CB08439004D8FAD /* ProfileManager.swift */,
 				89AD05622CB083B3004D8FAD /* Profile.swift */,
 				BA69278F2CA45D550082E840 /* AIModel */,
@@ -188,6 +187,7 @@
 			isa = PBXGroup;
 			children = (
 				8917A3DA2CA4D86100253254 /* AccountInfoView.swift */,
+				89AD05662CB08474004D8FAD /* ProfileSelectionView.swift */,
 				8917A3D82CA4D10F00253254 /* MenuView.swift */,
 				6EEDBF482CA3B9470079295D /* SplashPage.swift */,
 				89FA8A462C9A6F4D005480D8 /* homePageView.swift */,

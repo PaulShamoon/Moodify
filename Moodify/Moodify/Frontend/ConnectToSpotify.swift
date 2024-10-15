@@ -33,7 +33,7 @@ struct ConnectToSpotifyDisplay: View {
                 }
                 .padding()
                 .background(Color.green)
-                .foregroundColor(Color.white)
+                .foregroundColor(Color.black)
                 .cornerRadius(10)
             }
         }
@@ -45,4 +45,3 @@ struct ConnectToSpotifyDisplay: View {
         }
     }
 }
-
