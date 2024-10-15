@@ -39,12 +39,11 @@ class ProfileManager: ObservableObject {
 
     // Delete a profile
     func deleteProfile(profile: Profile) {
-        profiles.removeAll { $0.id == profile.id }
-        saveProfiles()
-        if currentProfile?.id == profile.id {
-            currentProfile = nil
+            if let index = profiles.firstIndex(where: { $0.id == profile.id }) {
+                profiles.remove(at: index)
+            }
+            saveProfiles() 
         }
-    }
 
     private func saveProfiles() {
         if let encoded = try? JSONEncoder().encode(profiles) {

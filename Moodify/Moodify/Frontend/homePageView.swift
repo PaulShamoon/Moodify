@@ -124,6 +124,10 @@ struct homePageView: View {
                     .navigationDestination(isPresented: $navigateToSpotify) {
                         ConnectToSpotifyDisplay(spotifyController: spotifyController)
                     }
+                    .alert(isPresented: $showingAlert) {
+                        Alert(title: Text("Error"), message: Text(alertMessage), dismissButton: .default(Text("OK")))
+                    }
+
                 }
             }
 
@@ -131,13 +135,11 @@ struct homePageView: View {
             if showMenu {
                 MenuView(showMenu: $showMenu, navigateToHomePage: $navigateToHomePage, isCreatingNewProfile: $isCreatingProfile, navigateToMusicPreferences: $navigateToMusicPreferences)
                     .transition(.move(edge: .trailing)) // Slide in from the right
+                    .zIndex(1) // Ensure the menu is above the main content
             }
         }
         .sheet(isPresented: $showingCamera) {
             CameraView(image: $capturedImage)
-        }
-        .alert(isPresented: $showingAlert) {
-            Alert(title: Text("Error"), message: Text(alertMessage), dismissButton: .default(Text("OK")))
         }
         .onChange(of: capturedImage) { newImage in
             if let newImage = newImage {

@@ -23,7 +23,6 @@ struct ProfileSelectionView: View {
                             .foregroundColor(.primary)
                     }
                 }
-                .onDelete(perform: deleteProfile)
             }
 
             // Button to add a new profile
@@ -49,13 +48,6 @@ struct ProfileSelectionView: View {
                 navigateToHomePage = false
                 showingQuestionnaire = false
             }
-        }
-    }
-
-    private func deleteProfile(at offsets: IndexSet) {
-        offsets.forEach { index in
-            let profile = profileManager.profiles[index]
-            profileManager.deleteProfile(profile: profile)
         }
     }
 

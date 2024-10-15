@@ -6,13 +6,15 @@ struct MenuView: View {
     @Binding var navigateToHomePage: Bool // navigation to home
     @Binding var isCreatingNewProfile: Bool
     @Binding var navigateToMusicPreferences: Bool
-
+    @State private var showingDeleteAlert = false
 
     var body: some View {
         ZStack {
             // Dim background with gradient when menu is shown
             LinearGradient(gradient: Gradient(colors: [Color.black, Color.gray.opacity(0.8)]), startPoint: .top, endPoint: .bottom)
                 .edgesIgnoringSafeArea(.all)
+                .opacity(showMenu ? 1 : 0) // Show only when menu is visible
+                .disabled(!showMenu) // Disable interaction when menu is hidden
 
             HStack {
                 Spacer() // Pushes the menu to the right side
@@ -32,7 +34,9 @@ struct MenuView: View {
                         .padding(.leading, 20)
                         Spacer()
                     }
+
                     Spacer()
+
                     VStack(alignment: .leading, spacing: 20) {
                         // Account Information Link
                         NavigationLink(destination: AccountInfoView().environmentObject(profileManager)) { // Use the shared ProfileManager
@@ -62,6 +66,25 @@ struct MenuView: View {
                                 .padding(.leading, 20)
                         }
 
+                        Button(action: {
+                            showingDeleteAlert = true
+                        }) {
+                            Text("Delete Profile")
+                                .font(.title2)
+                                .foregroundColor(.white)
+                                .padding(.leading, 20)
+                        }
+                        .alert(isPresented: $showingDeleteAlert) {
+                            Alert(
+                                title: Text("Delete Profile"),
+                                message: Text("Are you sure you want to delete the current profile?"),
+                                primaryButton: .destructive(Text("Delete")) {
+                                    deleteProfile()
+                                },
+                                secondaryButton: .cancel()
+                            )
+                        }
+
                         Spacer()
                     }
                     .padding(.top, 40)
@@ -80,5 +103,15 @@ struct MenuView: View {
         isCreatingNewProfile = false
         navigateToHomePage = false
         navigateToMusicPreferences = false
+    }
+
+    private func deleteProfile() {
+        if let currentProfile = profileManager.currentProfile {
+            profileManager.deleteProfile(profile: currentProfile)
+            profileManager.currentProfile = nil
+            isCreatingNewProfile = false
+            navigateToHomePage = false
+            navigateToMusicPreferences = false
+        }
     }
 }
