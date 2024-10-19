@@ -96,8 +96,10 @@ struct MenuView: View {
                                 .padding(.leading, 20)
                         }
                         .sheet(isPresented: $showingPinSetup) {
-                            PinSetupView(profile: profileManager.currentProfile)
-                                .environmentObject(profileManager)
+                            if let currentProfile = profileManager.currentProfile {
+                                PinSetupView(profile: currentProfile)
+                                    .environmentObject(profileManager)
+                            }
                         }
 
                         Spacer()
