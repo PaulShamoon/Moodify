@@ -19,13 +19,14 @@ class ProfileManager: ObservableObject {
     }
 
     // Update an existing profile
-    func updateProfile(profile: Profile, name: String, dateOfBirth: Date, favoriteGenres: [String], hasAgreedToTerms: Bool) {
+    func updateProfile(profile: Profile, name: String, dateOfBirth: Date, favoriteGenres: [String], hasAgreedToTerms: Bool, userPin: String?, userEmail: String?) {
         if let index = profiles.firstIndex(where: { $0.id == profile.id }) {
             profiles[index].name = name
             profiles[index].dateOfBirth = dateOfBirth
             profiles[index].favoriteGenres = favoriteGenres
             profiles[index].hasAgreedToTerms = hasAgreedToTerms
-            
+            profiles[index].userPin = userPin
+            profiles[index].userEmail = userEmail
             // Save profiles and trigger view update
             saveProfiles()
             selectProfile(profiles[index])  // Reassign currentProfile to trigger view update
@@ -57,5 +58,10 @@ class ProfileManager: ObservableObject {
             profiles = decodedProfiles
         }
     }
+    
+    func verifyPin(for profile: Profile, enteredPin: String) -> Bool {
+        return profile.userPin == enteredPin
+    }
+
 }
 

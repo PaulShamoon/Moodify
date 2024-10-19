@@ -31,7 +31,7 @@ struct PinSetupView: View {
                 .cornerRadius(10)
                 .frame(width: 200)
 
-            if profile?.userPin == nil {
+            if profile?.userEmail == nil {
                 TextField("Enter Recovery Email", text: $email)
                     .keyboardType(.emailAddress)
                     .padding()
@@ -39,6 +39,8 @@ struct PinSetupView: View {
                     .cornerRadius(10)
                     .autocapitalization(.none)
             }
+            
+            
 
             if showError {
                 Text(errorMessage)
@@ -75,16 +77,20 @@ struct PinSetupView: View {
         }
 
         if let profile = profile {
-            // Update profile with new PIN and email if it's a new setup
             profileManager.updateProfile(
                 profile: profile,
                 name: profile.name,
                 dateOfBirth: profile.dateOfBirth,
                 favoriteGenres: profile.favoriteGenres,
-                hasAgreedToTerms: profile.hasAgreedToTerms
+                hasAgreedToTerms: profile.hasAgreedToTerms,
+                userPin: pin,
+                userEmail: profile.userPin == nil ? email : profile.userEmail
             )
-            profileManager.currentProfile?.userPin = pin
-            profileManager.currentProfile?.userEmail = email
+
+            // Print statement for debugging
+            print("Stored PIN for profile: \(profileManager.currentProfile?.userPin ?? "No PIN set")")
+            print("Stored Recovery Email: \(profileManager.currentProfile?.userEmail ?? "No email set")")
+            // Close the view
             presentationMode.wrappedValue.dismiss()
         }
     }

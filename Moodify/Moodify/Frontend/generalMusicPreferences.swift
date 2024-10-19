@@ -60,7 +60,7 @@ struct GeneralMusicPreferencesView: View {
                 Button(action: {
                     // Always save the profile with the selected genres
                     if let currentProfile = profileManager.currentProfile {
-                        profileManager.updateProfile(profile: currentProfile, name: currentProfile.name, dateOfBirth: currentProfile.dateOfBirth, favoriteGenres: Array(selectedGenres), hasAgreedToTerms: currentProfile.hasAgreedToTerms)
+                        profileManager.updateProfile(profile: currentProfile, name: currentProfile.name, dateOfBirth: currentProfile.dateOfBirth, favoriteGenres: Array(selectedGenres), hasAgreedToTerms: currentProfile.hasAgreedToTerms, userPin: currentProfile.userPin, userEmail: currentProfile.userEmail)
                     }
                     
                     navigateToHomePage = true
