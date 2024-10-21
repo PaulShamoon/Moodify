@@ -43,11 +43,7 @@ struct ProfileSelectionView: View {
             }
         }
         .onChange(of: navigateToMusicPreferences) { value in
-            if value {
-                // Navigate to music preferences after completing the questionnaire
-                navigateToHomePage = false
-                showingQuestionnaire = false
-            }
+        handleMusicPreferenceNavigation(value)
         }
     }
 
@@ -56,4 +52,12 @@ struct ProfileSelectionView: View {
         navigateToHomePage = false
         navigateToMusicPreferences = false
     }
+    
+    private func handleMusicPreferenceNavigation(_ isNavigating: Bool) {
+        if isNavigating {
+            navigateToHomePage = false
+            showingQuestionnaire = false
+        }
+    }
+
 }

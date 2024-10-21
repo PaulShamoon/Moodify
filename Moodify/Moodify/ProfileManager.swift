@@ -3,13 +3,13 @@ import Foundation
 class ProfileManager: ObservableObject {
     @Published var profiles: [Profile] = []
     @Published var currentProfile: Profile? = nil
-
+    
     private let profilesKey = "savedProfiles"
-
+    
     init() {
         loadProfiles()
     }
-
+    
     // Create a new profile
     func createProfile(name: String, dateOfBirth: Date, favoriteGenres: [String], hasAgreedToTerms: Bool) {
         let newProfile = Profile(name: name, dateOfBirth: dateOfBirth, favoriteGenres: favoriteGenres, hasAgreedToTerms: hasAgreedToTerms)
@@ -17,7 +17,7 @@ class ProfileManager: ObservableObject {
         saveProfiles()
         selectProfile(newProfile)  // Immediately select the new profile
     }
-
+    
     // Update an existing profile
     func updateProfile(profile: Profile, name: String, dateOfBirth: Date, favoriteGenres: [String], hasAgreedToTerms: Bool) {
         if let index = profiles.firstIndex(where: { $0.id == profile.id }) {
@@ -31,30 +31,41 @@ class ProfileManager: ObservableObject {
             selectProfile(profiles[index])  // Reassign currentProfile to trigger view update
         }
     }
-
+    
     // Select a profile
     func selectProfile(_ profile: Profile) {
         currentProfile = profile
     }
-
+    
     // Delete a profile
     func deleteProfile(profile: Profile) {
-            if let index = profiles.firstIndex(where: { $0.id == profile.id }) {
-                profiles.remove(at: index)
-            }
-            saveProfiles() 
+        guard let index = profiles.firstIndex(where: { $0.id == profile.id }) else {
+            print("Profile not found. No deletion performed.")
+            return
         }
-
+        
+        profiles.remove(at: index)
+        saveProfiles()
+        print("Profile deleted successfully.")
+    }
+    
     private func saveProfiles() {
-        if let encoded = try? JSONEncoder().encode(profiles) {
+        do {
+            let encoded = try JSONEncoder().encode(profiles)
             UserDefaults.standard.set(encoded, forKey: profilesKey)
+        } catch {
+            print("Failed to save profiles: (error.localizedDescription)")
         }
     }
-
+    
     func loadProfiles() {
-        if let data = UserDefaults.standard.data(forKey: profilesKey),
-           let decodedProfiles = try? JSONDecoder().decode([Profile].self, from: data) {
-            profiles = decodedProfiles
+        do {
+            if let data = UserDefaults.standard.data(forKey: profilesKey) {
+                profiles = try JSONDecoder().decode([Profile].self, from: data)
+            }
+        } catch {
+            print("Failed to load profiles: (error.localizedDescription)")
+            profiles = []
         }
     }
 }
