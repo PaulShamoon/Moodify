@@ -6,15 +6,15 @@ be rendered upon every launch of the application
  
  Created by Paul Shamoon on 9/24/24.
  */
-struct SplashPageView: View { 
+struct SplashPageView: View {
     // Tracks whether to show the splash screen or navigate to the home page
     @State private var navigateToHomePage = false
     
     var body: some View {
         VStack {
             if navigateToHomePage {
-                // Navigates to the home page
-                homePageView()
+                // After splash is complete, the main app will handle the profile logic.
+                EmptyView() // Just a placeholder, actual navigation logic is in MoodifyApp
             } else {
                 // Splash screen content
                 VStack {

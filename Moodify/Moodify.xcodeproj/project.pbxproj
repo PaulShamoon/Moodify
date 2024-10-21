@@ -23,6 +23,10 @@
 		6EEDBF492CA3B94D0079295D /* SplashPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EEDBF482CA3B9470079295D /* SplashPage.swift */; };
 		8917A3D92CA4D11400253254 /* MenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8917A3D82CA4D10F00253254 /* MenuView.swift */; };
 		8917A3DB2CA4D87400253254 /* AccountInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8917A3DA2CA4D86100253254 /* AccountInfoView.swift */; };
+		898A9D5C2CBF14F900F941C4 /* TermsofService.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 898A9D5B2CBF14F900F941C4 /* TermsofService.pdf */; };
+		89AD05632CB083B8004D8FAD /* Profile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89AD05622CB083B3004D8FAD /* Profile.swift */; };
+		89AD05652CB08452004D8FAD /* ProfileManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89AD05642CB08439004D8FAD /* ProfileManager.swift */; };
+		89AD05672CB0847D004D8FAD /* ProfileSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89AD05662CB08474004D8FAD /* ProfileSelectionView.swift */; };
 		89AD20A72C93E39A00EC5BDB /* (null) in Sources */ = {isa = PBXBuildFile; };
 		89AD20A92C9500C800EC5BDB /* (null) in Sources */ = {isa = PBXBuildFile; };
 		89FA8A432C9A6F39005480D8 /* generalMusicPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89FA8A422C9A6F39005480D8 /* generalMusicPreferences.swift */; };
@@ -81,6 +85,10 @@
 		6EFE6C522C9E4AD40000DE46 /* Moodify-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Moodify-Bridging-Header.h"; sourceTree = "<group>"; };
 		8917A3D82CA4D10F00253254 /* MenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuView.swift; sourceTree = "<group>"; };
 		8917A3DA2CA4D86100253254 /* AccountInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountInfoView.swift; sourceTree = "<group>"; };
+		898A9D5B2CBF14F900F941C4 /* TermsofService.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = TermsofService.pdf; path = Moodify/TermsofService.pdf; sourceTree = "<group>"; };
+		89AD05622CB083B3004D8FAD /* Profile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Profile.swift; sourceTree = "<group>"; };
+		89AD05642CB08439004D8FAD /* ProfileManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileManager.swift; sourceTree = "<group>"; };
+		89AD05662CB08474004D8FAD /* ProfileSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileSelectionView.swift; sourceTree = "<group>"; };
 		89FA8A422C9A6F39005480D8 /* generalMusicPreferences.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = generalMusicPreferences.swift; sourceTree = "<group>"; };
 		89FA8A442C9A6F40005480D8 /* Questionnaire.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Questionnaire.swift; sourceTree = "<group>"; };
 		89FA8A462C9A6F4D005480D8 /* homePageView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = homePageView.swift; sourceTree = "<group>"; };
@@ -117,6 +125,7 @@
 		6934A1002C8FDA830086CC91 = {
 			isa = PBXGroup;
 			children = (
+				898A9D5B2CBF14F900F941C4 /* TermsofService.pdf */,
 				6934A10B2C8FDA840086CC91 /* Moodify */,
 				6934A11C2C8FDA850086CC91 /* MoodifyTests */,
 				6934A1262C8FDA850086CC91 /* MoodifyUITests */,
@@ -137,6 +146,8 @@
 		6934A10B2C8FDA840086CC91 /* Moodify */ = {
 			isa = PBXGroup;
 			children = (
+				89AD05642CB08439004D8FAD /* ProfileManager.swift */,
+				89AD05622CB083B3004D8FAD /* Profile.swift */,
 				BA69278F2CA45D550082E840 /* AIModel */,
 				694B6C002C9A4431002F0931 /* Frontend */,
 				6934A10C2C8FDA840086CC91 /* MoodifyApp.swift */,
@@ -179,6 +190,7 @@
 			isa = PBXGroup;
 			children = (
 				8917A3DA2CA4D86100253254 /* AccountInfoView.swift */,
+				89AD05662CB08474004D8FAD /* ProfileSelectionView.swift */,
 				8917A3D82CA4D10F00253254 /* MenuView.swift */,
 				6EEDBF482CA3B9470079295D /* SplashPage.swift */,
 				89FA8A462C9A6F4D005480D8 /* homePageView.swift */,
@@ -304,6 +316,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				898A9D5C2CBF14F900F941C4 /* TermsofService.pdf in Resources */,
 				6934A1142C8FDA840086CC91 /* Preview Assets.xcassets in Resources */,
 				6EA47A6C2C9E50D3006FB5C6 /* Moodify.plist in Resources */,
 				6934A1112C8FDA840086CC91 /* Assets.xcassets in Resources */,
@@ -340,8 +353,11 @@
 				694B6C032C9A4483002F0931 /* (null) in Sources */,
 				BA6927902CA45D550082E840 /* EmotionDetection.swift in Sources */,
 				89FA8A472C9A6F4D005480D8 /* homePageView.swift in Sources */,
+				89AD05632CB083B8004D8FAD /* Profile.swift in Sources */,
 				6934A10D2C8FDA840086CC91 /* MoodifyApp.swift in Sources */,
 				BA3C79602CA501C800A02C86 /* EmotionClassifier.mlmodel in Sources */,
+				89AD05652CB08452004D8FAD /* ProfileManager.swift in Sources */,
+				89AD05672CB0847D004D8FAD /* ProfileSelectionView.swift in Sources */,
 				89FA8A452C9A6F40005480D8 /* Questionnaire.swift in Sources */,
 				6EEDBF492CA3B94D0079295D /* SplashPage.swift in Sources */,
 				89AD20A72C93E39A00EC5BDB /* (null) in Sources */,
@@ -507,42 +523,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_ASSET_PATHS = "\"Moodify/Preview Content\"";
-				DEVELOPMENT_TEAM = 5RJHYK4MEZ;
-				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = Moodify/Info.plist;
-				INFOPLIST_KEY_NSCameraUsageDescription = "Moodify uses your camera to detect your emotions";
-				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
-				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
-				MARKETING_VERSION = 1.0;
-				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_BUNDLE_IDENTIFIER = Capstone.Moodify;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_OBJC_BRIDGING_HEADER = "Moodify/Moodify-Bridging-Header.h";
-				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Debug;
-		};
-		6934A12F2C8FDA850086CC91 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Moodify/Preview Content\"";
@@ -565,6 +546,45 @@
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = CapstoneMoodify;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "Moodify/Moodify-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		6934A12F2C8FDA850086CC91 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"Moodify/Preview Content\"";
+				DEVELOPMENT_TEAM = "";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Moodify/Info.plist;
+				INFOPLIST_KEY_NSCameraUsageDescription = "Moodify uses your camera to detect your emotions";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_BUNDLE_IDENTIFIER = CapstoneMoodify;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "Moodify/Moodify-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;

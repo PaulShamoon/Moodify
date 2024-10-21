@@ -2,6 +2,7 @@ import SwiftUI
 import AVFoundation
 
 struct homePageView: View {
+    var profile: Profile // Accept a profile as a parameter
     @StateObject private var model = EmotionDetection()
     @State private var showingCamera = false
     @State private var showingAlert = false
@@ -13,6 +14,9 @@ struct homePageView: View {
     @StateObject var spotifyController = SpotifyController()
     @State private var navigateToSpotify = false // State for navigation
     @State private var showMenu = false // State to show/hide the side menu
+    @Binding var navigateToHomePage: Bool // This will be passed from outside
+    @Binding var isCreatingProfile: Bool // This will be passed from outside
+    @Binding var navigateToMusicPreferences: Bool // This will be passed from outside
 
     var body: some View {
         ZStack {
@@ -37,9 +41,14 @@ struct homePageView: View {
                             .padding()
                         }
 
+                        // Display profile info
+                        Text("Welcome, \(profile.name)")
+                            .font(.title)
+                            .foregroundColor(.white)
+                            .padding()
+
                         // Title and Mood Display
                         VStack(spacing: 30) {
-                            // App Title
                             HStack(spacing: 0) {
                                 Text("M")
                                     .font(.system(size: 48, weight: .bold, design: .rounded))
@@ -115,20 +124,22 @@ struct homePageView: View {
                     .navigationDestination(isPresented: $navigateToSpotify) {
                         ConnectToSpotifyDisplay(spotifyController: spotifyController)
                     }
+                    .alert(isPresented: $showingAlert) {
+                        Alert(title: Text("Error"), message: Text(alertMessage), dismissButton: .default(Text("OK")))
+                    }
+
                 }
             }
 
             // Overlay the Menu if showMenu is true
             if showMenu {
-                MenuView(showMenu: $showMenu)
+                MenuView(showMenu: $showMenu, navigateToHomePage: $navigateToHomePage, isCreatingNewProfile: $isCreatingProfile, navigateToMusicPreferences: $navigateToMusicPreferences)
                     .transition(.move(edge: .trailing)) // Slide in from the right
+                    .zIndex(1) // Ensure the menu is above the main content
             }
         }
         .sheet(isPresented: $showingCamera) {
             CameraView(image: $capturedImage)
-        }
-        .alert(isPresented: $showingAlert) {
-            Alert(title: Text("Error"), message: Text(alertMessage), dismissButton: .default(Text("OK")))
         }
         .onChange(of: capturedImage) { newImage in
             if let newImage = newImage {
@@ -194,11 +205,6 @@ struct homePageView: View {
     }
 }
 
-struct ContentView_Previews: PreviewProvider {
-    static var previews: some View {
-        homePageView()
-    }
-}
 
 struct CameraView: UIViewControllerRepresentable {
     @Binding var image: UIImage?
