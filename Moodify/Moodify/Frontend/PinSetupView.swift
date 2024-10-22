@@ -5,7 +5,8 @@ struct PinSetupView: View {
     @State private var currentPin: String = "" // To store the current PIN for verification
     @State private var pin: String = ""
     @State private var confirmPin: String = ""
-    @State private var email: String = ""
+    @State private var securityQuestion: String = ""
+    @State private var securityQuestionAnswer: String = ""
     @State private var showError = false
     @State private var errorMessage: String = ""
     @Environment(\.presentationMode) var presentationMode
@@ -19,19 +20,15 @@ struct PinSetupView: View {
 
     var body: some View {
         VStack {
+            Text(profile?.userPin == nil ? "Set Your PIN" : "Change Pin")
+                .font(.largeTitle)
+                .padding()
+            
+            
             if profile?.userPin != nil {
-                Text("Change Pin")
-                    .font(.largeTitle)
-                    .padding()
-            } else if profile?.userPin == nil {
-                Text("Set Your PIN")
-                    .font(.largeTitle)
-                    .padding()
-            }
-            if profile?.userPin != nil {
-                HStack{
+                HStack {
                     // If the user already has a PIN, ask for the current PIN for verification
-                    Text("Enter Current PIN: ")
+                    Text("Enter Current PIN:")
                         .font(.system(size: 20, weight: .bold, design: .rounded))
                         .foregroundColor(.white)
                     Button(action: {
@@ -47,7 +44,6 @@ struct PinSetupView: View {
                             .padding(.leading, 10)
                             .frame(maxWidth: .infinity)
                     }
-
                 }
                 SecureField("Enter Current PIN", text: $currentPin)
                     .keyboardType(.numberPad)
@@ -59,7 +55,7 @@ struct PinSetupView: View {
             HStack{
                 Text("Enter New PIN:")
                     .font(.system(size: 20, weight: .bold, design: .rounded))
-                
+                    .foregroundColor(.white)
                 Button(action: {
                     showingTooltip2.toggle()
                 }) {
@@ -75,7 +71,7 @@ struct PinSetupView: View {
                 }
 
             }
-                .foregroundColor(.white)
+
             SecureField("Enter New 4-digit PIN", text: $pin)
                 .keyboardType(.numberPad)
                 .padding()
@@ -91,15 +87,9 @@ struct PinSetupView: View {
                 .frame(width: 200)
 
             HStack {
-                if profile?.userEmail == nil {
-                    Text("Set Recovery Email:")
-                        .font(.system(size: 20, weight: .bold, design: .rounded))
-                        .foregroundColor(.white)
-                } else {
-                    Text("Change Recovery Email:")
-                        .font(.system(size: 20, weight: .bold, design: .rounded))
-                        .foregroundColor(.white)
-                }
+                Text(profile?.personalSecurityQuestion == nil ? "Set Security Question:" : "Change Security Question:")
+                    .font(.system(size: 20, weight: .bold, design: .rounded))
+                    .foregroundColor(.white)
                 
                 Button(action: {
                     showingTooltip.toggle() // Toggle tooltip visibility
@@ -109,7 +99,7 @@ struct PinSetupView: View {
                 }
                 
                 if showingTooltip {
-                    Text("We need your email to reset your pin if forgotten.")
+                    Text("Set a security question to recover your PIN if forgotten.")
                         .font(.system(size: 12))
                         .foregroundColor(.white)
                         .padding(.leading, 10)
@@ -117,13 +107,16 @@ struct PinSetupView: View {
                 }
             }
             
-            TextField("Enter Email", text: $email)
-                .keyboardType(.emailAddress)
+            TextField("Enter Security Question", text: $securityQuestion)
                 .padding()
                 .background(Color.gray.opacity(0.2))
                 .cornerRadius(10)
-                .autocapitalization(.none)
-
+            
+            SecureField("Answer", text: $securityQuestionAnswer)
+                .padding()
+                .background(Color.gray.opacity(0.2))
+                .cornerRadius(10)
+            
             if showError {
                 Text(errorMessage)
                     .foregroundColor(.red)
@@ -144,9 +137,8 @@ struct PinSetupView: View {
         }
         .padding()
         .onAppear {
-            // Load the existing email into the state if available
-            if let existingEmail = profile?.userEmail {
-                email = existingEmail
+            if let existingSecurityQuestion = profile?.personalSecurityQuestion {
+                securityQuestion = existingSecurityQuestion
             }
         }
     }
@@ -174,9 +166,8 @@ struct PinSetupView: View {
             return
         }
 
-        // Ensure email is set if the profile does not already have a recovery email
-        if profile?.userPin == nil, email.isEmpty {
-            errorMessage = "Recovery email is required for setting a PIN."
+        if profile?.userPin == nil, securityQuestion.isEmpty || securityQuestionAnswer.isEmpty {
+            errorMessage = "Security Question and Answer are required for setting a PIN."
             showError = true
             return
         }
@@ -190,18 +181,17 @@ struct PinSetupView: View {
                 favoriteGenres: profile.favoriteGenres,
                 hasAgreedToTerms: profile.hasAgreedToTerms,
                 userPin: pin,
-                userEmail: email
+                personalSecurityQuestion: securityQuestion,
+                securityQuestionAnswer: securityQuestionAnswer
             )
-
-            // Print statement for debugging
             print("Stored PIN for profile: \(profileManager.currentProfile?.userPin ?? "No PIN set")")
-            print("Stored Recovery Email: \(profileManager.currentProfile?.userEmail ?? "No email set")")
-            // Close the view
+            print("Stored Security Question: \(profileManager.currentProfile?.personalSecurityQuestion ?? "No question set")")
+            print("Stored Security Question Answer: \(profileManager.currentProfile?.securityQuestionAnswer ?? "No answer set")")
             presentationMode.wrappedValue.dismiss()
         }
     }
 }
-
+/*
 struct PinSetupView_Previews: PreviewProvider {
     static var previews: some View {
         // Mock profiles for preview
@@ -243,3 +233,4 @@ struct PinSetupView_Previews: PreviewProvider {
         }
     }
 }
+*/

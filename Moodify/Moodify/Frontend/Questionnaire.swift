@@ -138,7 +138,7 @@ struct QuestionnaireView: View {
                     if validateForm() {
                         // Save or update the profile based on whether we're creating or editing
                         if let profile = profileManager.currentProfile {
-                            profileManager.updateProfile(profile: profile, name: name, dateOfBirth: dateOfBirth, favoriteGenres: profile.favoriteGenres, hasAgreedToTerms: agreedToTerms, userPin: profile.userPin, userEmail: profile.userEmail)
+                            profileManager.updateProfile(profile: profile, name: name, dateOfBirth: dateOfBirth, favoriteGenres: profile.favoriteGenres, hasAgreedToTerms: agreedToTerms, userPin: profile.userPin, personalSecurityQuestion: profile.personalSecurityQuestion, securityQuestionAnswer: profile.personalSecurityQuestion)
                         } else {
                             profileManager.createProfile(name: name, dateOfBirth: dateOfBirth, favoriteGenres: [], hasAgreedToTerms: agreedToTerms)
                         }

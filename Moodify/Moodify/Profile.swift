@@ -7,6 +7,7 @@ struct Profile: Identifiable, Codable {
     var favoriteGenres: [String]
     var hasAgreedToTerms: Bool
     var userPin: String?
-    var userEmail: String?
+    var personalSecurityQuestion: String?
+    var securityQuestionAnswer: String?
 }
 

@@ -19,17 +19,17 @@ class ProfileManager: ObservableObject {
     }
 
     // Update an existing profile
-    func updateProfile(profile: Profile, name: String, dateOfBirth: Date, favoriteGenres: [String], hasAgreedToTerms: Bool, userPin: String?, userEmail: String?) {
+    func updateProfile(profile: Profile, name: String, dateOfBirth: Date, favoriteGenres: [String], hasAgreedToTerms: Bool, userPin: String?, personalSecurityQuestion: String?, securityQuestionAnswer: String?) {
         if let index = profiles.firstIndex(where: { $0.id == profile.id }) {
             profiles[index].name = name
             profiles[index].dateOfBirth = dateOfBirth
             profiles[index].favoriteGenres = favoriteGenres
             profiles[index].hasAgreedToTerms = hasAgreedToTerms
             profiles[index].userPin = userPin
-            profiles[index].userEmail = userEmail
-            // Save profiles and trigger view update
+            profiles[index].personalSecurityQuestion = personalSecurityQuestion
+            profiles[index].securityQuestionAnswer = securityQuestionAnswer
             saveProfiles()
-            selectProfile(profiles[index])  // Reassign currentProfile to trigger view update
+            selectProfile(profiles[index])
         }
     }
 
@@ -40,11 +40,13 @@ class ProfileManager: ObservableObject {
 
     // Delete a profile
     func deleteProfile(profile: Profile) {
-            if let index = profiles.firstIndex(where: { $0.id == profile.id }) {
-                profiles.remove(at: index)
-            }
-            saveProfiles() 
+        guard let index = profiles.firstIndex(where: { $0.id == profile.id }) else {
+            print("Profile not found for deletion.")
+            return
         }
+        profiles.remove(at: index)
+        saveProfiles()
+    }
 
     private func saveProfiles() {
         if let encoded = try? JSONEncoder().encode(profiles) {
