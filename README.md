@@ -22,7 +22,7 @@ Note: if you change the port, make sure to change it here too
 ## Running emotion detector server side
 Run these commands in the terminal to setup emotion detection on the server side
 
-### Setup ngrok
+### Setup ngrok server
 you can use any port, but in this case 8080 is used
 ```terminal
 ngrok http 8080
