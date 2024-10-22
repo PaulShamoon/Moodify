@@ -1,12 +1,12 @@
 import SwiftUI
 
 struct GeneralMusicPreferencesView: View {
+    @EnvironmentObject var profileManager: ProfileManager
     @State private var selectedGenres: Set<String> = []
     @Binding var navigateToHomePage: Bool
     @State private var isPlaying = false
-    @State private var firstname: String = ""
     
-    @Environment(\.presentationMode) var presentationMode // Used to dismiss the view smoothly
+    @Environment(\.presentationMode) var presentationMode
 
     let genres = ["Pop", "Classical", "Regional", "Hip Hop", "Country", "Dance"]
 
@@ -16,7 +16,7 @@ struct GeneralMusicPreferencesView: View {
                 .edgesIgnoringSafeArea(.all)
             
             VStack(spacing: 20) {
-                Text("\(firstname), what are your favorite genres?")
+                Text("\(profileManager.currentProfile?.name ?? "User"), what are your favorite genres?")
                     .font(.system(size: 24, weight: .bold, design: .rounded))
                     .foregroundColor(.white)
                     .padding(.top, 20)
@@ -24,9 +24,7 @@ struct GeneralMusicPreferencesView: View {
                 LazyVGrid(columns: [GridItem(.adaptive(minimum: 150), spacing: 20)], spacing: 20) {
                     ForEach(genres, id: \.self) { genre in
                         Button(action: {
-                            withAnimation {
-                                toggleGenreSelection(genre: genre)
-                            }
+                            toggleGenreSelection(genre: genre)
                         }) {
                             ZStack {
                                 RoundedRectangle(cornerRadius: 16)
@@ -54,29 +52,29 @@ struct GeneralMusicPreferencesView: View {
 
                 if !selectedGenres.isEmpty {
                     Text("Selected Genres: \(selectedGenres.joined(separator: ", "))")
-                        .font(.system(size: 16, weight: .light, design: .rounded))
-                        .foregroundColor(.white.opacity(0.7))
+                        .font(.system(size: 16))
+                        .foregroundColor(.white)
                         .padding(.top, 20)
                 }
 
                 Button(action: {
-                    if selectedGenres.isEmpty {
-                        print("Skipped genre selection")
-                    } else {
-                        submitGenres()
+                    // Always save the profile with the selected genres
+                    if let currentProfile = profileManager.currentProfile {
+                        profileManager.updateProfile(profile: currentProfile, name: currentProfile.name, dateOfBirth: currentProfile.dateOfBirth, favoriteGenres: Array(selectedGenres), hasAgreedToTerms: currentProfile.hasAgreedToTerms)
                     }
-                    navigateToHomePage = true // Navigate after genres are selected or skipped
-                    presentationMode.wrappedValue.dismiss() // Dismiss the view smoothly
+                    
+                    navigateToHomePage = true
+                    presentationMode.wrappedValue.dismiss()
                 }) {
+                    // Button label and color based on genre selection
                     Text(selectedGenres.isEmpty ? "Skip" : "Submit")
-                        .font(.system(size: 20, weight: .bold, design: .rounded))
+                        .font(.system(size: 20, weight: .bold))
                         .foregroundColor(.black)
                         .padding()
                         .frame(maxWidth: .infinity)
-                        .background(LinearGradient(gradient: Gradient(colors: [Color.green, Color.green.opacity(0.8)]), startPoint: .leading, endPoint: .trailing))
+                        .background(LinearGradient(gradient: Gradient(colors: selectedGenres.isEmpty ? [Color.gray, Color.gray.opacity(0.8)] : [Color.green, Color.green.opacity(0.8)]), startPoint: .leading, endPoint: .trailing))
                         .cornerRadius(12)
                         .shadow(radius: 10)
-                        .opacity(selectedGenres.isEmpty ? 0.7 : 1.0)
                 }
                 .padding(.horizontal)
                 .padding(.top, 30)
@@ -85,22 +83,15 @@ struct GeneralMusicPreferencesView: View {
             }
             .padding()
             .onAppear {
-                loadFirstName()
-                loadSelectedGenres() // Load selected genres when the view appears
+                loadSelectedGenres()
             }
         }
     }
 
-    private func loadFirstName() {
-        firstname = UserDefaults.standard.string(forKey: "firstname") ?? "User"
-        print("Loaded First Name: \(firstname)")
-    }
-
     private func loadSelectedGenres() {
-        if let savedGenres = UserDefaults.standard.array(forKey: "selectedGenres") as? [String] {
-            selectedGenres = Set(savedGenres)
-            print("Loaded Selected Genres: \(selectedGenres)")
-        }
+        // Load the favorite genres from the current profile
+        selectedGenres = Set(profileManager.currentProfile?.favoriteGenres ?? [])
+        print("Loaded selected genres: \(selectedGenres)")
     }
 
     private func toggleGenreSelection(genre: String) {
@@ -109,16 +100,13 @@ struct GeneralMusicPreferencesView: View {
         } else {
             selectedGenres.insert(genre)
         }
-    }
-
-    func submitGenres() {
-        print("Selected Genres: \(selectedGenres.joined(separator: ", "))")
-        UserDefaults.standard.set(Array(selectedGenres), forKey: "selectedGenres")
+        print("Current genres: \(selectedGenres)")
     }
 }
 
 struct GeneralMusicPreferencesView_Previews: PreviewProvider {
     static var previews: some View {
         GeneralMusicPreferencesView(navigateToHomePage: .constant(false))
+            .environmentObject(ProfileManager()) // Provide mock ProfileManager for preview
     }
 }

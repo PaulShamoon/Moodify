@@ -3,6 +3,9 @@ import AVFoundation
 import UIKit
 
 struct homePageView: View {
+
+    var profile: Profile // Accept a profile as a parameter
+    @StateObject private var model = EmotionDetection()
     @State private var showingCamera = false
     @State private var showingAlert = false
     @State private var alertMessage = ""
@@ -12,10 +15,13 @@ struct homePageView: View {
     @State private var probabilities: [(emotion: String, probability: Double)] = []
     @State private var isDetectingMood: Bool = false
     @StateObject var spotifyController = SpotifyController()
-    @State private var navigateToSpotify = false
-    @State private var showMenu = false
 
     let backendURL = "https://a46d-2601-406-4d00-7af0-d964-735f-448-6a6a.ngrok-free.app/analyze"
+    @State private var navigateToSpotify = false // State for navigation
+    @State private var showMenu = false // State to show/hide the side menu
+    @Binding var navigateToHomePage: Bool // This will be passed from outside
+    @Binding var isCreatingProfile: Bool // This will be passed from outside
+    @Binding var navigateToMusicPreferences: Bool // This will be passed from outside
 
     var body: some View {
         ZStack {
@@ -35,9 +41,14 @@ struct homePageView: View {
                             .padding()
                         }
 
+                        // Display profile info
+                        Text("Welcome, \(profile.name)")
+                            .font(.title)
+                            .foregroundColor(.white)
+                            .padding()
+
                         // Title and Mood Display
                         VStack(spacing: 30) {
-                            // App Title
                             HStack(spacing: 0) {
                                 Text("M")
                                     .font(.system(size: 48, weight: .bold, design: .rounded))
@@ -140,12 +151,17 @@ struct homePageView: View {
                     .navigationDestination(isPresented: $navigateToSpotify) {
                         ConnectToSpotifyDisplay(spotifyController: spotifyController)
                     }
+                    .alert(isPresented: $showingAlert) {
+                        Alert(title: Text("Error"), message: Text(alertMessage), dismissButton: .default(Text("OK")))
+                    }
+
                 }
             }
 
             if showMenu {
-                MenuView(showMenu: $showMenu)
-                    .transition(.move(edge: .trailing))
+                MenuView(showMenu: $showMenu, navigateToHomePage: $navigateToHomePage, isCreatingNewProfile: $isCreatingProfile, navigateToMusicPreferences: $navigateToMusicPreferences)
+                    .transition(.move(edge: .trailing)) // Slide in from the right
+                    .zIndex(1) // Ensure the menu is above the main content
             }
         }
         .sheet(isPresented: $showingCamera) {
@@ -159,8 +175,25 @@ struct homePageView: View {
                     }
                 }
         }
-        .alert(isPresented: $showingAlert) {
-            Alert(title: Text("Error"), message: Text(alertMessage), dismissButton: .default(Text("OK")))
+      
+        .onChange(of: capturedImage) { newImage in
+            if let newImage = newImage {
+                isDetectingMood = false
+                if let result = model.detectEmotion(in: newImage) {
+                    let emotion = result.target
+                    let probability = result.targetProbability
+                    currentMoodText = emotion.prefix(1).uppercased() + emotion.dropFirst()
+                    currentMood = emotionToEmoji(emotion)
+                    print(probability)
+                }
+            }
+        }
+        .onChange(of: model.error) { newError in
+            if let error = newError {
+                alertMessage = error
+                showingAlert = true
+                isDetectingMood = false
+            }
         }
     }
 
@@ -255,6 +288,7 @@ struct homePageView: View {
         }
     }
 }
+
 
 struct CameraView: UIViewControllerRepresentable {
     @Binding var image: UIImage?

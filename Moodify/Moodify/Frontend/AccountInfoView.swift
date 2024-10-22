@@ -1,16 +1,7 @@
-//
-//  AccountInfoView.swift
-//  Moodify
-//
-//  Created by Mahdi Sulaiman on 9/25/24.
-//
 import SwiftUI
 
 struct AccountInfoView: View {
-    @State private var firstname: String = ""
-    @State private var lastname: String = ""
-    @State private var age: Int = 0
-    @State private var gender: String = ""
+    @EnvironmentObject var profileManager: ProfileManager
 
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
@@ -19,53 +10,48 @@ struct AccountInfoView: View {
                 .foregroundColor(.white)
                 .padding(.top, 20)
 
-            Text("First Name: \(firstname)")
-                .font(.title2)
-                .foregroundColor(.white)
+            if let profile = profileManager.currentProfile {
+                Text("Name: \(profile.name)")
+                    .font(.title2)
+                    .foregroundColor(.white)
 
-            Text("Last Name: \(lastname)")
-                .font(.title2)
-                .foregroundColor(.white)
+                Text("Age: \(calculateAge(from: profile.dateOfBirth))")
+                    .font(.title2)
+                    .foregroundColor(.white)
 
-            Text("Age: \(age)")
-                .font(.title2)
-                .foregroundColor(.white)
-
-            Text("Gender: \(gender)")
-                .font(.title2)
-                .foregroundColor(.white)
-
-            
-            VStack(alignment: .leading, spacing: 20) {
-                // Links to Questionnaire and Preferences
-                NavigationLink(destination: QuestionnaireView(navigateToMusicPreferences: .constant(false))) {
-                    Text("Edit User Information")
-                        .font(.title2.italic())
-                        .foregroundColor(.green)
-                        .padding(.leading, 50)
-                    
+                if !profile.favoriteGenres.isEmpty {
+                    Text("Favorite Genres: \(profile.favoriteGenres.joined(separator: ", "))")
+                        .font(.title2)
+                        .foregroundColor(.white)
+                } else {
+                    Text("Favorite Genres: Not Set")
+                        .font(.title2)
+                        .foregroundColor(.white)
                 }
+
+                // Option to edit the user information
+                VStack(alignment: .leading, spacing: 20) {
+                    NavigationLink(destination: QuestionnaireView(navigateToMusicPreferences: .constant(true)).environmentObject(profileManager)) {
+                        Text("Edit User Information")
+                            .font(.title2.italic())
+                            .foregroundColor(.green)
+                            .padding(.leading, 50)
+                    }
+                }
+            } else {
+                Text("No Profile Selected")
+                    .foregroundColor(.red)
             }
             Spacer()
         }
         .padding()
         .background(Color.black.edgesIgnoringSafeArea(.all))
-        .onAppear {
-            loadUserData()
-        }
     }
 
-    // Function to load data from UserDefaults
-    func loadUserData() {
-        firstname = UserDefaults.standard.string(forKey: "firstname") ?? "Unknown"
-        lastname = UserDefaults.standard.string(forKey: "lastname") ?? "Unknown"
-        age = UserDefaults.standard.integer(forKey: "age")
-        gender = UserDefaults.standard.string(forKey: "gender") ?? "Unknown"
+    // Calculate age based on the date of birth
+    func calculateAge(from date: Date) -> Int {
+        let calendar = Calendar.current
+        let ageComponents = calendar.dateComponents([.year], from: date, to: Date())
+        return ageComponents.year ?? 0
     }
 }
-struct AccountInfoView_Previews: PreviewProvider {
-    static var previews: some View {
-        AccountInfoView()
-    }
-}
-
