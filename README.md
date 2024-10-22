@@ -1,5 +1,13 @@
 # Moodify-CSC4996
 
+## Downloading Ngrok
+Goto the website: https://ngrok.com/ And create an account
+
+Once you create an account, grab your auth token here and add the authtoken
+![alt text](image-3.png)
+
+Finally, goto this download page to download ngrok: https://ngrok.com/download
+
 ## Setting up flask code
 The flask code is located in the Flask folder. 
 
