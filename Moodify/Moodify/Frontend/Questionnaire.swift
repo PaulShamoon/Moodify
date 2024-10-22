@@ -182,32 +182,15 @@ struct QuestionnaireView: View {
 
     // Validation function
     func validateForm() -> Bool {
-        var isValid = true
-        
-        if name.isEmpty {
-            nameError = "Name is required."
-            isValid = false
-        } else {
-            nameError = nil
-        }
-        
-        let calendar = Calendar.current
-        let age = calendar.dateComponents([.year], from: dateOfBirth, to: Date()).year ?? 0
-        if age < 13 {
-            ageError = "You must be at least 13 years old."
-            isValid = false
-        } else {
-            ageError = nil
-        }
-        
-        if !agreedToTerms && !(profileManager.currentProfile?.hasAgreedToTerms ?? false) {
-            termsError = "You must agree to the Terms of Service."
-            isValid = false
-        } else {
-            termsError = nil
-        }
-        
-        return isValid
+        nameError = name.isEmpty ? "Name is required." : nil
+
+        let age = Calendar.current.dateComponents([.year], from: dateOfBirth, to: Date()).year ?? 0
+        ageError = age < 13 ? "You must be at least 13 years old." : nil
+
+        let hasAgreed = profileManager.currentProfile?.hasAgreedToTerms ?? agreedToTerms
+        termsError = !hasAgreed ? "You must agree to the Terms of Service." : nil
+
+        return [nameError, ageError, termsError].allSatisfy { $0 == nil }
     }
 }
 

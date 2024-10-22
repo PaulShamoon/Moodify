@@ -14,8 +14,10 @@
 		6934A11E2C8FDA850086CC91 /* MoodifyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6934A11D2C8FDA850086CC91 /* MoodifyTests.swift */; };
 		6934A1282C8FDA850086CC91 /* MoodifyUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6934A1272C8FDA850086CC91 /* MoodifyUITests.swift */; };
 		6934A12A2C8FDA850086CC91 /* MoodifyUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6934A1292C8FDA850086CC91 /* MoodifyUITestsLaunchTests.swift */; };
-		694B6C012C9A4431002F0931 /* (null) in Sources */ = {isa = PBXBuildFile; };
+		694B6C012C9A4431002F0931 /* (
+    ) in Sources */ = {isa = PBXBuildFile; };
 		694B6C032C9A4483002F0931 /* (null) in Sources */ = {isa = PBXBuildFile; };
+		696300582CC6E65E00AE7814 /* DetectEmotionServices.swift in Sources */ = {isa = PBXBuildFile; fileRef = 696300572CC6E65E00AE7814 /* DetectEmotionServices.swift */; };
 		6EA47A6C2C9E50D3006FB5C6 /* Moodify.plist in Resources */ = {isa = PBXBuildFile; fileRef = 6EA47A6B2C9E50D3006FB5C6 /* Moodify.plist */; };
 		6EA47A702C9E5199006FB5C6 /* SpotifyController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EA47A6F2C9E5199006FB5C6 /* SpotifyController.swift */; };
 		6EA47A772C9E52D4006FB5C6 /* SpotifyiOS.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6EA47A752C9E52C7006FB5C6 /* SpotifyiOS.xcframework */; };
@@ -33,8 +35,6 @@
 		89FA8A432C9A6F39005480D8 /* generalMusicPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89FA8A422C9A6F39005480D8 /* generalMusicPreferences.swift */; };
 		89FA8A452C9A6F40005480D8 /* Questionnaire.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89FA8A442C9A6F40005480D8 /* Questionnaire.swift */; };
 		89FA8A472C9A6F4D005480D8 /* homePageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89FA8A462C9A6F4D005480D8 /* homePageView.swift */; };
-		BA3C79602CA501C800A02C86 /* EmotionClassifier.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = BA3C795F2CA501C800A02C86 /* EmotionClassifier.mlmodel */; };
-		BA6927902CA45D550082E840 /* EmotionDetection.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA69278E2CA45D550082E840 /* EmotionDetection.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -79,6 +79,7 @@
 		6934A1232C8FDA850086CC91 /* MoodifyUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MoodifyUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		6934A1272C8FDA850086CC91 /* MoodifyUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodifyUITests.swift; sourceTree = "<group>"; };
 		6934A1292C8FDA850086CC91 /* MoodifyUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodifyUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		696300572CC6E65E00AE7814 /* DetectEmotionServices.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetectEmotionServices.swift; sourceTree = "<group>"; };
 		6EA47A6B2C9E50D3006FB5C6 /* Moodify.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Moodify.plist; sourceTree = "<group>"; };
 		6EA47A6F2C9E5199006FB5C6 /* SpotifyController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpotifyController.swift; sourceTree = "<group>"; };
 		6EA47A752C9E52C7006FB5C6 /* SpotifyiOS.xcframework */ = {isa = PBXFileReference; expectedSignature = "AppleDeveloperProgram:2FNC3A47ZF:Spotify"; lastKnownFileType = wrapper.xcframework; path = SpotifyiOS.xcframework; sourceTree = "<group>"; };
@@ -94,8 +95,6 @@
 		89FA8A422C9A6F39005480D8 /* generalMusicPreferences.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = generalMusicPreferences.swift; sourceTree = "<group>"; };
 		89FA8A442C9A6F40005480D8 /* Questionnaire.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Questionnaire.swift; sourceTree = "<group>"; };
 		89FA8A462C9A6F4D005480D8 /* homePageView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = homePageView.swift; sourceTree = "<group>"; };
-		BA3C795F2CA501C800A02C86 /* EmotionClassifier.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = EmotionClassifier.mlmodel; sourceTree = "<group>"; };
-		BA69278E2CA45D550082E840 /* EmotionDetection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmotionDetection.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -148,9 +147,9 @@
 		6934A10B2C8FDA840086CC91 /* Moodify */ = {
 			isa = PBXGroup;
 			children = (
+
 				89AD05642CB08439004D8FAD /* ProfileManager.swift */,
 				89AD05622CB083B3004D8FAD /* Profile.swift */,
-				BA69278F2CA45D550082E840 /* AIModel */,
 				694B6C002C9A4431002F0931 /* Frontend */,
 				6934A10C2C8FDA840086CC91 /* MoodifyApp.swift */,
 				6EA47A6F2C9E5199006FB5C6 /* SpotifyController.swift */,
@@ -200,17 +199,9 @@
 				89FA8A442C9A6F40005480D8 /* Questionnaire.swift */,
 				6934A10E2C8FDA840086CC91 /* ConnectToSpotify.swift */,
 				89FA8A422C9A6F39005480D8 /* generalMusicPreferences.swift */,
+				696300572CC6E65E00AE7814 /* DetectEmotionServices.swift */,
 			);
 			path = Frontend;
-			sourceTree = "<group>";
-		};
-		BA69278F2CA45D550082E840 /* AIModel */ = {
-			isa = PBXGroup;
-			children = (
-				BA69278E2CA45D550082E840 /* EmotionDetection.swift */,
-				BA3C795F2CA501C800A02C86 /* EmotionClassifier.mlmodel */,
-			);
-			path = AIModel;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -350,22 +341,17 @@
 				8966A3A32CC3304F00FA58DE /* PinSetupView.swift in Sources */,
 				6EA47A702C9E5199006FB5C6 /* SpotifyController.swift in Sources */,
 				8917A3D92CA4D11400253254 /* MenuView.swift in Sources */,
+				696300582CC6E65E00AE7814 /* DetectEmotionServices.swift in Sources */,
 				6934A10F2C8FDA840086CC91 /* ConnectToSpotify.swift in Sources */,
 				89FA8A432C9A6F39005480D8 /* generalMusicPreferences.swift in Sources */,
 				8917A3DB2CA4D87400253254 /* AccountInfoView.swift in Sources */,
-				694B6C012C9A4431002F0931 /* (null) in Sources */,
-				694B6C032C9A4483002F0931 /* (null) in Sources */,
-				BA6927902CA45D550082E840 /* EmotionDetection.swift in Sources */,
 				89FA8A472C9A6F4D005480D8 /* homePageView.swift in Sources */,
 				89AD05632CB083B8004D8FAD /* Profile.swift in Sources */,
 				6934A10D2C8FDA840086CC91 /* MoodifyApp.swift in Sources */,
-				BA3C79602CA501C800A02C86 /* EmotionClassifier.mlmodel in Sources */,
 				89AD05652CB08452004D8FAD /* ProfileManager.swift in Sources */,
 				89AD05672CB0847D004D8FAD /* ProfileSelectionView.swift in Sources */,
 				89FA8A452C9A6F40005480D8 /* Questionnaire.swift in Sources */,
 				6EEDBF492CA3B94D0079295D /* SplashPage.swift in Sources */,
-				89AD20A72C93E39A00EC5BDB /* (null) in Sources */,
-				89AD20A92C9500C800EC5BDB /* (null) in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -52,11 +52,7 @@ struct ProfileSelectionView: View {
             }
         }
         .onChange(of: navigateToMusicPreferences) { value in
-            if value {
-                // Navigate to music preferences after completing the questionnaire
-                navigateToHomePage = false
-                showingQuestionnaire = false
-            }
+        handleMusicPreferenceNavigation(value)
         }
         // Display the custom PIN input view as a sheet when showingPinPrompt is true
         .sheet(isPresented: $showingPinPrompt) {
@@ -76,6 +72,14 @@ struct ProfileSelectionView: View {
         navigateToHomePage = false
         navigateToMusicPreferences = false
     }
+    
+    private func handleMusicPreferenceNavigation(_ isNavigating: Bool) {
+        if isNavigating {
+            navigateToHomePage = false
+            showingQuestionnaire = false
+        }
+    }
+
 
     private func selectProfile(_ profile: Profile) {
         profileManager.selectProfile(profile)
