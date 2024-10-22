@@ -33,7 +33,7 @@ struct MoodifyApp: App {
                             QuestionnaireView(navigateToMusicPreferences: $navigateToMusicPreferences)
                         }
                     } else {
-                        homePageView() // Default page after completion
+                        homePageView()
                     }
                 }
             }
