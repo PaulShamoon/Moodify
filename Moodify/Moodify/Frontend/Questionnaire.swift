@@ -126,22 +126,23 @@ struct QuestionnaireView: View {
                         .foregroundColor(.red)
                 }
 
-                // Terms of Service button and toggle
-                Button(action: {
-                    showingPDF = true // Show the PDF when clicked
-                }) {
-                    Text("Read Terms of Service")
-                        .font(.system(size: 18))
-                        .foregroundColor(.green)
-                }
-
-                // Show the terms toggle only if the user hasn't agreed
                 if !(profileManager.currentProfile?.hasAgreedToTerms ?? false) {
                     Toggle(isOn: $agreedToTerms) {
-                        Text("I agree to the Terms of Service")
-                            .foregroundColor(.white)
+                        HStack{
+                            Text("I agree to the")
+                                .foregroundColor(.white)
+                                .font(.system(size: 18))
+                            Text("Terms of Service")
+                                .foregroundColor(.green)
+                                .underline() // Optional: Add underline to make it look like a link
+                                .onTapGesture {
+                                    showingPDF = true // Show the PDF when "Terms of Service" is tapped
+                                }
+                                .font(.system(size: 18))
+                        }
                     }
-                    
+                    .toggleStyle(SwitchToggleStyle(tint: .green)) // Optional: Style the toggle switch
+
                     // Show error if terms are not agreed
                     if showErrorMessages, let termsError = termsError {
                         Text(termsError)
