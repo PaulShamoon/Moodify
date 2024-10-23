@@ -189,6 +189,11 @@ struct homePageView: View {
                         .padding(.horizontal)
                         
                         Spacer()
+                        
+                        .navigationDestination(isPresented: $navigateToSpotify) {
+                            ConnectToSpotifyDisplay(spotifyController: spotifyController)
+                        }
+
                     }
                     .padding(.top, 60)
                 }
