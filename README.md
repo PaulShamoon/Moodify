@@ -31,7 +31,7 @@ It should look like this
 ![alt text](image-1.png)
 Everytime you run ngrok again, you have to grab the new url and put it in the homePageView.swift
 
-For example in the example of the picture above: is the new url to be used
+In the example of the picture above: is the new url to be used
 
 https://58db-23-117-48-87.ngrok.free.app
 
@@ -58,16 +58,27 @@ python3 -m venv deepface-env
 ```terminal
 source deepface-env/bin/activate
 ```
-It should look like this
+
+#### It should look like this
 ![alt text](image.png)
+
+### Install these dependencies in order to run the flask code
+
+```terminal
+pip install flask
+```
+
+```terminal
+pip install deepface
+```
+
+```terminal
+pip install tf-keras
+```
 
 ### Run flask code
 ```terminal
 python3 flas.py
-```
-#### Note: you may need to install dependencies in order to run the flask code, such as
-```terminal
-pip install deepface
 ```
 
 ## After following all the steps, your terminal should look like this
@@ -75,4 +86,4 @@ Top terminal = ngrok http 8080
 Bottom terminal = python3 flas.py
 ![alt text](image-2.png)
 
-And finally, you can send pictures to flas.py to process for emotion detection 
+And finally, moodify utilize flas.py to process the emotion detection 
