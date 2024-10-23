@@ -37,7 +37,8 @@ struct ProfileSelectionView: View {
             // Button to add a new profile
             Button(action: {
                 resetProfileCreationState()
-                showingQuestionnaire = true  // Open questionnaire for adding a new profile
+                isCreatingNewProfile = true
+                showingQuestionnaire = true
             }) {
                 Text("Add Profile")
                     .font(.headline)
@@ -45,10 +46,6 @@ struct ProfileSelectionView: View {
                     .padding()
                     .background(Color.green)
                     .cornerRadius(8)
-            }
-            .sheet(isPresented: $showingQuestionnaire) {
-                QuestionnaireView(navigateToMusicPreferences: $navigateToMusicPreferences)
-                    .environmentObject(profileManager)
             }
         }
         .onChange(of: navigateToMusicPreferences) { value in

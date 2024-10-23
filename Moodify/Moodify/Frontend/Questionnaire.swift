@@ -5,6 +5,7 @@ struct QuestionnaireView: View {
     @EnvironmentObject var profileManager: ProfileManager // Inject ProfileManager
     @State private var agreedToTerms: Bool = false
     @Binding var navigateToMusicPreferences: Bool // Binding to control navigation
+    @Binding var isCreatingNewProfile: Bool // Binding to detect profile creation mode
 
     @Environment(\.presentationMode) var presentationMode
     @State private var showingPDF = false
@@ -27,6 +28,23 @@ struct QuestionnaireView: View {
                 .edgesIgnoringSafeArea(.all)
             
             VStack(alignment: .leading, spacing: 20) {
+                
+                if isCreatingNewProfile {
+                    Button(action: {
+                        isCreatingNewProfile = false
+                        presentationMode.wrappedValue.dismiss() // Navigate back to the previous view
+                    }) {
+                        HStack {
+                            Image(systemName: "chevron.left")
+                                .font(.headline)
+                            Text("Back")
+                                .font(.headline)
+                        }
+                        .foregroundColor(.white)
+                        .padding(.bottom, 10)
+                    }
+                }
+                
                 // App title
                 HStack(spacing: 0) {
                     Text("M")
@@ -218,8 +236,7 @@ struct PDFKitView: UIViewRepresentable {
     
     func updateUIView(_ uiView: PDFView, context: Context) {}
 }
-
-struct QuestionnaireView_Previews: PreviewProvider {
+/**struct QuestionnaireView_Previews: PreviewProvider {
     @State static var navigateToMusicPreferences = false
 
     static var previews: some View {
@@ -229,3 +246,4 @@ struct QuestionnaireView_Previews: PreviewProvider {
         }
     }
 }
+ */
