@@ -1,11 +1,12 @@
 import SwiftUI
 import AVFoundation
-import UIKit
 
 struct homePageView: View {
-
-    var profile: Profile // Accept a profile as a parameter
-    @StateObject private var model = EmotionDetection()
+    let profile: Profile  // Profile passed from ProfileSelectionView
+    @Binding var navigateToHomePage: Bool
+    @Binding var isCreatingNewProfile: Bool
+    @Binding var navigateToMusicPreferences: Bool
+    
     @State private var showingCamera = false
     @State private var showingAlert = false
     @State private var alertMessage = ""
@@ -15,14 +16,12 @@ struct homePageView: View {
     @State private var probabilities: [(emotion: String, probability: Double)] = []
     @State private var isDetectingMood: Bool = false
     @StateObject var spotifyController = SpotifyController()
-
-    let backendURL = "https://a46d-2601-406-4d00-7af0-d964-735f-448-6a6a.ngrok-free.app/analyze"
-    @State private var navigateToSpotify = false // State for navigation
-    @State private var showMenu = false // State to show/hide the side menu
-    @Binding var navigateToHomePage: Bool // This will be passed from outside
     @Binding var isCreatingProfile: Bool // This will be passed from outside
-    @Binding var navigateToMusicPreferences: Bool // This will be passed from outside
-
+    @State private var showMenu = false
+    
+    // NOTE - this URL is temporary and needs to be updated each time from the backend side to detect mood properly
+    let backendURL = "https://ea06-143-59-31-134.ngrok-free.app/analyze"
+    
     var body: some View {
         ZStack {
             NavigationView {
@@ -40,65 +39,41 @@ struct homePageView: View {
                             }
                             .padding()
                         }
-
-                        // Display profile info
-                        Text("Welcome, \(profile.name)")
-                            .font(.title)
-                            .foregroundColor(.white)
-                            .padding()
-
-                        // Title and Mood Display
+                        
+                        // Welcome and mood display
                         VStack(spacing: 30) {
-                            HStack(spacing: 0) {
-                                Text("M")
-                                    .font(.system(size: 48, weight: .bold, design: .rounded))
-                                    .foregroundColor(Color(red: 0.0, green: 0.5, blue: 0.2))
-                                Text("oodify")
-                                    .font(.system(size: 48, weight: .bold, design: .rounded))
-                                    .foregroundColor(Color(red: 0.96, green: 0.87, blue: 0.70))
-                            }
-                            .padding(.top, 20)
-
-                            // Subtitle
-                            Text("Discover playlists that match your mood")
-                                .font(.system(size: 18, weight: .light, design: .rounded))
-                                .foregroundColor(.white.opacity(0.8))
-                                .multilineTextAlignment(.center)
-                                .padding(.horizontal, 30)
-
-                            // Mood Display
-                            VStack(spacing: 10) {
-                                Text("Your Current Mood")
-                                    .font(.system(size: 22, weight: .medium, design: .rounded))
-                                    .foregroundColor(.white)
-
-                                Text(currentMood)
-                                    .font(.system(size: 60))
-                                    .foregroundColor(.white)
-                                    .padding()
-                                    .background(Circle().fill(Color.gray.opacity(0.4)))
-                                    .shadow(radius: 10)
-
-                                Text(currentMoodText)
-                                    .font(.system(size: 22, weight: .medium, design: .rounded))
-                                    .foregroundColor(.white)
-                            }
-
-                            // Probabilities Display
+                            Text("Welcome, \(profile.name)")
+                                .font(.title)
+                                .foregroundColor(.white)
+                            
+                            Text("Your Current Mood")
+                                .font(.headline)
+                                .foregroundColor(.white)
+                            
+                            Text(currentMood)
+                                .font(.system(size: 60))
+                                .foregroundColor(.white)
+                                .padding()
+                                .background(Circle().fill(Color.gray.opacity(0.4)))
+                                .shadow(radius: 10)
+                            
+                            Text(currentMoodText)
+                                .font(.body)
+                                .foregroundColor(.white)
+                            
+                            // Probabilities display
                             if !probabilities.isEmpty {
                                 VStack(alignment: .leading, spacing: 10) {
                                     Text("Probabilities")
                                         .font(.headline)
-                                        .padding(.bottom, 5)
-
+                                        .foregroundColor(.white)
+                                    
                                     ForEach(probabilities, id: \.emotion) { prob in
                                         HStack {
                                             Text("\(prob.emotion.capitalized):")
-                                                .font(.system(size: 18, weight: .medium, design: .rounded))
                                                 .foregroundColor(.white)
                                             Spacer()
                                             Text("\(String(format: "%.2f", prob.probability * 100))%")
-                                                .font(.system(size: 18, weight: .bold, design: .rounded))
                                                 .foregroundColor(.green)
                                         }
                                         .padding(.vertical, 5)
@@ -110,54 +85,40 @@ struct homePageView: View {
                                 .padding(.horizontal, 20)
                             }
                         }
-
-                        // Detect Mood Button
+                        
+                        // Detect Mood button
                         Button(action: {
                             checkCameraPermission()
                         }) {
                             HStack {
                                 Image(systemName: "camera")
-                                    .font(.title2)
-                                    .foregroundColor(.black)
                                 Text(isDetectingMood ? "Detecting..." : "Detect Mood")
-                                    .font(.system(size: 20, weight: .bold, design: .rounded))
-                                    .foregroundColor(.black)
                             }
                             .padding()
                             .background(Capsule().fill(Color.green))
                             .shadow(radius: 10)
                         }
-
-                        // Connect to Spotify Button
+                        
+                        // Connect to Spotify button
                         Button(action: {
-                            navigateToSpotify = true
+                            navigateToMusicPreferences = true
                         }) {
                             HStack {
                                 Image(systemName: "music.note")
-                                    .font(.title2)
-                                    .foregroundColor(.black)
                                 Text("Connect to Spotify")
-                                    .font(.system(size: 20, weight: .bold, design: .rounded))
-                                    .foregroundColor(.black)
                             }
                             .padding()
                             .background(Capsule().fill(Color.green))
                             .shadow(radius: 10)
                         }
-
+                        
                         Spacer()
                     }
                     .padding(.top, 60)
-                    .navigationDestination(isPresented: $navigateToSpotify) {
-                        ConnectToSpotifyDisplay(spotifyController: spotifyController)
-                    }
-                    .alert(isPresented: $showingAlert) {
-                        Alert(title: Text("Error"), message: Text(alertMessage), dismissButton: .default(Text("OK")))
-                    }
-
                 }
             }
-
+            
+            // Slide-in menu
             if showMenu {
                 MenuView(showMenu: $showMenu, navigateToHomePage: $navigateToHomePage, isCreatingNewProfile: $isCreatingProfile, navigateToMusicPreferences: $navigateToMusicPreferences)
                     .transition(.move(edge: .trailing)) // Slide in from the right
@@ -175,28 +136,12 @@ struct homePageView: View {
                     }
                 }
         }
-      
-        .onChange(of: capturedImage) { newImage in
-            if let newImage = newImage {
-                isDetectingMood = false
-                if let result = model.detectEmotion(in: newImage) {
-                    let emotion = result.target
-                    let probability = result.targetProbability
-                    currentMoodText = emotion.prefix(1).uppercased() + emotion.dropFirst()
-                    currentMood = emotionToEmoji(emotion)
-                    print(probability)
-                }
-            }
-        }
-        .onChange(of: model.error) { newError in
-            if let error = newError {
-                alertMessage = error
-                showingAlert = true
-                isDetectingMood = false
-            }
+        .alert(isPresented: $showingAlert) {
+            Alert(title: Text("Error"), message: Text(alertMessage), dismissButton: .default(Text("OK")))
         }
     }
-
+    
+    // Check camera permissions
     private func checkCameraPermission() {
         switch AVCaptureDevice.authorizationStatus(for: .video) {
         case .authorized:
@@ -211,36 +156,37 @@ struct homePageView: View {
                 }
             }
         case .denied, .restricted:
-            alertMessage = "Camera access is required. Please enable it in Settings."
+            alertMessage = "Enable camera access in Settings."
             showingAlert = true
         @unknown default:
             alertMessage = "Unexpected error occurred."
             showingAlert = true
         }
     }
-
+    
+    // Analyze the captured image using the backend
     private func analyzeImage(image: UIImage) {
         guard let imageData = image.jpegData(compressionQuality: 0.8) else {
             alertMessage = "Failed to convert image to JPEG."
             showingAlert = true
             return
         }
-
+        
         var request = URLRequest(url: URL(string: backendURL)!)
         request.httpMethod = "POST"
-
+        
         let boundary = UUID().uuidString
         request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
-
+        
         var body = Data()
         body.append("--\(boundary)\r\n".data(using: .utf8)!)
         body.append("Content-Disposition: form-data; name=\"image\"; filename=\"mood.jpg\"\r\n".data(using: .utf8)!)
         body.append("Content-Type: image/jpeg\r\n\r\n".data(using: .utf8)!)
         body.append(imageData)
         body.append("\r\n--\(boundary)--\r\n".data(using: .utf8)!)
-
+        
         request.httpBody = body
-
+        
         URLSession.shared.dataTask(with: request) { data, response, error in
             if let error = error {
                 DispatchQueue.main.async {
@@ -249,7 +195,7 @@ struct homePageView: View {
                 }
                 return
             }
-
+            
             guard let data = data else {
                 DispatchQueue.main.async {
                     alertMessage = "No data received from the server."
@@ -257,7 +203,7 @@ struct homePageView: View {
                 }
                 return
             }
-
+            
             if let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
                let emotion = json["emotion"] as? String,
                let probabilitiesDict = json["probabilities"] as? [String: Double] {
@@ -276,7 +222,8 @@ struct homePageView: View {
             }
         }.resume()
     }
-
+    
+    // Convert emotion string to emoji
     private func moodEmoji(for emotion: String) -> String {
         switch emotion.lowercased() {
         case "happy": return "😄"
@@ -289,11 +236,10 @@ struct homePageView: View {
     }
 }
 
-
 struct CameraView: UIViewControllerRepresentable {
     @Binding var image: UIImage?
     @Environment(\.presentationMode) private var presentationMode
-
+    
     func makeUIViewController(context: Context) -> UIImagePickerController {
         let picker = UIImagePickerController()
         picker.sourceType = .camera
@@ -301,20 +247,20 @@ struct CameraView: UIViewControllerRepresentable {
         picker.delegate = context.coordinator
         return picker
     }
-
+    
     func updateUIViewController(_ uiViewController: UIImagePickerController, context: Context) {}
-
+    
     func makeCoordinator() -> Coordinator {
         Coordinator(self)
     }
-
+    
     class Coordinator: NSObject, UINavigationControllerDelegate, UIImagePickerControllerDelegate {
         let parent: CameraView
-
+        
         init(_ parent: CameraView) {
             self.parent = parent
         }
-
+        
         func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
             if let image = info[.originalImage] as? UIImage {
                 let fixedImage = fixOrientation(image: image, cameraDevice: picker.cameraDevice)
@@ -324,7 +270,7 @@ struct CameraView: UIViewControllerRepresentable {
             }
             parent.presentationMode.wrappedValue.dismiss()
         }
-
+        
         func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
             parent.presentationMode.wrappedValue.dismiss()
         }
@@ -348,6 +294,11 @@ struct CameraView: UIViewControllerRepresentable {
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        homePageView()
+        homePageView(
+            profile: Profile(name: "Test User", dateOfBirth: Date(), favoriteGenres: ["Pop", "Rock"], hasAgreedToTerms: true),
+            navigateToHomePage: .constant(false),
+            isCreatingNewProfile: .constant(false),
+            navigateToMusicPreferences: .constant(false), isCreatingProfile: .constant(false)
+        )
     }
 }

@@ -16,3 +16,5 @@ xcuserdata/**/xcdebugger/
 
 *.lock
 UserInterfaceState.xcuserstate
+
+deepface-env
