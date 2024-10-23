@@ -20,10 +20,9 @@ struct PinSetupView: View {
 
     var body: some View {
         VStack {
-            Text(profile?.userPin == nil ? "Set Your PIN" : "Change Pin")
+            Text(profile?.userPin == nil ? "Set Your PIN" : "Change PIN")
                 .font(.largeTitle)
                 .padding()
-            
             
             if profile?.userPin != nil {
                 HStack {
@@ -38,7 +37,7 @@ struct PinSetupView: View {
                             .foregroundColor(.green)
                     }
                     if showingTooltip1 {
-                        Text("We need you current pin in order to change it")
+                        Text("We need your current pin to verify your identity.")
                             .font(.system(size: 12))
                             .foregroundColor(.white)
                             .padding(.leading, 10)
@@ -52,7 +51,8 @@ struct PinSetupView: View {
                     .cornerRadius(10)
                     .frame(width: 200)
             }
-            HStack{
+
+            HStack {
                 Text("Enter New PIN:")
                     .font(.system(size: 20, weight: .bold, design: .rounded))
                     .foregroundColor(.white)
@@ -63,13 +63,12 @@ struct PinSetupView: View {
                         .foregroundColor(.green)
                 }
                 if showingTooltip2 {
-                    Text("You can set a PIN to secure your profile from other users")
+                    Text("You can set a PIN to secure your profile from other users.")
                         .font(.system(size: 12))
                         .foregroundColor(.white)
                         .padding(.leading, 10)
                         .frame(maxWidth: .infinity)
                 }
-
             }
 
             SecureField("Enter New 4-digit PIN", text: $pin)
@@ -81,42 +80,43 @@ struct PinSetupView: View {
 
             SecureField("Confirm New PIN", text: $confirmPin)
                 .keyboardType(.numberPad)
+            
                 .padding()
                 .background(Color.gray.opacity(0.2))
                 .cornerRadius(10)
                 .frame(width: 200)
 
-            HStack {
-                Text(profile?.personalSecurityQuestion == nil ? "Set Security Question:" : "Change Security Question:")
-                    .font(.system(size: 20, weight: .bold, design: .rounded))
-                    .foregroundColor(.white)
-                
-                Button(action: {
-                    showingTooltip.toggle() // Toggle tooltip visibility
-                }) {
-                    Image(systemName: "questionmark.circle")
-                        .foregroundColor(.green)
-                }
-                
-                if showingTooltip {
-                    Text("Set a security question to recover your PIN if forgotten.")
-                        .font(.system(size: 12))
+            // Show security question input only when setting a new PIN
+            if profile?.userPin == nil {
+                HStack {
+                    Text("Set Security Question:")
+                        .font(.system(size: 20, weight: .bold, design: .rounded))
                         .foregroundColor(.white)
-                        .padding(.leading, 10)
-                        .frame(maxWidth: .infinity)
+                    Button(action: {
+                        showingTooltip.toggle()
+                    }) {
+                        Image(systemName: "questionmark.circle")
+                            .foregroundColor(.green)
+                    }
+                    if showingTooltip {
+                        Text("Set a security question to recover your PIN if forgotten.")
+                            .font(.system(size: 12))
+                            .foregroundColor(.white)
+                            .padding(.leading, 10)
+                            .frame(maxWidth: .infinity)
+                    }
                 }
+                
+                TextField("Enter Security Question", text: $securityQuestion)
+                    .padding()
+                    .background(Color.gray.opacity(0.2))
+                    .cornerRadius(10)
+                
+                SecureField("Answer", text: $securityQuestionAnswer)
+                    .padding()
+                    .background(Color.gray.opacity(0.2))
+                    .cornerRadius(10)
             }
-            
-            TextField("Enter Security Question", text: $securityQuestion)
-                .padding()
-                .background(Color.gray.opacity(0.2))
-                .cornerRadius(10)
-            
-            SecureField("Answer", text: $securityQuestionAnswer)
-                .padding()
-                .background(Color.gray.opacity(0.2))
-                .cornerRadius(10)
-            
             if showError {
                 Text(errorMessage)
                     .foregroundColor(.red)
@@ -161,19 +161,22 @@ struct PinSetupView: View {
         }
         
         guard pin == confirmPin else {
-            errorMessage = "PINs must match."
+            errorMessage = "The Confirm PIN must match your New PIN must match."
             showError = true
             return
         }
 
-        if profile?.userPin == nil, securityQuestion.isEmpty || securityQuestionAnswer.isEmpty {
-            errorMessage = "Security Question and Answer are required for setting a PIN."
-            showError = true
-            return
+        // Ensure security question and answer are set only if the user is setting a new PIN
+        if profile?.userPin == nil {
+            guard !securityQuestion.isEmpty && !securityQuestionAnswer.isEmpty else {
+                errorMessage = "Security Question and Answer are required for setting a PIN."
+                showError = true
+                return
+            }
         }
 
         if let profile = profile {
-            // Update the profile with the new PIN and email
+            // Update the profile with the new PIN
             profileManager.updateProfile(
                 profile: profile,
                 name: profile.name,
@@ -181,8 +184,8 @@ struct PinSetupView: View {
                 favoriteGenres: profile.favoriteGenres,
                 hasAgreedToTerms: profile.hasAgreedToTerms,
                 userPin: pin,
-                personalSecurityQuestion: securityQuestion,
-                securityQuestionAnswer: securityQuestionAnswer
+                personalSecurityQuestion: profile.userPin == nil ? securityQuestion : profile.personalSecurityQuestion,
+                securityQuestionAnswer: profile.userPin == nil ? securityQuestionAnswer : profile.securityQuestionAnswer
             )
             print("Stored PIN for profile: \(profileManager.currentProfile?.userPin ?? "No PIN set")")
             print("Stored Security Question: \(profileManager.currentProfile?.personalSecurityQuestion ?? "No question set")")
