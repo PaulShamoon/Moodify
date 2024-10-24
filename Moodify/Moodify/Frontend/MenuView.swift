@@ -2,133 +2,249 @@ import SwiftUI
 
 struct MenuView: View {
     @Binding var showMenu: Bool
-    @EnvironmentObject var profileManager: ProfileManager // Use the existing profile manager
-    @Binding var navigateToHomePage: Bool // navigation to home
+    @EnvironmentObject var profileManager: ProfileManager
+    @Binding var navigateToHomePage: Bool
     @Binding var isCreatingNewProfile: Bool
     @Binding var navigateToMusicPreferences: Bool
+    @State private var showingAccountInformation = false
+    @State private var showingMusicPreferences = false
     @State private var showingDeleteAlert = false
-    @State private var showingPinSetup = false // State to control showing the PIN setup view
-
-
+    @State private var showingPinSetup = false
+    @State private var selectedTab: MenuTab? = nil
+    
+    @Namespace private var menuAnimation
+    
+    enum MenuTab: String, CaseIterable {
+        case account = "Account Information"
+        case music = "Music Preferences"
+        case user = "Switch User"
+        case pin = "Set/Change PIN"
+        case delete = "Delete Profile"
+        
+        var icon: String {
+            switch self {
+            case .account: return "person.circle"
+            case .music: return "music.note.list"
+            case .user: return "arrow.triangle.2.circlepath"
+            case .pin: return "lock.circle"
+            case .delete: return "trash.circle"
+            }
+        }
+        
+        var color: Color {
+            switch self {
+            case .account: return .blue
+            case .music: return .purple
+            case .user: return .green
+            case .pin: return .orange
+            case .delete: return .red
+            }
+        }
+    }
+    
     var body: some View {
-        ZStack {
-            // Dim background with gradient when menu is shown
-            LinearGradient(gradient: Gradient(colors: [Color.black, Color.gray.opacity(0.8)]), startPoint: .top, endPoint: .bottom)
-                .edgesIgnoringSafeArea(.all)
-                .opacity(showMenu ? 1 : 0) // Show only when menu is visible
-                .disabled(!showMenu) // Disable interaction when menu is hidden
-
-            HStack {
-                Spacer() // Pushes the menu to the right side
-
-                VStack(alignment: .leading) {
-                    HStack {
-                        Button(action: {
-                            withAnimation {
-                                showMenu = false // Close menu on button click
-                            }
-                        }) {
-                            Image(systemName: "xmark")
-                                .font(.title)
-                                .foregroundColor(.white)
+        GeometryReader { geometry in
+            ZStack {
+                Color.black.opacity(0.3)
+                    .edgesIgnoringSafeArea(.all)
+                    .opacity(showMenu ? 1 : 0)
+                    .animation(.easeInOut(duration: 0.3), value: showMenu)
+                    .onTapGesture {
+                        withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
+                            showMenu = false
                         }
-                        .padding(.top, 40)
-                        .padding(.leading, 20)
-                        Spacer()
                     }
 
+                HStack {
                     Spacer()
-
-                    VStack(alignment: .leading, spacing: 20) {
-                        // Account Information Link
-                        NavigationLink(destination: AccountInfoView().environmentObject(profileManager)) { // Use the shared ProfileManager
-                            Text("Account Information")
-                                .font(.title2)
-                                .foregroundColor(.white)
-                                .padding(.leading, 20)
-                                .padding(.top, 100)
+                    
+                    VStack(spacing: 0) {
+                        MenuHeader(showMenu: $showMenu)
+                        
+                        if let profile = profileManager.currentProfile {
+                            ProfileSection(profile: profile)
                         }
 
-                        // Music Preferences Link
-                        NavigationLink(destination: GeneralMusicPreferencesView(navigateToHomePage: .constant(false)).environmentObject(profileManager)) { // Use the shared ProfileManager
-                            Text("Music Preferences")
-                                .font(.title2)
-                                .foregroundColor(.white)
-                                .padding(.leading, 20)
-                        }
-
-                        // Switch User Button
-                        Button(action: {
-                            switchUser() // Call the switch user function
-                            showMenu = false
-                        }) {
-                            Text("Switch User")
-                                .font(.title2)
-                                .foregroundColor(.white)
-                                .padding(.leading, 20)
-                        }
-
-                        Button(action: {
-                            showingDeleteAlert = true
-                        }) {
-                            Text("Delete Profile")
-                                .font(.title2)
-                                .foregroundColor(.white)
-                                .padding(.leading, 20)
-                        }
-                        .alert(isPresented: $showingDeleteAlert) {
-                            Alert(
-                                title: Text("Delete Profile"),
-                                message: Text("Are you sure you want to delete the current profile?"),
-                                primaryButton: .destructive(Text("Delete")) {
-                                    deleteProfile()
-                                },
-                                secondaryButton: .cancel()
-                            )
+                        ScrollView {
+                            VStack(spacing: 8) {
+                                ForEach(MenuTab.allCases, id: \.self) { tab in
+                                    MenuButton(
+                                        tab: tab,
+                                        isSelected: selectedTab == tab,
+                                        action: {
+                                            handleTabSelection(tab)
+                                        }
+                                    )
+                                }
+                            }
+                            .padding(.vertical)
                         }
                         
-                        Button(action: {
-                            showingPinSetup = true // Show the PIN setup view
-                        }) {
-                            Text("Set/Change PIN")
-                                .font(.title2)
-                                .foregroundColor(.white)
-                                .padding(.leading, 20)
-                        }
-                        .sheet(isPresented: $showingPinSetup) {
-                            if let currentProfile = profileManager.currentProfile {
-                                PinSetupView(profile: currentProfile)
-                                    .environmentObject(profileManager)
-                            }
-                        }
-
                         Spacer()
+
+                        Text("Prototype 2.0")
+                            .font(.caption)
+                            .foregroundColor(.gray)
+                            .padding(.bottom)
                     }
-                    .padding(.top, 40)
+                    .frame(width: min(geometry.size.width * 0.85, 320))
+                    .background(
+                        RoundedRectangle(cornerRadius: 20)
+                            .fill(Color(red: 20/255, green: 20/255, blue: 20/255))
+                            .shadow(radius: 10)
+                    )
+                    .offset(x: showMenu ? 0 : geometry.size.width)
+                    .animation(.spring(response: 0.4, dampingFraction: 0.8), value: showMenu)
                 }
-                .frame(width: 250)
-                .background(Color.black.opacity(0.8))
-                .edgesIgnoringSafeArea(.bottom)
+                NavigationLink(
+                    destination: AccountInfoView()
+                        .environmentObject(profileManager),
+                    isActive: $showingAccountInformation
+                ) { EmptyView() }
+                NavigationLink(
+                    destination: GeneralMusicPreferencesView(navigateToHomePage: .constant(false))
+                        .environmentObject(profileManager),
+                    isActive: $showingMusicPreferences
+                ) { EmptyView() }
+                NavigationLink(
+                    destination: PinSetupView(profile: profileManager.currentProfile)
+                        .environmentObject(profileManager),
+                    isActive: $showingPinSetup
+                ) { EmptyView() }
+            }
+            .alert(isPresented: $showingDeleteAlert) {
+                Alert(
+                    title: Text("Delete Profile"),
+                    message: Text("Are you sure you want to delete the current profile? This action cannot be undone."),
+                    primaryButton: .destructive(Text("Delete")) {
+                        deleteProfile()
+                    },
+                    secondaryButton: .cancel()
+                )
             }
         }
         .navigationBarHidden(true)
     }
-
-    private func switchUser() {
-        // Reset the app states to ensure proper navigation
-        profileManager.currentProfile = nil
-        isCreatingNewProfile = false
-        navigateToHomePage = false
-        navigateToMusicPreferences = false
+    
+    private func handleTabSelection(_ tab: MenuTab) {
+        withAnimation(.spring()) {
+            selectedTab = tab
+        }
+        
+        switch tab {
+        case .account:
+            showingAccountInformation = true
+        case .music:
+            showingMusicPreferences = true
+        case .user:
+            switchUser()
+        case .pin:
+            showingPinSetup = true
+        case .delete:
+            showingDeleteAlert = true
+        }
     }
-
-    private func deleteProfile() {
-        if let currentProfile = profileManager.currentProfile {
-            profileManager.deleteProfile(profile: currentProfile)
+    
+    private func switchUser() {
+        withAnimation {
             profileManager.currentProfile = nil
             isCreatingNewProfile = false
             navigateToHomePage = false
             navigateToMusicPreferences = false
+            showMenu = false
         }
+    }
+    
+    private func deleteProfile() {
+        if let currentProfile = profileManager.currentProfile {
+            withAnimation {
+                profileManager.deleteProfile(profile: currentProfile)
+                profileManager.currentProfile = nil
+                isCreatingNewProfile = false
+                navigateToHomePage = false
+                navigateToMusicPreferences = false
+                showMenu = false
+            }
+        }
+    }
+}
+
+// MARK: - Supporting Views
+struct MenuHeader: View {
+    @Binding var showMenu: Bool
+    
+    var body: some View {
+        HStack {
+            Text("Menu")
+                .font(.title.bold())
+            
+            Spacer()
+            
+            Button {
+                withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
+                    showMenu = false
+                }
+            } label: {
+                Image(systemName: "xmark.circle.fill")
+                    .font(.title2)
+                    .foregroundColor(.gray)
+            }
+        }
+        .padding()
+    }
+}
+
+struct ProfileSection: View {
+    let profile: Profile
+    
+    var body: some View {
+        VStack(spacing: 12) {
+            Image(systemName: "person.crop.circle.fill")
+                .font(.system(size: 60))
+                .foregroundColor(.blue)
+            
+            Text(profile.name)
+                .font(.title3.bold())
+            
+            Divider()
+        }
+        .padding()
+    }
+}
+
+struct MenuButton: View {
+    let tab: MenuView.MenuTab
+    let isSelected: Bool
+    let action: () -> Void
+    
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: 16) {
+                Image(systemName: tab.icon)
+                    .font(.title3)
+                    .foregroundColor(tab.color)
+                    .frame(width: 24)
+                
+                Text(tab.rawValue)
+                    .font(.body)
+                
+                Spacer()
+                
+                if tab != .delete {
+                    Image(systemName: "chevron.right")
+                        .font(.caption)
+                        .foregroundColor(.gray)
+                }
+            }
+            .padding(.horizontal)
+            .padding(.vertical, 12)
+            .background(
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(isSelected ? tab.color.opacity(0.1) : Color.clear)
+            )
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(PlainButtonStyle())
+        .padding(.horizontal)
     }
 }

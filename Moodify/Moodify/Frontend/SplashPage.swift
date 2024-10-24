@@ -11,7 +11,10 @@ struct SplashPageView: View {
     @State private var navigateToHomePage = false
     
     var body: some View {
-        VStack {
+        ZStack {
+            Color.black // Set the background to black permamently regardless of light mode
+                .ignoresSafeArea() // Make sure it covers the entire screen
+
             if navigateToHomePage {
                 // After splash is complete, the main app will handle the profile logic.
                 EmptyView() // Just a placeholder, actual navigation logic is in MoodifyApp
