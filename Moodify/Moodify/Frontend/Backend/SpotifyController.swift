@@ -176,4 +176,42 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
     func skipToPrevious() {
         playbackController.skipToPrevious()
     }
+    
+    /*
+     Method to add songs to the queue relating to users detected mood
+     
+     @param mood: the users detected mood
+     
+     Created by: Paul Shamoon
+     */
+    func addSongsToQueue(mood: String) {
+        let songs: [String]
+        
+        switch mood.lowercased() {
+            case "happy":
+                songs = happy_songs
+            case "sad":
+                songs = sad_songs
+            case "angry":
+                songs = angry_songs
+            default:
+                songs = neutral_songs
+        }
+        
+        // Shuffle the set of songs to maintain a random order
+        let shuffledSongs = songs.shuffled()
+        
+        for (index, uri) in shuffledSongs.enumerated() {
+            // Need to add a small delay between requests to prevent rate limiting errors
+            DispatchQueue.main.asyncAfter(deadline: .now() + Double(index) * 0.5) {
+                self.appRemote.playerAPI?.enqueueTrackUri("spotify:track:\(uri)", callback: { (result, error) in
+                    if let error = error {
+                        print("Failed to enqueue song URI \(uri): \(error.localizedDescription)")
+                    } else {
+                        print("Enqueued song URI: \(uri)")
+                    }
+                })
+            }
+        }
+    }
 }
