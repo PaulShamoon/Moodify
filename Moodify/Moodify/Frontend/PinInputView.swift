@@ -8,10 +8,12 @@ import SwiftUI
 
 struct PinInputView: View {
     let profile: Profile
-    @EnvironmentObject var profileManager: ProfileManager // Add this line
+    @EnvironmentObject var profileManager: ProfileManager
     @State private var enteredPin: String = ""
     @State private var showError: Bool = false
     @State private var showingForgotPin = false
+    @Environment(\.presentationMode) var presentationMode
+    @State private var navigateBackToSelection = false
     var onPinEntered: (String) -> Void
 
     var body: some View {
@@ -60,12 +62,17 @@ struct PinInputView: View {
             }
             .padding(.top, 10)
             .sheet(isPresented: $showingForgotPin) {
-                ForgotPinView(profile: profile)
-                    .environmentObject(profileManager) // Ensure profileManager is passed here
+                ForgotPinView(navigateBackToSelection: $navigateBackToSelection, profile: profile)
+                    .environmentObject(profileManager)
             }
 
             Spacer()
         }
         .padding()
+        .onChange(of: navigateBackToSelection) { value in
+            if value {
+                presentationMode.wrappedValue.dismiss() // Dismiss the view when navigation flag is set
+            }
+        }
     }
 }

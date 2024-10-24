@@ -8,6 +8,7 @@ struct ForgotPinView: View {
     @State private var showError = false
     @State private var errorMessage: String = ""
     @Environment(\.presentationMode) var presentationMode
+    @Binding var navigateBackToSelection: Bool
     
     var profile: Profile
 
@@ -60,9 +61,6 @@ struct ForgotPinView: View {
             Spacer()
         }
         .padding()
-        .onAppear {
-            profileManager.loadProfiles() // Ensure the latest profile data is loaded when the view appears
-        }
     }
 
     private func resetPin() {
@@ -104,7 +102,7 @@ struct ForgotPinView: View {
             )
 
             print("PIN reset successfully for profile: \(profileManager.profiles[profileIndex].name)")
-            presentationMode.wrappedValue.dismiss()
+            navigateBackToSelection = true // Navigate back to the selection page
         } else {
             errorMessage = "Profile not found. Please try again."
             showError = true
