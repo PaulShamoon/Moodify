@@ -201,7 +201,6 @@ struct PinSetupView: View {
     }
 }
 
-/*
 struct PinSetupView_Previews: PreviewProvider {
     static var previews: some View {
         // Mock profiles for preview
@@ -210,8 +209,9 @@ struct PinSetupView_Previews: PreviewProvider {
             dateOfBirth: Date(),
             favoriteGenres: ["Rock", "Pop"],
             hasAgreedToTerms: true,
-            userPin: "1234", // Simulate an existing PIN
-            userEmail: "user@example.com"
+            userPin: "1234", 
+            personalSecurityQuestion: "What is your pet's name?",
+            securityQuestionAnswer: "dog"
         )
         
         let profileWithoutPin = Profile(
@@ -219,14 +219,14 @@ struct PinSetupView_Previews: PreviewProvider {
             dateOfBirth: Date(),
             favoriteGenres: ["Jazz", "Blues"],
             hasAgreedToTerms: true,
-            userPin: nil, // No existing PIN
-            userEmail: nil
+            userPin: nil,
+            personalSecurityQuestion: nil,
+            securityQuestionAnswer: nil
         )
         
         // Mock profile manager
         let profileManager = ProfileManager()
         
-        // Inject the mock profile into the profile manager for each view
         profileManager.profiles = [profileWithPin, profileWithoutPin]
         profileManager.currentProfile = profileWithPin
         
@@ -243,4 +243,3 @@ struct PinSetupView_Previews: PreviewProvider {
         }
     }
 }
-*/
