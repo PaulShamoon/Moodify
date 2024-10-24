@@ -30,6 +30,7 @@ class ProfileManager: ObservableObject {
             profiles[index].securityQuestionAnswer = securityQuestionAnswer
             saveProfiles()
             selectProfile(profiles[index])
+            loadProfiles() // Refresh profiles after updating
         }
     }
     
@@ -47,6 +48,7 @@ class ProfileManager: ObservableObject {
         
         profiles.remove(at: index)
         saveProfiles()
+        loadProfiles() // Refresh profiles after deletion
         print("Profile deleted successfully.")
     }
     
@@ -55,7 +57,7 @@ class ProfileManager: ObservableObject {
             let encoded = try JSONEncoder().encode(profiles)
             UserDefaults.standard.set(encoded, forKey: profilesKey)
         } catch {
-            print("Failed to save profiles: (error.localizedDescription)")
+            print("Failed to save profiles: \(error.localizedDescription)")
         }
     }
     
@@ -63,9 +65,12 @@ class ProfileManager: ObservableObject {
         do {
             if let data = UserDefaults.standard.data(forKey: profilesKey) {
                 profiles = try JSONDecoder().decode([Profile].self, from: data)
+                if let currentProfileID = currentProfile?.id {
+                    currentProfile = profiles.first { $0.id == currentProfileID }
+                }
             }
         } catch {
-            print("Failed to load profiles: (error.localizedDescription)")
+            print("Failed to load profiles: \(error.localizedDescription)")
             profiles = []
         }
     }
@@ -73,6 +78,4 @@ class ProfileManager: ObservableObject {
     func verifyPin(for profile: Profile, enteredPin: String) -> Bool {
         return profile.userPin == enteredPin
     }
-
 }
-

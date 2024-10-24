@@ -14,8 +14,6 @@ struct PinSetupView: View {
     @State private var showingTooltip1 = false
     @State private var showingTooltip2 = false
 
-
-    
     var profile: Profile?
 
     var body: some View {
@@ -80,7 +78,6 @@ struct PinSetupView: View {
 
             SecureField("Confirm New PIN", text: $confirmPin)
                 .keyboardType(.numberPad)
-            
                 .padding()
                 .background(Color.gray.opacity(0.2))
                 .cornerRadius(10)
@@ -149,20 +146,24 @@ struct PinSetupView: View {
             guard currentPin == existingPin else {
                 errorMessage = "Current PIN is incorrect."
                 showError = true
+                print("Current PIN entered is incorrect.")
                 return
             }
+            print("Current PIN is correct.")
         }
 
         // Validate the new PIN
         guard pin.count == 4 else {
             errorMessage = "PINs must be 4 digits."
             showError = true
+            print("New PIN is not 4 digits.")
             return
         }
         
         guard pin == confirmPin else {
-            errorMessage = "The Confirm PIN must match your New PIN must match."
+            errorMessage = "The Confirm PIN must match your New PIN."
             showError = true
+            print("New PIN and Confirm PIN do not match.")
             return
         }
 
@@ -171,8 +172,10 @@ struct PinSetupView: View {
             guard !securityQuestion.isEmpty && !securityQuestionAnswer.isEmpty else {
                 errorMessage = "Security Question and Answer are required for setting a PIN."
                 showError = true
+                print("Security Question or Answer is empty.")
                 return
             }
+            print("Security Question and Answer are set.")
         }
 
         if let profile = profile {
@@ -187,13 +190,17 @@ struct PinSetupView: View {
                 personalSecurityQuestion: profile.userPin == nil ? securityQuestion : profile.personalSecurityQuestion,
                 securityQuestionAnswer: profile.userPin == nil ? securityQuestionAnswer : profile.securityQuestionAnswer
             )
-            print("Stored PIN for profile: \(profileManager.currentProfile?.userPin ?? "No PIN set")")
+            
+            print("Profile updated with new PIN: \(pin)")
             print("Stored Security Question: \(profileManager.currentProfile?.personalSecurityQuestion ?? "No question set")")
             print("Stored Security Question Answer: \(profileManager.currentProfile?.securityQuestionAnswer ?? "No answer set")")
             presentationMode.wrappedValue.dismiss()
+        } else {
+            print("No profile found to update.")
         }
     }
 }
+
 /*
 struct PinSetupView_Previews: PreviewProvider {
     static var previews: some View {
