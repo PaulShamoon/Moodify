@@ -61,6 +61,10 @@ struct ForgotPinView: View {
             Spacer()
         }
         .padding()
+        .onDisappear {
+            // Ensure the profile data is reloaded when this view is dismissed
+            profileManager.loadProfiles()
+        }
     }
 
     private func resetPin() {

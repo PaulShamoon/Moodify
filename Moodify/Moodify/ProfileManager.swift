@@ -15,7 +15,7 @@ class ProfileManager: ObservableObject {
         let newProfile = Profile(name: name, dateOfBirth: dateOfBirth, favoriteGenres: favoriteGenres, hasAgreedToTerms: hasAgreedToTerms)
         profiles.append(newProfile)
         saveProfiles()
-        selectProfile(newProfile)  // Immediately select the new profile
+        selectProfile(newProfile)
     }
     
     // Update an existing profile
@@ -30,7 +30,7 @@ class ProfileManager: ObservableObject {
             profiles[index].securityQuestionAnswer = securityQuestionAnswer
             saveProfiles()
             selectProfile(profiles[index])
-            loadProfiles() // Refresh profiles after updating
+            loadProfiles() 
         }
     }
     

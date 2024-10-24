@@ -74,5 +74,8 @@ struct PinInputView: View {
                 presentationMode.wrappedValue.dismiss() // Dismiss the view when navigation flag is set
             }
         }
+        .onAppear {
+            profileManager.loadProfiles() // Refresh data when the view appears
+        }
     }
 }

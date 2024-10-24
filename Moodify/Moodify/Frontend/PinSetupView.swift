@@ -2,7 +2,7 @@ import SwiftUI
 
 struct PinSetupView: View {
     @EnvironmentObject var profileManager: ProfileManager
-    @State private var currentPin: String = "" // To store the current PIN for verification
+    @State private var currentPin: String = ""
     @State private var pin: String = ""
     @State private var confirmPin: String = ""
     @State private var securityQuestion: String = ""
