@@ -199,9 +199,9 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
         let songs: [String]
         
         switch mood.lowercased() {
-            case "happy":
+            case "happy", "surprise":
                 songs = happy_songs
-            case "sad":
+            case "sad", "fear", "disgust":
                 songs = sad_songs
             case "angry":
                 songs = angry_songs

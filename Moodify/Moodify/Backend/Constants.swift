@@ -51,7 +51,33 @@ let happy_songs = [
 ]
 
 let angry_songs = [
-    ""
+    // heavy metal
+    // The Troopper
+    "2pxAohyJptQWTQ5ZRWYijN",
+    // Paranoid
+    "1jzDzZWeSDBg5fhNc3tczV",
+    // Killing In the Name
+    "59WN2psjkt1tyaxjspN8fp",
+    // Right Now
+    "437ShA8eBSfBmezIP9MeX1",
+    
+    // pop punk
+    // Misery Business
+    "6SpLc7EXZIPpy0sVko0aoU",
+    // Still Into you
+    "1yjY7rpaAQvKwpdUliHx0d",
+    
+    // hard rock
+    // Animals I Have Becom
+    "56sk7jBpZV0CD31G9hEU3b",
+    // I Hate Everything About You
+    "0M955bMOoilikPXwKLYpoi",
+    
+    // Rap
+    // Imortal
+    "4IO8X9W69dIQe0EC5ALXhq",
+    // DNA
+    "6HZILIRieu8S0iqY8kIKhj"
 ]
 
 let neutral_songs = [
