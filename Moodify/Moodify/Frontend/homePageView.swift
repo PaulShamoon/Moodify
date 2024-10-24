@@ -197,6 +197,9 @@ struct homePageView: View {
                     }
                     .padding(.top, 60)
                 }
+                .alert(isPresented: $showingAlert) {
+                    Alert(title: Text("Error"), message: Text(alertMessage), dismissButton: .default(Text("OK")))
+                }
             }
             
             // Slide-in menu
@@ -216,9 +219,6 @@ struct homePageView: View {
                         showingAlert = true
                     }
                 }
-        }
-        .alert(isPresented: $showingAlert) {
-            Alert(title: Text("Error"), message: Text(alertMessage), dismissButton: .default(Text("OK")))
         }
     }
     

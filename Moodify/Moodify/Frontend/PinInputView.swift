@@ -11,9 +11,9 @@ struct PinInputView: View {
     @EnvironmentObject var profileManager: ProfileManager
     @State private var enteredPin: String = ""
     @State private var showError: Bool = false
-    @State private var showingForgotPin = false
+    @State private var showingForgotPin: Bool = false
     @Environment(\.presentationMode) var presentationMode
-    @State private var navigateBackToSelection = false
+    @State private var navigateBackToSelection: Bool = false
     var onPinEntered: (String) -> Void
 
     var body: some View {

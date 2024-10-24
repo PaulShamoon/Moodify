@@ -5,7 +5,7 @@ struct ForgotPinView: View {
     @State private var enteredAnswer: String = ""
     @State private var newPin: String = ""
     @State private var confirmNewPin: String = ""
-    @State private var showError = false
+    @State private var showError: Bool = false
     @State private var errorMessage: String = ""
     @Environment(\.presentationMode) var presentationMode
     @Binding var navigateBackToSelection: Bool
