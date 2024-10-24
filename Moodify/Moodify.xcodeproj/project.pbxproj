@@ -148,6 +148,7 @@
 				89AD05642CB08439004D8FAD /* ProfileManager.swift */,
 				89AD05622CB083B3004D8FAD /* Profile.swift */,
 				694B6C002C9A4431002F0931 /* Frontend */,
+				6E52B8522CC98F1B0049BF08 /* Backend */,
 				6EFE6C522C9E4AD40000DE46 /* Moodify-Bridging-Header.h */,
 				6EA47A752C9E52C7006FB5C6 /* SpotifyiOS.xcframework */,
 				6EA47A6B2C9E50D3006FB5C6 /* Moodify.plist */,
@@ -194,7 +195,6 @@
 				6934A10E2C8FDA840086CC91 /* ConnectToSpotify.swift */,
 				89FA8A422C9A6F39005480D8 /* generalMusicPreferences.swift */,
 				696300572CC6E65E00AE7814 /* DetectEmotionServices.swift */,
-				6E52B8522CC98F1B0049BF08 /* Backend */,
 			);
 			path = Frontend;
 			sourceTree = "<group>";
