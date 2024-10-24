@@ -8,7 +8,8 @@ import SwiftUI
  */
 struct ConnectToSpotifyDisplay: View {
     @ObservedObject var spotifyController: SpotifyController
-    
+    @Environment(\.dismiss) var dismiss // Environment property to handle view dismissal
+
     var body: some View {
         VStack(spacing: 20) {
             Text("Choose your streaming provider to continue")
@@ -39,9 +40,12 @@ struct ConnectToSpotifyDisplay: View {
         }
         .padding()
         
-         // This redirects users back to our application
+         // We can access the url when spotift redirects us to Moodify
         .onOpenURL { url in
+            // We call setAccessToken passing in the url so it can retrieve the access token from it
             spotifyController.setAccessToken(from: url)
+            // This navigates us back to the homepage
+            dismiss()
         }
     }
 }
