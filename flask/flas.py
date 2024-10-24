@@ -5,7 +5,7 @@ import numpy as np
 
 app = Flask(__name__)
 
-@app.route('/predict-mood', methods=['POST'])
+@app.route('/analyze', methods=['POST'])
 def analyze():
     try:
         # Read the uploaded image from the request

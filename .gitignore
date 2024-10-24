@@ -8,6 +8,7 @@ xcuserdata/
 build/
 DerivedData/
 xcuserdata/**/xcdebugger/
+deepface-env/
 
 .DS_Store
 
