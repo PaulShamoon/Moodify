@@ -6,6 +6,9 @@ struct ProfileSelectionView: View {
     @Binding var isCreatingNewProfile: Bool
     @State private var showingQuestionnaire = false
     @Binding var navigateToMusicPreferences: Bool
+    @State private var showingPinPrompt = false
+    @State private var selectedProfile: Profile? = nil
+    
     let defaultProfileImage = URL(string: "https://cdn.pixabay.com/photo/2016/11/08/15/21/user-1808597_1280.png")!
     let columns = [
         GridItem(.adaptive(minimum: 160, maximum: 180), spacing: 24)
@@ -13,6 +16,7 @@ struct ProfileSelectionView: View {
     
     var body: some View {
         ZStack {
+            // Background gradient
             LinearGradient(
                 gradient: Gradient(colors: [
                     Color.black,
@@ -25,6 +29,7 @@ struct ProfileSelectionView: View {
             .ignoresSafeArea()
             
             VStack(spacing: 24) {
+                // Header
                 VStack(spacing: 8) {
                     Text("Who's Listening?")
                         .font(.system(size: 32, weight: .bold))
@@ -46,6 +51,7 @@ struct ProfileSelectionView: View {
                 }
                 .padding(.top, 40)
                 
+                // Profile Grid
                 ScrollView(showsIndicators: false) {
                     LazyVGrid(columns: columns, spacing: 24) {
                         ForEach(profileManager.profiles, id: \.id) { profile in
@@ -53,9 +59,11 @@ struct ProfileSelectionView: View {
                                 profile: profile,
                                 defaultProfileImage: defaultProfileImage,
                                 action: {
-                                    withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
-                                        profileManager.selectProfile(profile)
-                                        navigateToHomePage = true
+                                    if let pin = profile.userPin, !pin.isEmpty {
+                                        selectedProfile = profile
+                                        showingPinPrompt = true
+                                    } else {
+                                        selectProfile(profile)
                                     }
                                 }
                             )
@@ -65,6 +73,7 @@ struct ProfileSelectionView: View {
                 }
                 .frame(maxHeight: UIScreen.main.bounds.height * 0.6)
                 
+                // Add New Profile Button
                 Button(action: {
                     withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
                         resetProfileCreationState()
@@ -99,6 +108,16 @@ struct ProfileSelectionView: View {
         .onChange(of: navigateToMusicPreferences) { value in
             handleMusicPreferenceNavigation(value)
         }
+        .sheet(isPresented: $showingPinPrompt) {
+            PinInputView(
+                profile: selectedProfile ?? Profile(name: "", dateOfBirth: Date(), favoriteGenres: [], hasAgreedToTerms: false),
+                onPinEntered: { enteredPin in
+                    if let profile = selectedProfile {
+                        verifyPin(for: profile, enteredPin: enteredPin)
+                    }
+                }
+            )
+        }
     }
     
     private func resetProfileCreationState() {
@@ -106,27 +125,30 @@ struct ProfileSelectionView: View {
         navigateToHomePage = false
         navigateToMusicPreferences = false
     }
-
+    
     private func handleMusicPreferenceNavigation(_ isNavigating: Bool) {
         if isNavigating {
             navigateToHomePage = false
             showingQuestionnaire = false
         }
     }
-
-    // Preview provider for development
-    struct ProfileSelectionView_Previews: PreviewProvider {
-        static var previews: some View {
-            ProfileSelectionView(
-                navigateToHomePage: .constant(false),
-                isCreatingNewProfile: .constant(false),
-                navigateToMusicPreferences: .constant(false)
-            )
-            .environmentObject(ProfileManager())
+    
+    private func selectProfile(_ profile: Profile) {
+        withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+            profileManager.selectProfile(profile)
+            navigateToHomePage = true
+        }
+    }
+    
+    private func verifyPin(for profile: Profile, enteredPin: String) {
+        if enteredPin == profile.userPin {
+            selectProfile(profile)
+            showingPinPrompt = false
         }
     }
 }
 
+// ProfileCard View remains unchanged
 struct ProfileCard: View {
     let profile: Profile
     let defaultProfileImage: URL
@@ -136,7 +158,6 @@ struct ProfileCard: View {
     var body: some View {
         Button(action: action) {
             VStack(spacing: 16) {
-                // Profile Image
                 AsyncImage(url: defaultProfileImage) { phase in
                     switch phase {
                     case .empty:
@@ -178,7 +199,7 @@ struct ProfileCard: View {
             .frame(width: 160, height: 180)
             .background(
                 RoundedRectangle(cornerRadius: 20)
-                    .fill(Color(hex: "1C1C1E")) // Dark card background
+                    .fill(Color(hex: "1C1C1E"))
                     .overlay(
                         RoundedRectangle(cornerRadius: 20)
                             .stroke(Color(hex: "22C55E").opacity(0.2), lineWidth: 1)
@@ -204,7 +225,7 @@ struct ProfileCard: View {
     }
 }
 
-// Helper extension for hex colors
+// Color extension remains unchanged
 extension Color {
     init(hex: String) {
         let hex = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
@@ -212,11 +233,11 @@ extension Color {
         Scanner(string: hex).scanHexInt64(&int)
         let a, r, g, b: UInt64
         switch hex.count {
-        case 3: // RGB (12-bit)
+        case 3:
             (a, r, g, b) = (255, (int >> 8) * 17, (int >> 4 & 0xF) * 17, (int & 0xF) * 17)
-        case 6: // RGB (24-bit)
+        case 6:
             (a, r, g, b) = (255, int >> 16, int >> 8 & 0xFF, int & 0xFF)
-        case 8: // ARGB (32-bit)
+        case 8:
             (a, r, g, b) = (int >> 24, int >> 16 & 0xFF, int >> 8 & 0xFF, int & 0xFF)
         default:
             (a, r, g, b) = (1, 1, 1, 0)
@@ -225,7 +246,7 @@ extension Color {
             .sRGB,
             red: Double(r) / 255,
             green: Double(g) / 255,
-            blue:  Double(b) / 255,
+            blue: Double(b) / 255,
             opacity: Double(a) / 255
         )
     }
