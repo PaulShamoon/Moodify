@@ -8,7 +8,6 @@ import Foundation
 import SpotifyiOS
 
 class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDelegate, SPTAppRemoteDelegate {
-    
     // Unique Spotify client ID
     private let spotifyClientID = "3dfaae404a2f4847a2ff7d707f7154f4"
     
@@ -17,12 +16,21 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
     
     // Published property to hold the current track name
     @Published var currentTrackName: String = "No track playing"
+    
+    // Published property to hold the current track album
     @Published var currentAlbumName: String = ""
+    
+    // Stores all data for the current track, used to fetch album covers
+    var currentTrackValue: SPTAppRemoteTrack? = nil
+
     // Variable to store the last known player state
     var isPaused: Bool = false
 
     // Access token for API requests
     @Published var accessToken: String? = nil
+    
+    // Variable to hold album cover
+    @Published var albumCover: UIImage? = nil
     
     // Spotify App Remote instance
     private lazy var appRemote: SPTAppRemote = {
@@ -81,6 +89,7 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
             // Reset track and album name
             currentTrackName = "No track playing"
             currentAlbumName = ""
+            accessToken = nil
         } else {
             print("AppRemote is not connected, no need to disconnect")
         }
@@ -138,8 +147,10 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
     */
     func playerStateDidChange(_ playerState: SPTAppRemotePlayerState) {
         DispatchQueue.main.async {
+            self.currentTrackValue = playerState.track
             self.currentTrackName = playerState.track.name
             self.currentAlbumName = playerState.track.album.name
+            self.fetchAlbumCover()
         }
     }
     
@@ -175,5 +186,70 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
     */
     func skipToPrevious() {
         playbackController.skipToPrevious()
+    }
+    
+    /*
+     Method to add songs to the queue relating to users detected mood
+     
+     @param mood: the users detected mood
+     
+     Created by: Paul Shamoon
+     */
+    func addSongsToQueue(mood: String) {
+        let songs: [String]
+        
+        switch mood.lowercased() {
+            case "happy":
+                songs = happy_songs
+            case "sad":
+                songs = sad_songs
+            case "angry":
+                songs = angry_songs
+            default:
+                songs = neutral_songs
+        }
+        
+        // Shuffle the set of songs to maintain a random order
+        let shuffledSongs = songs.shuffled()
+        
+        for (index, uri) in shuffledSongs.enumerated() {
+            // Need to add a small delay between requests to prevent rate limiting errors
+            DispatchQueue.main.asyncAfter(deadline: .now() + Double(index) * 0.5) {
+                self.appRemote.playerAPI?.enqueueTrackUri("spotify:track:\(uri)", callback: { (result, error) in
+                    if let error = error {
+                        print("Failed to enqueue song URI \(uri): \(error.localizedDescription)")
+                    } else {
+                        print("Enqueued song URI: \(uri)")
+                    }
+                })
+            }
+        }
+    }
+    
+    /*
+     Method fetches the current tracks album cover
+     
+     Created on 10/23/24 by: Paul Shamoon
+     */
+    func fetchAlbumCover() {
+        // Fetch the current track image with specified size
+        // Note to Naz: you can mess around with the cgsize and set it to whatever works best with our frontend. remove this comment in your UI pr
+        appRemote.imageAPI?.fetchImage(forItem: currentTrackValue!, with: CGSize(width: 200, height: 200), callback: { (result, error) in
+            if let error = error {
+                print("Failed to fetch album cover: \(error.localizedDescription)")
+                return
+            }
+            
+            // Ensure that result is of type UIImage
+            if let image = result as? UIImage {
+                print("Successfully fetched album cover")
+                DispatchQueue.main.async {
+                    // Update the album cover on the main thread
+                    self.albumCover = image
+                }
+            } else {
+                print("Failed to cast result to UIImage")
+            }
+        })
     }
 }
