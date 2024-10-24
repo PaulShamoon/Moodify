@@ -34,7 +34,7 @@ struct MoodifyApp: App {
                                 }
                                 .environmentObject(profileManager)
                         } else {
-                            QuestionnaireView(navigateToMusicPreferences: $navigateToMusicPreferences)
+                            QuestionnaireView(navigateToMusicPreferences: $navigateToMusicPreferences, isCreatingNewProfile: $isCreatingNewProfile)
                                 .environmentObject(profileManager)
                         }
                     } else {

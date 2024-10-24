@@ -17,3 +17,5 @@ deepface-env/
 
 *.lock
 UserInterfaceState.xcuserstate
+
+deepface-env

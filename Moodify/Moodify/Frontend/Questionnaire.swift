@@ -5,6 +5,7 @@ struct QuestionnaireView: View {
     @EnvironmentObject var profileManager: ProfileManager // Inject ProfileManager
     @State private var agreedToTerms: Bool = false
     @Binding var navigateToMusicPreferences: Bool // Binding to control navigation
+    @Binding var isCreatingNewProfile: Bool // Binding to detect profile creation mode
 
     @Environment(\.presentationMode) var presentationMode
     @State private var showingPDF = false
@@ -27,6 +28,23 @@ struct QuestionnaireView: View {
                 .edgesIgnoringSafeArea(.all)
             
             VStack(alignment: .leading, spacing: 20) {
+                
+                if isCreatingNewProfile {
+                    Button(action: {
+                        isCreatingNewProfile = false
+                        presentationMode.wrappedValue.dismiss() // Navigate back to the previous view
+                    }) {
+                        HStack {
+                            Image(systemName: "chevron.left")
+                                .font(.headline)
+                            Text("Back")
+                                .font(.headline)
+                        }
+                        .foregroundColor(.white)
+                        .padding(.bottom, 10)
+                    }
+                }
+                
                 // App title
                 HStack(spacing: 0) {
                     Text("M")
@@ -108,22 +126,23 @@ struct QuestionnaireView: View {
                         .foregroundColor(.red)
                 }
 
-                // Terms of Service button and toggle
-                Button(action: {
-                    showingPDF = true // Show the PDF when clicked
-                }) {
-                    Text("Read Terms of Service")
-                        .font(.system(size: 18))
-                        .foregroundColor(.green)
-                }
-
-                // Show the terms toggle only if the user hasn't agreed
                 if !(profileManager.currentProfile?.hasAgreedToTerms ?? false) {
                     Toggle(isOn: $agreedToTerms) {
-                        Text("I agree to the Terms of Service")
-                            .foregroundColor(.white)
+                        HStack{
+                            Text("I agree to the")
+                                .foregroundColor(.white)
+                                .font(.system(size: 18))
+                            Text("Terms of Service")
+                                .foregroundColor(.green)
+                                .underline() // Optional: Add underline to make it look like a link
+                                .onTapGesture {
+                                    showingPDF = true // Show the PDF when "Terms of Service" is tapped
+                                }
+                                .font(.system(size: 18))
+                        }
                     }
-                    
+                    .toggleStyle(SwitchToggleStyle(tint: .green)) // Optional: Style the toggle switch
+
                     // Show error if terms are not agreed
                     if showErrorMessages, let termsError = termsError {
                         Text(termsError)
@@ -138,7 +157,7 @@ struct QuestionnaireView: View {
                     if validateForm() {
                         // Save or update the profile based on whether we're creating or editing
                         if let profile = profileManager.currentProfile {
-                            profileManager.updateProfile(profile: profile, name: name, dateOfBirth: dateOfBirth, favoriteGenres: profile.favoriteGenres, hasAgreedToTerms: agreedToTerms)
+                            profileManager.updateProfile(profile: profile, name: name, dateOfBirth: dateOfBirth, favoriteGenres: profile.favoriteGenres, hasAgreedToTerms: agreedToTerms, userPin: profile.userPin, personalSecurityQuestion: profile.personalSecurityQuestion, securityQuestionAnswer: profile.personalSecurityQuestion)
                         } else {
                             profileManager.createProfile(name: name, dateOfBirth: dateOfBirth, favoriteGenres: [], hasAgreedToTerms: agreedToTerms)
                         }
@@ -218,8 +237,7 @@ struct PDFKitView: UIViewRepresentable {
     
     func updateUIView(_ uiView: PDFView, context: Context) {}
 }
-
-struct QuestionnaireView_Previews: PreviewProvider {
+/**struct QuestionnaireView_Previews: PreviewProvider {
     @State static var navigateToMusicPreferences = false
 
     static var previews: some View {
@@ -229,3 +247,4 @@ struct QuestionnaireView_Previews: PreviewProvider {
         }
     }
 }
+ */

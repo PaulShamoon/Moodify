@@ -31,7 +31,7 @@ struct AccountInfoView: View {
 
                 // Option to edit the user information
                 VStack(alignment: .leading, spacing: 20) {
-                    NavigationLink(destination: QuestionnaireView(navigateToMusicPreferences: .constant(true)).environmentObject(profileManager)) {
+                    NavigationLink(destination: QuestionnaireView(navigateToMusicPreferences: .constant(true), isCreatingNewProfile: .constant(false)).environmentObject(profileManager)) {
                         Text("Edit User Information")
                             .font(.title2.italic())
                             .foregroundColor(.green)

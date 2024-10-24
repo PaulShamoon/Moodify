@@ -7,6 +7,8 @@ struct MenuView: View {
     @Binding var isCreatingNewProfile: Bool
     @Binding var navigateToMusicPreferences: Bool
     @State private var showingDeleteAlert = false
+    @State private var showingPinSetup = false // State to control showing the PIN setup view
+
 
     var body: some View {
         ZStack {
@@ -83,6 +85,21 @@ struct MenuView: View {
                                 },
                                 secondaryButton: .cancel()
                             )
+                        }
+                        
+                        Button(action: {
+                            showingPinSetup = true // Show the PIN setup view
+                        }) {
+                            Text("Set/Change PIN")
+                                .font(.title2)
+                                .foregroundColor(.white)
+                                .padding(.leading, 20)
+                        }
+                        .sheet(isPresented: $showingPinSetup) {
+                            if let currentProfile = profileManager.currentProfile {
+                                PinSetupView(profile: currentProfile)
+                                    .environmentObject(profileManager)
+                            }
                         }
 
                         Spacer()
