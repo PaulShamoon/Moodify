@@ -21,7 +21,7 @@ struct homePageView: View {
     @State private var showMenu = false
     
     // NOTE - this URL is temporary and needs to be updated each time from the backend side to detect mood properly
-    let backendURL = "https://e051-24-192-192-234.ngrok-free.app/analyze"
+    let backendURL = "https://2ce5-2603-3015-9ea-8100-e109-7db2-f470-de2.ngrok-free.app/analyze"
     
     var body: some View {
         ZStack {

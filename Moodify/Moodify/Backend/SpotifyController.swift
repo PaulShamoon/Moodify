@@ -59,10 +59,7 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
     private func retrieveAccessToken() {
         if let storedAccessToken = UserDefaults.standard.string(forKey: "SpotifyAccessToken") {
             self.accessToken = storedAccessToken
-            // Initializes playbackController
-            _ = playbackController
             appRemote.connectionParameters.accessToken = storedAccessToken
-            playbackController = PlaybackController(appRemote: appRemote)
         } else {
             print("No access token found in UserDefaults")
         }
@@ -81,7 +78,7 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
     }
     
     /*
-     Method disconnects the application from Spotify if already connected
+     Method disconnects the application from Spotify if already connected.
      */
     func disconnect() {
         if appRemote.isConnected {
@@ -131,13 +128,17 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
         }
     }
     
-    // Handle connection failure
-    @objc func appRemote(_ appRemote: SPTAppRemote, didFailConnectionAttemptWithError error: Error?) {
+    /*
+     Called when the app remote fails to establish a connection.
+     */
+    func appRemote(_ appRemote: SPTAppRemote, didFailConnectionAttemptWithError error: Error?) {
         print("Failed to connect to Spotify App Remote: \(String(describing: error?.localizedDescription))")
     }
     
-    // Handle disconnection
-    @objc func appRemote(_ appRemote: SPTAppRemote, didDisconnectWithError error: Error?) {
+    /*
+     Called when the app remote is disconnected.
+     */
+    func appRemote(_ appRemote: SPTAppRemote, didDisconnectWithError error: Error?) {
         print("Disconnected from Spotify App Remote: \(String(describing: error?.localizedDescription))")
     }
     
@@ -196,26 +197,63 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
      Created by: Paul Shamoon
      */
     func addSongsToQueue(mood: String) {
-        let songs: [String]
+        // Use Spotify's recommendations endpoint for personalized tracks.
+        let seedGenres = mood.lowercased()
+        let limit = 10
         
-        switch mood.lowercased() {
-            case "happy", "surprise":
-                songs = happy_songs
-            case "sad", "fear", "disgust":
-                songs = sad_songs
-            case "angry":
-                songs = angry_songs
-            default:
-                songs = neutral_songs
+        let urlString = "https://api.spotify.com/v1/recommendations?seed_genres=\(seedGenres)&limit=\(limit)"
+        
+        guard let url = URL(string: urlString), let accessToken = self.accessToken else {
+            print("Invalid URL or missing access token")
+            return
         }
         
-        // Shuffle the set of songs to maintain a random order
-        let shuffledSongs = songs.shuffled()
+        var request = URLRequest(url: url)
+        request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
         
-        for (index, uri) in shuffledSongs.enumerated() {
-            // Need to add a small delay between requests to prevent rate limiting errors
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            if let error = error {
+                print("Error fetching recommendations: \(error.localizedDescription)")
+                return
+            }
+            
+            guard let data = data else {
+                print("No data received from Spotify")
+                return
+            }
+            
+            do {
+                // Log the raw response data for debugging
+                if let jsonString = String(data: data, encoding: .utf8) {
+                    print("Raw JSON response: \(jsonString)")
+                }
+                
+                // Try parsing the JSON
+                if let json = try JSONSerialization.jsonObject(with: data) as? [String: Any],
+                   let tracks = json["tracks"] as? [[String: Any]] {
+                    let uris = tracks.compactMap { $0["uri"] as? String }
+                    
+                    // Log the parsed URIs for better understanding of the data
+                    print("Parsed URIs: \(uris)")
+                    
+                    self.enqueueTracks(uris: uris)
+                } else {
+                    print("Unexpected JSON structure")
+                }
+            } catch {
+                print("Error parsing recommendations response: \(error.localizedDescription)")
+            }
+        }.resume()
+    }
+    
+    /*
+     Method to enqueue a list of track URIs.
+     @param uris: Array of Spotify track URIs.
+     */
+    private func enqueueTracks(uris: [String]) {
+        for (index, uri) in uris.enumerated() {
             DispatchQueue.main.asyncAfter(deadline: .now() + Double(index) * 0.5) {
-                self.appRemote.playerAPI?.enqueueTrackUri("spotify:track:\(uri)", callback: { (result, error) in
+                self.appRemote.playerAPI?.enqueueTrackUri(uri, callback: { (result, error) in
                     if let error = error {
                         print("Failed to enqueue song URI \(uri): \(error.localizedDescription)")
                     } else {
