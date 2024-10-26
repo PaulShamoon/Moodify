@@ -197,6 +197,7 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
      Created by: Paul Shamoon
      */
     func addSongsToQueue(mood: String, userGenres: [String]) {
+        clearQueue() //clears the queue before adding other songs based on another mood.
         // Define mood-based valence, energy, and additional features ranges
         var minValence: Double = 0.5
         var maxValence: Double = 0.5
@@ -313,7 +314,6 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
      @param uris: Array of Spotify track URIs.
      */
     private func enqueueTracks(uris: [String]) {
-        clearQueue() //clears the queue before adding other songs based on another mood.
         for (index, uri) in uris.enumerated() {
             DispatchQueue.main.asyncAfter(deadline: .now() + Double(index) * 0.5) {
                 self.appRemote.playerAPI?.enqueueTrackUri(uri, callback: { (result, error) in

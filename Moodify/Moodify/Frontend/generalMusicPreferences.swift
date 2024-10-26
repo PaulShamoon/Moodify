@@ -40,8 +40,13 @@ struct GeneralMusicPreferencesView: View {
     
     @Environment(\.presentationMode) var presentationMode
     
-    let genres = ["Pop", "Rock", "Hip-Hop", "Indie", "Classical", "Jazz", "Electronic", "House", "Dance", "Metal", "Country", "R&B", "Reggae", "Blues", "Latin", "Soul", "Punk", "Techno", "K-Pop", "Lo-Fi", "Chill", "Acoustic"]
-    
+    let genres = [
+        "Pop", "Hip-Hop", "Rock", "Indie", "Electronic", "Jazz", "Dance", "R&B", "House", "Classical",
+        "Reggae", "Soul", "Country", "Metal", "Techno", "Latin", "Punk", "Blues", "Ambient", "Acoustic",
+        "Folk", "Alternative", "K-Pop", "Chill", "Lo-Fi", "EDM", "Disco", "Trance", "Ska", "Gospel",
+        "Funk", "Garage", "Grunge", "Synth-Pop", "Opera", "Bluegrass", "Film Scores", "World Music",
+        "Samba", "Tango"
+    ]
     var body: some View {
         ZStack {
             LinearGradient(gradient: Gradient(colors: [Color.black, Color(white: 0.1)]),
@@ -58,7 +63,7 @@ struct GeneralMusicPreferencesView: View {
                     }
                     .padding(.top, 20)
                     
-                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 150), spacing: 16)], spacing: 16) {
+                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 100), spacing: 12)], spacing: 12) {
                         ForEach(genres, id: \.self) { genre in
                             Button(action: {
                                 withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
@@ -66,30 +71,30 @@ struct GeneralMusicPreferencesView: View {
                                 }
                             }) {
                                 ZStack {
-                                    RoundedRectangle(cornerRadius: 16)
+                                    RoundedRectangle(cornerRadius: 12)
                                         .fill(selectedGenres.contains(genre) ?
                                               LinearGradient(gradient: Gradient(colors: [Color.green, Color.green.opacity(0.7)]), startPoint: .topLeading, endPoint: .bottomTrailing) :
                                                 LinearGradient(gradient: Gradient(colors: [Color.white.opacity(0.1), Color.white.opacity(0.05)]), startPoint: .topLeading, endPoint: .bottomTrailing))
-                                        .shadow(color: selectedGenres.contains(genre) ? Color.green.opacity(0.3) : Color.black.opacity(0.2), radius: 8, x: 0, y: 4)
+                                        .shadow(color: selectedGenres.contains(genre) ? Color.green.opacity(0.3) : Color.black.opacity(0.2), radius: 6, x: 0, y: 3)
                                     
-                                    VStack(spacing: 12) {
+                                    VStack(spacing: 8) {
                                         Image(systemName: genreIcon(for: genre))
-                                            .font(.system(size: 30))
+                                            .font(.system(size: 22))
                                             .foregroundColor(selectedGenres.contains(genre) ? .white : .gray)
                                         
                                         Text(genre)
-                                            .font(.system(size: 18, weight: .semibold, design: .rounded))
+                                            .font(.system(size: 14, weight: .semibold, design: .rounded))
                                             .foregroundColor(.white)
                                         
                                         if selectedGenres.contains(genre) {
                                             Image(systemName: "checkmark.circle.fill")
                                                 .foregroundColor(.white)
-                                                .font(.system(size: 20))
+                                                .font(.system(size: 16))
                                         }
                                     }
-                                    .padding(.vertical, 8)
+                                    .padding(.vertical, 6)
                                 }
-                                .frame(height: 130)
+                                .frame(height: 100)
                             }
                         }
                     }
