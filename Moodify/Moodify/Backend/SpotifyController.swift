@@ -199,7 +199,7 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
     func addSongsToQueue(mood: String) {
         // Use Spotify's recommendations endpoint for personalized tracks.
         let seedGenres = mood.lowercased()
-        let limit = 10
+        let limit = 20
         
         let urlString = "https://api.spotify.com/v1/recommendations?seed_genres=\(seedGenres)&limit=\(limit)"
         
@@ -251,6 +251,7 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
      @param uris: Array of Spotify track URIs.
      */
     private func enqueueTracks(uris: [String]) {
+        clearQueue() //clears the queue before adding other songs based on another mood.
         for (index, uri) in uris.enumerated() {
             DispatchQueue.main.asyncAfter(deadline: .now() + Double(index) * 0.5) {
                 self.appRemote.playerAPI?.enqueueTrackUri(uri, callback: { (result, error) in
@@ -289,5 +290,32 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
                 print("Failed to cast result to UIImage")
             }
         })
+    }
+    /*
+     Method to clear the current Spotify playback queue.
+     */
+    private func clearQueue() {
+        guard let accessToken = self.accessToken else {
+            print("Missing access token")
+            return
+        }
+        
+        let urlString = "https://api.spotify.com/v1/me/player/pause"
+        guard let url = URL(string: urlString) else {
+            print("Invalid URL")
+            return
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "PUT"
+        request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
+        
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            if let error = error {
+                print("Error clearing the queue: \(error.localizedDescription)")
+                return
+            }
+            print("Playback paused, effectively clearing the queue")
+        }.resume()
     }
 }
