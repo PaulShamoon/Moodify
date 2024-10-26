@@ -197,23 +197,82 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
      Created by: Paul Shamoon
      */
     func addSongsToQueue(mood: String, userGenres: [String]) {
-        // Convert the mood and user-selected genres to lowercase.
-        let moodAsGenre = mood.lowercased()
-        let limitedGenres = userGenres.prefix(4).map { $0.lowercased() } // Limit to 4 and convert to lowercase
-        let seedGenres = ([moodAsGenre] + limitedGenres).joined(separator: ",")
+        // Define mood-based valence, energy, and additional features ranges
+        var minValence: Double = 0.5
+        var maxValence: Double = 0.5
+        var minEnergy: Double = 0.5
+        var maxEnergy: Double = 0.5
+        var minLoudness: Double? = nil
+        var maxLoudness: Double? = nil
+        var minAcousticness: Double? = nil
+        var maxAcousticness: Double? = nil
+        var minDanceability: Double? = nil
+        var maxDanceability: Double? = nil
+
+        switch mood.lowercased() {
+        case "happy":
+            minValence = 0.7
+            maxValence = 1.0
+            minEnergy = 0.6
+            maxEnergy = 0.9
+            minDanceability = 0.7
+            maxDanceability = 1.0 // Danceable, upbeat tracks
+
+        case "sad":
+            minValence = 0.0
+            maxValence = 0.3
+            minEnergy = 0.3
+            maxEnergy = 0.5
+            minAcousticness = 0.6
+            maxAcousticness = 1.0 // Softer, acoustic-style tracks
+
+        case "angry":
+            minValence = 0.0
+            maxValence = 0.3
+            minEnergy = 0.8
+            maxEnergy = 1.0
+            minLoudness = -5.0 // Louder tracks for intensity
+
+        case "neutral":
+            minValence = 0.4
+            maxValence = 0.6
+            minEnergy = 0.4
+            maxEnergy = 0.6
+            minAcousticness = 0.3
+            maxAcousticness = 0.6 // Balanced range for neutrality
+
+        default:
+            break
+        }
+
+        // Limit the number of user-selected genres (Spotify allows up to 5 seeds)
+        let limitedGenres = userGenres.prefix(5).map { $0.lowercased() }
+        let seedGenres = limitedGenres.joined(separator: ",")
 
         let limit = 20  // Number of recommendations to retrieve
 
-        let urlString = "https://api.spotify.com/v1/recommendations?seed_genres=\(seedGenres)&limit=\(limit)"
-        
+        var urlString = """
+        https://api.spotify.com/v1/recommendations?seed_genres=\(seedGenres)&limit=\(limit)\
+        &min_valence=\(minValence)&max_valence=\(maxValence)\
+        &min_energy=\(minEnergy)&max_energy=\(maxEnergy)
+        """
+
+        // Append additional parameters if set
+        if let minLoudness = minLoudness { urlString += "&min_loudness=\(minLoudness)" }
+        if let maxLoudness = maxLoudness { urlString += "&max_loudness=\(maxLoudness)" }
+        if let minAcousticness = minAcousticness { urlString += "&min_acousticness=\(minAcousticness)" }
+        if let maxAcousticness = maxAcousticness { urlString += "&max_acousticness=\(maxAcousticness)" }
+        if let minDanceability = minDanceability { urlString += "&min_danceability=\(minDanceability)" }
+        if let maxDanceability = maxDanceability { urlString += "&max_danceability=\(maxDanceability)" }
+
         guard let url = URL(string: urlString), let accessToken = self.accessToken else {
             print("Invalid URL or missing access token")
             return
         }
-        
+
         var request = URLRequest(url: url)
         request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
-        
+
         URLSession.shared.dataTask(with: request) { data, response, error in
             if let error = error {
                 print("Error fetching recommendations: \(error.localizedDescription)")
@@ -248,7 +307,7 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
             }
         }.resume()
     }
-    
+
     /*
      Method to enqueue a list of track URIs.
      @param uris: Array of Spotify track URIs.
