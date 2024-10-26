@@ -196,11 +196,14 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
      
      Created by: Paul Shamoon
      */
-    func addSongsToQueue(mood: String) {
-        // Use Spotify's recommendations endpoint for personalized tracks.
-        let seedGenres = mood.lowercased()
-        let limit = 20
-        
+    func addSongsToQueue(mood: String, userGenres: [String]) {
+        // Convert the mood and user-selected genres to lowercase.
+        let moodAsGenre = mood.lowercased()
+        let limitedGenres = userGenres.prefix(4).map { $0.lowercased() } // Limit to 4 and convert to lowercase
+        let seedGenres = ([moodAsGenre] + limitedGenres).joined(separator: ",")
+
+        let limit = 20  // Number of recommendations to retrieve
+
         let urlString = "https://api.spotify.com/v1/recommendations?seed_genres=\(seedGenres)&limit=\(limit)"
         
         guard let url = URL(string: urlString), let accessToken = self.accessToken else {

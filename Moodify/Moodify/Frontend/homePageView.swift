@@ -294,7 +294,8 @@ struct homePageView: View {
                     probabilities = sortedProbabilities.map { ($0.key, $0.value) }
                     currentMood = moodEmoji(for: emotion)
                     currentMoodText = "You seem to be \(emotion.capitalized)."
-                    spotifyController.addSongsToQueue(mood: emotion)
+                    spotifyController.addSongsToQueue(mood: emotion, userGenres: profile.favoriteGenres)
+
                 }
             } else {
                 DispatchQueue.main.async {
