@@ -131,14 +131,14 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
     /*
      Called when the app remote fails to establish a connection.
      */
-    func appRemote(_ appRemote: SPTAppRemote, didFailConnectionAttemptWithError error: Error?) {
+    @objc func appRemote(_ appRemote: SPTAppRemote, didFailConnectionAttemptWithError error: Error?) {
         print("Failed to connect to Spotify App Remote: \(String(describing: error?.localizedDescription))")
     }
     
     /*
      Called when the app remote is disconnected.
      */
-    func appRemote(_ appRemote: SPTAppRemote, didDisconnectWithError error: Error?) {
+    @objc func appRemote(_ appRemote: SPTAppRemote, didDisconnectWithError error: Error?) {
         print("Disconnected from Spotify App Remote: \(String(describing: error?.localizedDescription))")
     }
     
@@ -190,15 +190,34 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
     }
     
     /*
-     Method to add songs to the queue relating to users detected mood
+     Method that retrieves the mood parameters, constructs the recommendation URL, and then fetches the recommendations
      
      @param mood: the users detected mood
      
      Created by: Paul Shamoon
+     Updated by: Mohammad Sulaiman
      */
     func addSongsToQueue(mood: String, userGenres: [String]) {
-        clearQueue() //clears the queue before adding other songs based on another mood.
-        // Define mood-based valence, energy, and additional features ranges
+        // Get feature parameters based on mood
+        let (minValence, maxValence, minEnergy, maxEnergy, minLoudness, maxLoudness, minAcousticness, maxAcousticness, minDanceability, maxDanceability) = getMoodParameters(for: mood)
+
+        // Build the recommendation URL
+        guard let url = buildRecommendationURL(userGenres: userGenres, limit: 20, minValence: minValence, maxValence: maxValence, minEnergy: minEnergy, maxEnergy: maxEnergy, minLoudness: minLoudness, maxLoudness: maxLoudness, minAcousticness: minAcousticness, maxAcousticness: maxAcousticness, minDanceability: minDanceability, maxDanceability: maxDanceability),
+              let accessToken = self.accessToken else {
+            print("Invalid URL or missing access token")
+            return
+        }
+
+        // Fetch recommendations and handle the response
+        fetchRecommendations(url: url, accessToken: accessToken)
+    }
+    
+    /*
+    Function that determines the mood-based audio feature ranges (e.g., valence, energy) based on the provided mood. It returns a tuple with the appropriate values for each feature.
+     
+     Created by: Mohammad Sulaiman
+     */
+    private func getMoodParameters(for mood: String) -> (Double, Double, Double, Double, Double?, Double?, Double?, Double?, Double?, Double?) {
         var minValence: Double = 0.5
         var maxValence: Double = 0.5
         var minEnergy: Double = 0.5
@@ -211,7 +230,7 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
         var maxDanceability: Double? = nil
 
         switch mood.lowercased() {
-        case "happy":
+        case "happy", "surprise":
             minValence = 0.7
             maxValence = 1.0
             minEnergy = 0.6
@@ -219,7 +238,7 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
             minDanceability = 0.7
             maxDanceability = 1.0 // Danceable, upbeat tracks
 
-        case "sad":
+        case "sad", "disgust", "fear":
             minValence = 0.0
             maxValence = 0.3
             minEnergy = 0.3
@@ -246,11 +265,17 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
             break
         }
 
-        // Limit the number of user-selected genres (Spotify allows up to 5 seeds)
+        return (minValence, maxValence, minEnergy, maxEnergy, minLoudness, maxLoudness, minAcousticness, maxAcousticness, minDanceability, maxDanceability)
+    }
+
+    /*
+     Function that constructs the Spotify API recommendation URL using the provided genres and audio feature ranges. It dynamically includes each feature parameter in the URL if it’s not nil.
+     
+     Created by: Mohammad Sulaiman
+     */
+    private func buildRecommendationURL(userGenres: [String], limit: Int, minValence: Double, maxValence: Double, minEnergy: Double, maxEnergy: Double, minLoudness: Double?, maxLoudness: Double?, minAcousticness: Double?, maxAcousticness: Double?, minDanceability: Double?, maxDanceability: Double?) -> URL? {
         let limitedGenres = userGenres.prefix(5).map { $0.lowercased() }
         let seedGenres = limitedGenres.joined(separator: ",")
-
-        let limit = 20  // Number of recommendations to retrieve
 
         var urlString = """
         https://api.spotify.com/v1/recommendations?seed_genres=\(seedGenres)&limit=\(limit)\
@@ -258,7 +283,6 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
         &min_energy=\(minEnergy)&max_energy=\(maxEnergy)
         """
 
-        // Append additional parameters if set
         if let minLoudness = minLoudness { urlString += "&min_loudness=\(minLoudness)" }
         if let maxLoudness = maxLoudness { urlString += "&max_loudness=\(maxLoudness)" }
         if let minAcousticness = minAcousticness { urlString += "&min_acousticness=\(minAcousticness)" }
@@ -266,11 +290,15 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
         if let minDanceability = minDanceability { urlString += "&min_danceability=\(minDanceability)" }
         if let maxDanceability = maxDanceability { urlString += "&max_danceability=\(maxDanceability)" }
 
-        guard let url = URL(string: urlString), let accessToken = self.accessToken else {
-            print("Invalid URL or missing access token")
-            return
-        }
+        return URL(string: urlString)
+    }
 
+    /*
+     Function that sends the recommendation request to Spotify, handles the response, parses the track URIs, and then calls enqueueTracks with the list of track URIs.
+     
+     Created by: Mohammad Sulaiman
+     */
+    private func fetchRecommendations(url: URL, accessToken: String) {
         var request = URLRequest(url: url)
         request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
 
@@ -316,6 +344,7 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
     private func enqueueTracks(uris: [String]) {
         for (index, uri) in uris.enumerated() {
             DispatchQueue.main.asyncAfter(deadline: .now() + Double(index) * 0.5) {
+                // Need to add a small delay between requests to prevent rate limiting errors
                 self.appRemote.playerAPI?.enqueueTrackUri(uri, callback: { (result, error) in
                     if let error = error {
                         print("Failed to enqueue song URI \(uri): \(error.localizedDescription)")
@@ -352,32 +381,5 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
                 print("Failed to cast result to UIImage")
             }
         })
-    }
-    /*
-     Method to clear the current Spotify playback queue.
-     */
-    private func clearQueue() {
-        guard let accessToken = self.accessToken else {
-            print("Missing access token")
-            return
-        }
-        
-        let urlString = "https://api.spotify.com/v1/me/player/pause"
-        guard let url = URL(string: urlString) else {
-            print("Invalid URL")
-            return
-        }
-        
-        var request = URLRequest(url: url)
-        request.httpMethod = "PUT"
-        request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
-        
-        URLSession.shared.dataTask(with: request) { data, response, error in
-            if let error = error {
-                print("Error clearing the queue: \(error.localizedDescription)")
-                return
-            }
-            print("Playback paused, effectively clearing the queue")
-        }.resume()
     }
 }
