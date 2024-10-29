@@ -8,6 +8,51 @@ import Foundation
 import SpotifyiOS
 
 class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDelegate, SPTAppRemoteDelegate {
+    
+    // Changes the Profile's genres into genre seeds that the API can read
+    private let genresDisplayToAPI: [String: String] = [
+        "Pop": "pop",
+        "Hip-Hop": "hip-hop",
+        "Rock": "rock",
+        "Indie": "indie",
+        "Electronic": "electronic",
+        "Jazz": "jazz",
+        "Dance": "dance",
+        "R&B": "r-n-b",  // Maps user-facing "R&B" to "r-n-b" for API
+        "House": "house",
+        "Classical": "classical",
+        "Reggae": "reggae",
+        "Soul": "soul",
+        "Country": "country",
+        "Metal": "metal",
+        "Techno": "techno",
+        "Latin": "latin",
+        "Punk": "punk",
+        "Blues": "blues",
+        "Ambient": "ambient",
+        "Acoustic": "acoustic",
+        "Folk": "folk",
+        "Alternative": "alternative",
+        "K-Pop": "k-pop",
+        "Chill": "chill",
+        "Lo-Fi": "lo-fi",
+        "EDM": "edm",
+        "Disco": "disco",
+        "Trance": "trance",
+        "Ska": "ska",
+        "Gospel": "gospel",
+        "Funk": "funk",
+        "Garage": "garage",
+        "Grunge": "grunge",
+        "Synth-Pop": "synth-pop",
+        "Opera": "opera",
+        "Bluegrass": "bluegrass",
+        "Film Scores": "movie",
+        "World Music": "world-music",
+        "Samba": "samba",
+        "Tango": "tango"
+    ]
+    
     // Unique Spotify client ID
     private let spotifyClientID = "3dfaae404a2f4847a2ff7d707f7154f4"
     
@@ -22,10 +67,10 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
     
     // Stores all data for the current track, used to fetch album covers
     var currentTrackValue: SPTAppRemoteTrack? = nil
-
+    
     // Variable to store the last known player state
     var isPaused: Bool = false
-
+    
     // Access token for API requests
     @Published var accessToken: String? = nil
     
@@ -145,7 +190,7 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
     /*
      Method fetches the changed state of the player and updates data
      Modified by Paul Shamoon on 10/16/2024.
-    */
+     */
     func playerStateDidChange(_ playerState: SPTAppRemotePlayerState) {
         DispatchQueue.main.async {
             self.currentTrackValue = playerState.track
@@ -159,7 +204,7 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
     /*
      Method plays or pauses the player depending on its current status
      Created by Paul Shamoon on 10/17/2024.
-    */
+     */
     func togglePlayPause() {
         if isPaused {
             // If isPaused is true, then resume player
@@ -176,7 +221,7 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
     /*
      Method skips to the next song in the queue
      Created by Paul Shamoon on 10/17/2024.
-    */
+     */
     func skipToNext() {
         playbackController.skipToNext()
     }
@@ -184,7 +229,7 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
     /*
      Method skips to the previous song in the queue
      Created by Paul Shamoon on 10/17/2024.
-    */
+     */
     func skipToPrevious() {
         playbackController.skipToPrevious()
     }
@@ -200,20 +245,20 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
     func addSongsToQueue(mood: String, userGenres: [String]) {
         // Get feature parameters based on mood
         let (minValence, maxValence, minEnergy, maxEnergy, minLoudness, maxLoudness, minAcousticness, maxAcousticness, minDanceability, maxDanceability) = getMoodParameters(for: mood)
-
+        
         // Build the recommendation URL
         guard let url = buildRecommendationURL(userGenres: userGenres, limit: 20, minValence: minValence, maxValence: maxValence, minEnergy: minEnergy, maxEnergy: maxEnergy, minLoudness: minLoudness, maxLoudness: maxLoudness, minAcousticness: minAcousticness, maxAcousticness: maxAcousticness, minDanceability: minDanceability, maxDanceability: maxDanceability),
               let accessToken = self.accessToken else {
             print("Invalid URL or missing access token")
             return
         }
-
+        
         // Fetch recommendations and handle the response
         fetchRecommendations(url: url, accessToken: accessToken)
     }
     
     /*
-    Function that determines the mood-based audio feature ranges (e.g., valence, energy) based on the provided mood. It returns a tuple with the appropriate values for each feature.
+     Function that determines the mood-based audio feature ranges (e.g., valence, energy) based on the provided mood. It returns a tuple with the appropriate values for each feature.
      
      Created by: Mohammad Sulaiman
      */
@@ -228,16 +273,19 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
         var maxAcousticness: Double? = nil
         var minDanceability: Double? = nil
         var maxDanceability: Double? = nil
-
+        
         switch mood.lowercased() {
         case "happy", "surprise":
             minValence = 0.7
             maxValence = 1.0
             minEnergy = 0.6
             maxEnergy = 0.9
-            minDanceability = 0.7
-            maxDanceability = 1.0 // Danceable, upbeat tracks
-
+            /*
+             minDanceability = 0.7
+             maxDanceability = 1.0 // Danceable, upbeat tracks
+             */
+            
+            
         case "sad", "disgust", "fear":
             minValence = 0.0
             maxValence = 0.3
@@ -245,14 +293,14 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
             maxEnergy = 0.5
             minAcousticness = 0.6
             maxAcousticness = 1.0 // Softer, acoustic-style tracks
-
+            
         case "angry":
             minValence = 0.0
             maxValence = 0.3
             minEnergy = 0.8
             maxEnergy = 1.0
             minLoudness = -5.0 // Louder tracks for intensity
-
+            
         case "neutral":
             minValence = 0.4
             maxValence = 0.6
@@ -260,14 +308,14 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
             maxEnergy = 0.6
             minAcousticness = 0.3
             maxAcousticness = 0.6 // Balanced range for neutrality
-
+            
         default:
             break
         }
-
+        
         return (minValence, maxValence, minEnergy, maxEnergy, minLoudness, maxLoudness, minAcousticness, maxAcousticness, minDanceability, maxDanceability)
     }
-
+    
     /*
      Function that constructs the Spotify API recommendation URL using the provided genres and audio feature ranges. It dynamically includes each feature parameter in the URL if it’s not nil.
      
@@ -275,14 +323,14 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
      */
     private func buildRecommendationURL(userGenres: [String], limit: Int, minValence: Double, maxValence: Double, minEnergy: Double, maxEnergy: Double, minLoudness: Double?, maxLoudness: Double?, minAcousticness: Double?, maxAcousticness: Double?, minDanceability: Double?, maxDanceability: Double?) -> URL? {
         // TODO: Shuffle the usergenres if more than 5 moods are selected.
-        let seedGenres = userGenres.prefix(5).map { $0.lowercased() }.joined(separator: ",")
-
+        // Convert user-selected genres to API-compatible genres
+        let seedGenres = userGenres.prefix(5).compactMap { genresDisplayToAPI[$0] }.joined(separator: ",")
+        
         var urlString = """
-        https://api.spotify.com/v1/recommendations?seed_genres=\(seedGenres)&limit=\(limit)\
-        &min_valence=\(minValence)&max_valence=\(maxValence)\
-        &min_energy=\(minEnergy)&max_energy=\(maxEnergy)
-        """
-
+            https://api.spotify.com/v1/recommendations?seed_genres=\(seedGenres)&limit=\(limit)\
+            &min_valence=\(minValence)&max_valence=\(maxValence)\
+            &min_energy=\(minEnergy)&max_energy=\(maxEnergy)
+            """
         // Organize optional parameters in a dictionary
         let optionalParameters: [String: Double?] = [
             "min_loudness": minLoudness,
@@ -299,11 +347,11 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
                 urlString += "&\(key)=\(value)"
             }
         }
-
+        
         return URL(string: urlString)
     }
-
-
+    
+    
     /*
      Function that sends the recommendation request to Spotify, handles the response, parses the track URIs, and then calls enqueueTracks with the list of track URIs.
      
@@ -312,7 +360,7 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
     private func fetchRecommendations(url: URL, accessToken: String) {
         var request = URLRequest(url: url)
         request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
-
+        
         URLSession.shared.dataTask(with: request) { data, response, error in
             if let error = error {
                 print("Error fetching recommendations: \(error.localizedDescription)")
@@ -347,7 +395,7 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
             }
         }.resume()
     }
-
+    
     /*
      Method to enqueue a list of track URIs.
      @param uris: Array of Spotify track URIs.
