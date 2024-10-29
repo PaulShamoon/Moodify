@@ -402,10 +402,6 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
     private func apiGenre(from genre: String) -> String {
         switch genre {
         case "R&B": return "r-n-b"
-        case "Hip-Hop": return "hip-hop"
-        case "K-Pop": return "k-pop"
-        case "Lo-Fi": return "lo-fi"
-        case "Synth-Pop": return "synth-pop"
         case "World Music": return "world-music"
         case "Film Scores": return "movie"
         default: return genre.lowercased()
