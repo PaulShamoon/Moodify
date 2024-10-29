@@ -274,8 +274,8 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
      Created by: Mohammad Sulaiman
      */
     private func buildRecommendationURL(userGenres: [String], limit: Int, minValence: Double, maxValence: Double, minEnergy: Double, maxEnergy: Double, minLoudness: Double?, maxLoudness: Double?, minAcousticness: Double?, maxAcousticness: Double?, minDanceability: Double?, maxDanceability: Double?) -> URL? {
-        let limitedGenres = userGenres.prefix(5).map { $0.lowercased() }
-        let seedGenres = limitedGenres.joined(separator: ",")
+        // TODO: Shuffle the usergenres if more than 5 moods are selected.
+        let seedGenres = userGenres.prefix(5).map { $0.lowercased() }.joined(separator: ",")
 
         var urlString = """
         https://api.spotify.com/v1/recommendations?seed_genres=\(seedGenres)&limit=\(limit)\
@@ -283,15 +283,26 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
         &min_energy=\(minEnergy)&max_energy=\(maxEnergy)
         """
 
-        if let minLoudness = minLoudness { urlString += "&min_loudness=\(minLoudness)" }
-        if let maxLoudness = maxLoudness { urlString += "&max_loudness=\(maxLoudness)" }
-        if let minAcousticness = minAcousticness { urlString += "&min_acousticness=\(minAcousticness)" }
-        if let maxAcousticness = maxAcousticness { urlString += "&max_acousticness=\(maxAcousticness)" }
-        if let minDanceability = minDanceability { urlString += "&min_danceability=\(minDanceability)" }
-        if let maxDanceability = maxDanceability { urlString += "&max_danceability=\(maxDanceability)" }
+        // Organize optional parameters in a dictionary
+        let optionalParameters: [String: Double?] = [
+            "min_loudness": minLoudness,
+            "max_loudness": maxLoudness,
+            "min_acousticness": minAcousticness,
+            "max_acousticness": maxAcousticness,
+            "min_danceability": minDanceability,
+            "max_danceability": maxDanceability
+        ]
+
+        // Iterate over optional parameters and append if non-nil
+        for (key, value) in optionalParameters {
+            if let value = value {
+                urlString += "&\(key)=\(value)"
+            }
+        }
 
         return URL(string: urlString)
     }
+
 
     /*
      Function that sends the recommendation request to Spotify, handles the response, parses the track URIs, and then calls enqueueTracks with the list of track URIs.
