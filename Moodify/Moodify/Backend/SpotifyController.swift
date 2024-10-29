@@ -9,50 +9,6 @@ import SpotifyiOS
 
 class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDelegate, SPTAppRemoteDelegate {
     
-    // Changes the Profile's genres into genre seeds that the API can read
-    private let genresDisplayToAPI: [String: String] = [
-        "Pop": "pop",
-        "Hip-Hop": "hip-hop",
-        "Rock": "rock",
-        "Indie": "indie",
-        "Electronic": "electronic",
-        "Jazz": "jazz",
-        "Dance": "dance",
-        "R&B": "r-n-b",  // Maps user-facing "R&B" to "r-n-b" for API
-        "House": "house",
-        "Classical": "classical",
-        "Reggae": "reggae",
-        "Soul": "soul",
-        "Country": "country",
-        "Metal": "metal",
-        "Techno": "techno",
-        "Latin": "latin",
-        "Punk": "punk",
-        "Blues": "blues",
-        "Ambient": "ambient",
-        "Acoustic": "acoustic",
-        "Folk": "folk",
-        "Alternative": "alternative",
-        "K-Pop": "k-pop",
-        "Chill": "chill",
-        "Lo-Fi": "lo-fi",
-        "EDM": "edm",
-        "Disco": "disco",
-        "Trance": "trance",
-        "Ska": "ska",
-        "Gospel": "gospel",
-        "Funk": "funk",
-        "Garage": "garage",
-        "Grunge": "grunge",
-        "Synth-Pop": "synth-pop",
-        "Opera": "opera",
-        "Bluegrass": "bluegrass",
-        "Film Scores": "movie",
-        "World Music": "world-music",
-        "Samba": "samba",
-        "Tango": "tango"
-    ]
-    
     // Unique Spotify client ID
     private let spotifyClientID = "3dfaae404a2f4847a2ff7d707f7154f4"
     
@@ -324,7 +280,7 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
     private func buildRecommendationURL(userGenres: [String], limit: Int, minValence: Double, maxValence: Double, minEnergy: Double, maxEnergy: Double, minLoudness: Double?, maxLoudness: Double?, minAcousticness: Double?, maxAcousticness: Double?, minDanceability: Double?, maxDanceability: Double?) -> URL? {
         // TODO: Shuffle the usergenres if more than 5 moods are selected.
         // Convert user-selected genres to API-compatible genres
-        let seedGenres = userGenres.prefix(5).compactMap { genresDisplayToAPI[$0] }.joined(separator: ",")
+        let seedGenres = userGenres.prefix(5).map { apiGenre(from: $0) }.joined(separator: ",")
         
         var urlString = """
             https://api.spotify.com/v1/recommendations?seed_genres=\(seedGenres)&limit=\(limit)\
@@ -440,5 +396,19 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
                 print("Failed to cast result to UIImage")
             }
         })
+    }
+    
+    // Function to convert user-facing genre names to API-compatible genre names
+    private func apiGenre(from genre: String) -> String {
+        switch genre {
+        case "R&B": return "r-n-b"
+        case "Hip-Hop": return "hip-hop"
+        case "K-Pop": return "k-pop"
+        case "Lo-Fi": return "lo-fi"
+        case "Synth-Pop": return "synth-pop"
+        case "World Music": return "world-music"
+        case "Film Scores": return "movie"
+        default: return genre.lowercased()
+        }
     }
 }
