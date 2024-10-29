@@ -1,3 +1,4 @@
+// Add text to inform user to select in order of preference
 import SwiftUI
 
 struct PreferenceInfoRow: View {
@@ -39,124 +40,130 @@ struct GeneralMusicPreferencesView: View {
     
     @Environment(\.presentationMode) var presentationMode
     
-    let genres = ["Pop", "Classical", "Regional", "Hip Hop", "Country", "Dance"]
-    
+    let genres = [
+        "Pop", "Hip-Hop", "Rock", "Indie", "Electronic", "Jazz", "Dance", "R&B", "House", "Classical",
+        "Reggae", "Soul", "Country", "Metal", "Techno", "Latin", "Punk", "Blues", "Ambient", "Acoustic",
+        "Folk", "Alternative", "K-Pop", "Chill", "Lo-Fi", "EDM", "Disco", "Trance", "Ska", "Gospel",
+        "Funk", "Garage", "Grunge", "Synth-Pop", "Opera", "Bluegrass", "Film Scores", "World Music",
+        "Samba", "Tango"
+    ]
     var body: some View {
         ZStack {
             LinearGradient(gradient: Gradient(colors: [Color.black, Color(white: 0.1)]),
-                          startPoint: .top,
-                          endPoint: .bottom)
-                .edgesIgnoringSafeArea(.all)
+                           startPoint: .top,
+                           endPoint: .bottom)
+            .edgesIgnoringSafeArea(.all)
             
-            VStack(spacing: 24) {
-                VStack(spacing: 8) {
-                    Text("\(profileManager.currentProfile?.name ?? "User"), select your favorite genres")
-                        .font(.system(size: 18, weight: .medium, design: .rounded))
-                        .foregroundColor(.gray)
-                }
-                .padding(.top, 20)
-                
-                LazyVGrid(columns: [GridItem(.adaptive(minimum: 150), spacing: 16)], spacing: 16) {
-                    ForEach(genres, id: \.self) { genre in
-                        Button(action: {
-                            withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
-                                toggleGenreSelection(genre: genre)
-                            }
-                        }) {
-                            ZStack {
-                                RoundedRectangle(cornerRadius: 16)
-                                    .fill(selectedGenres.contains(genre) ?
-                                          LinearGradient(gradient: Gradient(colors: [Color.green, Color.green.opacity(0.7)]), startPoint: .topLeading, endPoint: .bottomTrailing) :
-                                          LinearGradient(gradient: Gradient(colors: [Color.white.opacity(0.1), Color.white.opacity(0.05)]), startPoint: .topLeading, endPoint: .bottomTrailing))
-                                    .shadow(color: selectedGenres.contains(genre) ? Color.green.opacity(0.3) : Color.black.opacity(0.2), radius: 8, x: 0, y: 4)
-                                
-                                VStack(spacing: 12) {
-                                    Image(systemName: genreIcon(for: genre))
-                                        .font(.system(size: 30))
-                                        .foregroundColor(selectedGenres.contains(genre) ? .white : .gray)
-                                    
-                                    Text(genre)
-                                        .font(.system(size: 18, weight: .semibold, design: .rounded))
-                                        .foregroundColor(.white)
-                                    
-                                    if selectedGenres.contains(genre) {
-                                        Image(systemName: "checkmark.circle.fill")
-                                            .foregroundColor(.white)
-                                            .font(.system(size: 20))
-                                    }
+            ScrollView {
+                VStack(spacing: 24) {
+                    VStack(spacing: 8) {
+                        Text("\(profileManager.currentProfile?.name ?? "User"), select your favorite genres")
+                            .font(.system(size: 18, weight: .medium, design: .rounded))
+                            .foregroundColor(.gray)
+                    }
+                    .padding(.top, 20)
+                    
+                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 100), spacing: 12)], spacing: 12) {
+                        ForEach(genres, id: \.self) { genre in
+                            Button(action: {
+                                withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                                    toggleGenreSelection(genre: genre)
                                 }
-                                .padding(.vertical, 8)
+                            }) {
+                                ZStack {
+                                    RoundedRectangle(cornerRadius: 12)
+                                        .fill(selectedGenres.contains(genre) ?
+                                              LinearGradient(gradient: Gradient(colors: [Color.green, Color.green.opacity(0.7)]), startPoint: .topLeading, endPoint: .bottomTrailing) :
+                                                LinearGradient(gradient: Gradient(colors: [Color.white.opacity(0.1), Color.white.opacity(0.05)]), startPoint: .topLeading, endPoint: .bottomTrailing))
+                                        .shadow(color: selectedGenres.contains(genre) ? Color.green.opacity(0.3) : Color.black.opacity(0.2), radius: 6, x: 0, y: 3)
+                                    
+                                    VStack(spacing: 8) {
+                                        Image(systemName: genreIcon(for: genre))
+                                            .font(.system(size: 22))
+                                            .foregroundColor(selectedGenres.contains(genre) ? .white : .gray)
+                                        
+                                        Text(genre)
+                                            .font(.system(size: 14, weight: .semibold, design: .rounded))
+                                            .foregroundColor(.white)
+                                        
+                                        if selectedGenres.contains(genre) {
+                                            Image(systemName: "checkmark.circle.fill")
+                                                .foregroundColor(.white)
+                                                .font(.system(size: 16))
+                                        }
+                                    }
+                                    .padding(.vertical, 6)
+                                }
+                                .frame(height: 100)
                             }
-                            .frame(height: 130)
                         }
                     }
-                }
-                .padding(.horizontal)
-                
-                VStack(spacing: 16) {
-                    PreferenceInfoRow(
-                        icon: "music.note.list",
-                        title: "Selected Genres",
-                        value: selectedGenres.isEmpty ? "No genres selected" : selectedGenres.joined(separator: ", "),
-                        iconColor: .green
-                    )
+                    .padding(.horizontal)
                     
-                    PreferenceInfoRow(
-                        icon: "number.circle.fill",
-                        title: "Total Selected",
-                        value: "\(selectedGenres.count) of \(genres.count) genres",
-                        iconColor: .blue
-                    )
-                }
-                .padding(16)
-                .background(Color.white.opacity(0.05))
-                .cornerRadius(16)
-                .padding(.horizontal)
-                
-                Spacer()
-                
-                // Submit Button
-                Button(action: {
-                    if let currentProfile = profileManager.currentProfile {
-                        profileManager.updateProfile(
-                            profile: currentProfile,
-                            name: currentProfile.name,
-                            dateOfBirth: currentProfile.dateOfBirth,
-                            favoriteGenres: Array(selectedGenres),
-                            hasAgreedToTerms: currentProfile.hasAgreedToTerms,
-                            userPin: currentProfile.userPin,
-                            personalSecurityQuestion: currentProfile.personalSecurityQuestion,
-                            securityQuestionAnswer: currentProfile.personalSecurityQuestion
+                    VStack(spacing: 16) {
+                        PreferenceInfoRow(
+                            icon: "music.note.list",
+                            title: "Selected Genres",
+                            value: selectedGenres.isEmpty ? "No genres selected" : selectedGenres.joined(separator: ", "),
+                            iconColor: .green
+                        )
+                        
+                        PreferenceInfoRow(
+                            icon: "number.circle.fill",
+                            title: "Total Selected",
+                            value: "\(selectedGenres.count) of \(genres.count) genres",
+                            iconColor: .blue
                         )
                     }
-                    
-                    navigateToHomePage = true
-                    presentationMode.wrappedValue.dismiss()
-                }) {
-                    HStack {
-                        Text(selectedGenres.isEmpty ? "Skip for now" : "Save preferences")
-                            .font(.system(size: 18, weight: .bold, design: .rounded))
-                        
-                        if !selectedGenres.isEmpty {
-                            Image(systemName: "arrow.right.circle.fill")
-                                .font(.system(size: 20))
-                        }
-                    }
-                    .foregroundColor(selectedGenres.isEmpty ? .gray : .black)
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 56)
-                    .background(
-                        selectedGenres.isEmpty ?
-                            LinearGradient(gradient: Gradient(colors: [Color.white.opacity(0.1), Color.white.opacity(0.1)]), startPoint: .leading, endPoint: .trailing) :
-                            LinearGradient(gradient: Gradient(colors: [Color.green, Color.green.opacity(0.8)]), startPoint: .leading, endPoint: .trailing)
-                    )
-
+                    .padding(16)
+                    .background(Color.white.opacity(0.05))
                     .cornerRadius(16)
-                    .shadow(color: selectedGenres.isEmpty ? .clear : Color.green.opacity(0.3),
-                           radius: 8, x: 0, y: 4)
+                    .padding(.horizontal)
+                    
+                    Spacer()
+                    
+                    // Submit Button
+                    Button(action: {
+                        if let currentProfile = profileManager.currentProfile {
+                            profileManager.updateProfile(
+                                profile: currentProfile,
+                                name: currentProfile.name,
+                                dateOfBirth: currentProfile.dateOfBirth,
+                                favoriteGenres: Array(selectedGenres),
+                                hasAgreedToTerms: currentProfile.hasAgreedToTerms,
+                                userPin: currentProfile.userPin,
+                                personalSecurityQuestion: currentProfile.personalSecurityQuestion,
+                                securityQuestionAnswer: currentProfile.personalSecurityQuestion
+                            )
+                        }
+                        
+                        navigateToHomePage = true
+                        presentationMode.wrappedValue.dismiss()
+                    }) {
+                        HStack {
+                            Text(selectedGenres.isEmpty ? "Skip for now" : "Save preferences")
+                                .font(.system(size: 18, weight: .bold, design: .rounded))
+                            
+                            if !selectedGenres.isEmpty {
+                                Image(systemName: "arrow.right.circle.fill")
+                                    .font(.system(size: 20))
+                            }
+                        }
+                        .foregroundColor(selectedGenres.isEmpty ? .gray : .black)
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 56)
+                        .background(
+                            selectedGenres.isEmpty ?
+                            LinearGradient(gradient: Gradient(colors: [Color.white.opacity(0.1), Color.white.opacity(0.1)]), startPoint: .leading, endPoint: .trailing) :
+                                LinearGradient(gradient: Gradient(colors: [Color.green, Color.green.opacity(0.8)]), startPoint: .leading, endPoint: .trailing)
+                        )
+                        .cornerRadius(16)
+                        .shadow(color: selectedGenres.isEmpty ? .clear : Color.green.opacity(0.3),
+                                radius: 8, x: 0, y: 4)
+                    }
+                    .padding(.horizontal)
+                    .padding(.bottom, 20)
                 }
-                .padding(.horizontal)
-                .padding(.bottom, 20)
             }
         }
         .onAppear {
@@ -182,9 +189,7 @@ struct GeneralMusicPreferencesView: View {
             return "star.fill"
         case "Classical":
             return "music.note.list"
-        case "Regional":
-            return "globe.americas.fill"
-        case "Hip Hop":
+        case "Hip-Hop":
             return "beats.headphones"
         case "Country":
             return "guitars.fill"

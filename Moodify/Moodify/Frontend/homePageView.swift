@@ -21,7 +21,7 @@ struct homePageView: View {
     @State private var showMenu = false
     
     // NOTE - this URL is temporary and needs to be updated each time from the backend side to detect mood properly
-    let backendURL = "https://e051-24-192-192-234.ngrok-free.app/analyze"
+    let backendURL = "/analyze"
     
     var body: some View {
         ZStack {
@@ -294,7 +294,8 @@ struct homePageView: View {
                     probabilities = sortedProbabilities.map { ($0.key, $0.value) }
                     currentMood = moodEmoji(for: emotion)
                     currentMoodText = "You seem to be \(emotion.capitalized)."
-                    spotifyController.addSongsToQueue(mood: emotion)
+                    spotifyController.addSongsToQueue(mood: emotion, userGenres: profile.favoriteGenres)
+
                 }
             } else {
                 DispatchQueue.main.async {
