@@ -17,6 +17,9 @@
 		696300582CC6E65E00AE7814 /* DetectEmotionServices.swift in Sources */ = {isa = PBXBuildFile; fileRef = 696300572CC6E65E00AE7814 /* DetectEmotionServices.swift */; };
 		6E52B8542CC98F3E0049BF08 /* PlayBackController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E52B8532CC98F370049BF08 /* PlayBackController.swift */; };
 		6E52B85A2CC9A9F30049BF08 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E52B8592CC9A9EE0049BF08 /* Constants.swift */; };
+		6E728B912CD1B95700017EA4 /* Queue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E728B902CD1B94F00017EA4 /* Queue.swift */; };
+		6E728B932CD1B98600017EA4 /* QueueManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E728B922CD1B97900017EA4 /* QueueManager.swift */; };
+		6E728B952CD1CD9B00017EA4 /* Player.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E728B942CD1CD9800017EA4 /* Player.swift */; };
 		6EA47A6C2C9E50D3006FB5C6 /* Moodify.plist in Resources */ = {isa = PBXBuildFile; fileRef = 6EA47A6B2C9E50D3006FB5C6 /* Moodify.plist */; };
 		6EA47A702C9E5199006FB5C6 /* SpotifyController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EA47A6F2C9E5199006FB5C6 /* SpotifyController.swift */; };
 		6EA47A772C9E52D4006FB5C6 /* SpotifyiOS.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6EA47A752C9E52C7006FB5C6 /* SpotifyiOS.xcframework */; };
@@ -81,6 +84,9 @@
 		696300572CC6E65E00AE7814 /* DetectEmotionServices.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetectEmotionServices.swift; sourceTree = "<group>"; };
 		6E52B8532CC98F370049BF08 /* PlayBackController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayBackController.swift; sourceTree = "<group>"; };
 		6E52B8592CC9A9EE0049BF08 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
+		6E728B902CD1B94F00017EA4 /* Queue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Queue.swift; sourceTree = "<group>"; };
+		6E728B922CD1B97900017EA4 /* QueueManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueueManager.swift; sourceTree = "<group>"; };
+		6E728B942CD1CD9800017EA4 /* Player.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Player.swift; sourceTree = "<group>"; };
 		6EA47A6B2C9E50D3006FB5C6 /* Moodify.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Moodify.plist; sourceTree = "<group>"; };
 		6EA47A6F2C9E5199006FB5C6 /* SpotifyController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpotifyController.swift; sourceTree = "<group>"; };
 		6EA47A752C9E52C7006FB5C6 /* SpotifyiOS.xcframework */ = {isa = PBXFileReference; expectedSignature = "AppleDeveloperProgram:2FNC3A47ZF:Spotify"; lastKnownFileType = wrapper.xcframework; path = SpotifyiOS.xcframework; sourceTree = "<group>"; };
@@ -192,6 +198,7 @@
 		694B6C002C9A4431002F0931 /* Frontend */ = {
 			isa = PBXGroup;
 			children = (
+				6E728B942CD1CD9800017EA4 /* Player.swift */,
 				89B1EC0F2CC9C1BF0041F9EE /* ForgotPinView.swift */,
 				89B1EC0D2CC9BDB10041F9EE /* PinInputView.swift */,
 				8966A3A22CC3304500FA58DE /* PinSetupView.swift */,
@@ -211,6 +218,8 @@
 		6E52B8522CC98F1B0049BF08 /* Backend */ = {
 			isa = PBXGroup;
 			children = (
+				6E728B922CD1B97900017EA4 /* QueueManager.swift */,
+				6E728B902CD1B94F00017EA4 /* Queue.swift */,
 				6E52B8592CC9A9EE0049BF08 /* Constants.swift */,
 				6E52B8532CC98F370049BF08 /* PlayBackController.swift */,
 				6EA47A6F2C9E5199006FB5C6 /* SpotifyController.swift */,
@@ -355,7 +364,10 @@
 				8966A3A32CC3304F00FA58DE /* PinSetupView.swift in Sources */,
 				89B1EC102CC9C1CC0041F9EE /* ForgotPinView.swift in Sources */,
 				6EA47A702C9E5199006FB5C6 /* SpotifyController.swift in Sources */,
+				6E728B912CD1B95700017EA4 /* Queue.swift in Sources */,
+				6E728B952CD1CD9B00017EA4 /* Player.swift in Sources */,
 				8917A3D92CA4D11400253254 /* MenuView.swift in Sources */,
+				6E728B932CD1B98600017EA4 /* QueueManager.swift in Sources */,
 				696300582CC6E65E00AE7814 /* DetectEmotionServices.swift in Sources */,
 				6934A10F2C8FDA840086CC91 /* ConnectToSpotify.swift in Sources */,
 				89B1EC0E2CC9BDBA0041F9EE /* PinInputView.swift in Sources */,
@@ -535,7 +547,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Moodify/Preview Content\"";
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 5RJHYK4MEZ;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Moodify/Info.plist;
@@ -552,7 +564,7 @@
 				);
 				MARKETING_VERSION = 1.0;
 				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_BUNDLE_IDENTIFIER = Moodify;
+				PRODUCT_BUNDLE_IDENTIFIER = Moodify2;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -590,7 +602,7 @@
 				);
 				MARKETING_VERSION = 1.0;
 				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_BUNDLE_IDENTIFIER = Moodify;
+				PRODUCT_BUNDLE_IDENTIFIER = Moodify2;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;

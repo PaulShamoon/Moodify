@@ -18,6 +18,9 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
     // Published property to hold the current track name
     @Published var currentTrackName: String = "No track playing"
     
+    // Published property to hold the current track uri
+    @Published var currentTrackURI: String = ""
+    
     // Published property to hold the current track album
     @Published var currentAlbumName: String = ""
     
@@ -32,6 +35,8 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
     
     // Variable to hold album cover
     @Published var albumCover: UIImage? = nil
+    
+    @Published var currentQueue: [Song] = []
     
     // Spotify App Remote instance
     private lazy var appRemote: SPTAppRemote = {
@@ -49,6 +54,10 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
     // Lazy initialization of the playbackController
     private lazy var playbackController: PlaybackController = {
         return PlaybackController(appRemote: appRemote)
+    }()
+    
+    private lazy var queueManager: QueueManager = {
+        return QueueManager()
     }()
     
     override init() {
@@ -149,8 +158,10 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
      */
     func playerStateDidChange(_ playerState: SPTAppRemotePlayerState) {
         DispatchQueue.main.async {
+            self.queueManager.removeSongsFromQueue(trackURI: self.currentTrackURI)
             self.currentTrackValue = playerState.track
             self.currentTrackName = playerState.track.name
+            self.currentTrackURI = playerState.track.uri
             self.currentAlbumName = playerState.track.album.name
             self.fetchAlbumCover()
         }
@@ -341,8 +352,8 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
                     
                     // Log the parsed URIs for better understanding of the data
                     print("Parsed URIs: \(uris)")
-                    
-                    self.enqueueTracks(uris: uris)
+//                    print("Tracks: \(tracks)")
+                    self.enqueueTracks(tracks: tracks)
                 } else {
                     print("Unexpected JSON structure")
                 }
@@ -356,21 +367,29 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
      Method to enqueue a list of track URIs.
      @param uris: Array of Spotify track URIs.
      */
-    private func enqueueTracks(uris: [String]) {
-        for (index, uri) in uris.enumerated() {
+    private func enqueueTracks(tracks: [[String: Any]]) {
+        for (index, track) in tracks.enumerated() {
+            // Extract the URI from each track dictionary
+            guard let uri = track["uri"] as? String else {
+                print("Failed to find URI in track at index \(index)")
+                continue
+            }
+
+
+            // Add a small delay between requests to prevent rate limiting
             DispatchQueue.main.asyncAfter(deadline: .now() + Double(index) * 0.5) {
-                // Need to add a small delay between requests to prevent rate limiting errors
                 self.appRemote.playerAPI?.enqueueTrackUri(uri, callback: { (result, error) in
                     if let error = error {
                         print("Failed to enqueue song URI \(uri): \(error.localizedDescription)")
                     } else {
                         print("Enqueued song URI: \(uri)")
+                        // Only want to parse the track after succesfully queueing a song
+                        self.queueManager.parseTrack(data: track)
                     }
                 })
             }
         }
     }
-    
     /*
      Method fetches the current tracks album cover
      
