@@ -21,7 +21,7 @@ struct homePageView: View {
     @State private var showMenu = false
     
     // NOTE - this URL is temporary and needs to be updated each time from the backend side to detect mood properly
-    let backendURL = "/analyze"
+    let backendURL = "https://6e9f-143-59-31-134.ngrok-free.app/analyze"
     
     var body: some View {
         ZStack {
@@ -101,27 +101,23 @@ struct homePageView: View {
                         }
                         
                          // Connect to Spotify/Resume Playback button
-                         Button(action: {
-                             // If no access token is stored then the user never intially connected to Spotify and authorized Moodify
-                             if spotifyController.accessToken == nil {
-                                 navigateToSpotify = true
-                             } else {
-                                 // If access token is stored then we just want to reconnect to spotify
-                                 spotifyController.connect()
-                             }
-                         }) {
-                             HStack {
-                                 Image(systemName: "music.note")
-                                     .font(.title2)
-                                     .foregroundColor(.black)
-                                 Text(spotifyController.accessToken == nil ? "Connect to Spotify" : "Resume Playback")
-                                     .font(.system(size: 20, weight: .bold, design: .rounded))
-                                     .foregroundColor(.black)
-                             }
-                             .padding()
-                             .background(Capsule().fill(Color.green))
-                             .shadow(radius: 10)
-                         }
+                        if spotifyController.accessToken == nil || spotifyController.isAccessTokenExpired() {
+                            Button(action: {
+                                navigateToSpotify = true
+                            }) {
+                                HStack {
+                                    Image(systemName: "music.note")
+                                        .font(.title2)
+                                        .foregroundColor(.black)
+                                    Text("Connect to Spotify")
+                                        .font(.system(size: 20, weight: .bold, design: .rounded))
+                                        .foregroundColor(.black)
+                                }
+                                .padding()
+                                .background(Capsule().fill(Color.green))
+                                .shadow(radius: 10)
+                            }
+                        }
                         
                         // Player to control Spotify
                         ZStack {

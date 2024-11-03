@@ -9,6 +9,9 @@ import SpotifyiOS
 
 class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDelegate, SPTAppRemoteDelegate {
     
+    //Stores token expiration
+    private var tokenExpirationDate: Date?
+    
     // Unique Spotify client ID
     private let spotifyClientID = "3dfaae404a2f4847a2ff7d707f7154f4"
     
@@ -58,14 +61,22 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
     
     // Function to retrieve the access token from UserDefaults
     private func retrieveAccessToken() {
-        if let storedAccessToken = UserDefaults.standard.string(forKey: "SpotifyAccessToken") {
+        if let storedAccessToken = UserDefaults.standard.string(forKey: "SpotifyAccessToken"),
+           let expirationTimestamp = UserDefaults.standard.object(forKey: "SpotifyTokenExpiration") as? TimeInterval {
             self.accessToken = storedAccessToken
+            self.tokenExpirationDate = Date(timeIntervalSince1970: expirationTimestamp)
             appRemote.connectionParameters.accessToken = storedAccessToken
         } else {
             print("No access token found in UserDefaults")
         }
     }
     
+    func isAccessTokenExpired() -> Bool {
+        guard let expirationDate = tokenExpirationDate else { return true }
+        return Date() >= expirationDate
+    }
+    
+
     /*
      Method connects the application to Spotify and or authorizes Moodify
      */
@@ -93,20 +104,26 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
         }
     }
     
-    // Handle incoming URL after authorization
+    //  Method to handle incoming URL after authorization and to set access token and expiration
+    //
     func setAccessToken(from url: URL) {
         let parameters = appRemote.authorizationParameters(from: url)
         
-        if let accessToken = parameters?[SPTAppRemoteAccessTokenKey] {
+        if let accessToken = parameters?[SPTAppRemoteAccessTokenKey],
+           let expiresIn = parameters?["expires_in"] as? String,
+           let expirationInterval = TimeInterval(expiresIn) {
             self.accessToken = accessToken
+            self.tokenExpirationDate = Date().addingTimeInterval(expirationInterval)
+            
             appRemote.connectionParameters.accessToken = accessToken
             UserDefaults.standard.set(accessToken, forKey: "SpotifyAccessToken")
-            // Connect after setting access token
+            UserDefaults.standard.set(self.tokenExpirationDate?.timeIntervalSince1970, forKey: "SpotifyTokenExpiration")
             appRemote.connect()
         } else if let errorDescription = parameters?[SPTAppRemoteErrorDescriptionKey] {
             print("Error setting access token: \(errorDescription)")
         }
     }
+    
     
     // Delegate method for successful connection
     @objc func appRemoteDidEstablishConnection(_ appRemote: SPTAppRemote) {
