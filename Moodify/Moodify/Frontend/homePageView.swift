@@ -103,6 +103,7 @@ struct homePageView: View {
                          // Connect to Spotify/Resume Playback button
                         if spotifyController.accessToken == nil || spotifyController.isAccessTokenExpired() {
                             Button(action: {
+                                spotifyController.refreshAccessToken() // Attempt to refresh the token
                                 navigateToSpotify = true
                             }) {
                                 HStack {
@@ -215,6 +216,8 @@ struct homePageView: View {
                         showingAlert = true
                     }
                 }
+        }.onAppear {
+            spotifyController.connect()
         }
     }
     
