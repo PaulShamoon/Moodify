@@ -7,7 +7,7 @@ struct homePageView: View {
     @Binding var isCreatingNewProfile: Bool
     @Binding var navigateToMusicPreferences: Bool
     @State private var navigateToSpotify = false // State for navigation
-    
+    @AppStorage("hasConnectedSpotify") private var hasConnectedSpotify = false
     @State private var showingCamera = false
     @State private var showingAlert = false
     @State private var alertMessage = ""
@@ -101,9 +101,8 @@ struct homePageView: View {
                         }
                         
                          // Connect to Spotify/Resume Playback button
-                        if spotifyController.accessToken == nil || spotifyController.isAccessTokenExpired() {
+                        if !hasConnectedSpotify || spotifyController.accessToken == nil {
                             Button(action: {
-                                spotifyController.refreshAccessToken() // Attempt to refresh the token
                                 navigateToSpotify = true
                             }) {
                                 HStack {
@@ -119,83 +118,88 @@ struct homePageView: View {
                                 .shadow(radius: 10)
                             }
                         }
-                        
-                        // Player to control Spotify
-                        ZStack {
-                            // Rounded rectangle for the background
-                            RoundedRectangle(cornerRadius: 10)
+                        if hasConnectedSpotify && spotifyController.accessToken != nil {
+                            // Player to control Spotify
+                            ZStack {
+                                // Rounded rectangle for the background
+                                RoundedRectangle(cornerRadius: 10)
                                 // Background color of the box
-                                .fill(Color(red: 0.96, green: 0.87, blue: 0.70))
+                                    .fill(Color(red: 0.96, green: 0.87, blue: 0.70))
                                 // Fixed height for the player bar
-                                .frame(height: 60)
+                                    .frame(height: 60)
                                 // Shadow effect
-                                .shadow(color: .gray, radius: 5, x: 0, y: 5)
-
-                            HStack {
-                                VStack(alignment: .leading) {
+                                    .shadow(color: .gray, radius: 5, x: 0, y: 5)
+                                
+                                HStack {
+                                    VStack(alignment: .leading) {
                                         Text(spotifyController.currentTrackName)
-                                        .font(.headline)
-                                        .foregroundColor(.black)
-                                        .padding(.leading, 10)
-
-                                    Text(spotifyController.currentAlbumName)
-                                        .font(.subheadline)
-                                        .foregroundColor(.black)
-                                        .padding(.leading, 10)
+                                            .font(.headline)
+                                            .foregroundColor(.black)
+                                            .padding(.leading, 10)
+                                        
+                                        Text(spotifyController.currentAlbumName)
+                                            .font(.subheadline)
+                                            .foregroundColor(.black)
+                                            .padding(.leading, 10)
+                                    }
+                                    Spacer()
+                                    
+                                    // Button to skip to the previously played song
+                                    Button(action: {
+                                        spotifyController.skipToPrevious()
+                                    }) {
+                                        Image(systemName: "backward.fill")
+                                            .resizable()
+                                            .frame(width: 20, height: 20)
+                                            .padding()
+                                            .foregroundColor(.black)
+                                    }
+                                    
+                                    // Button to play/pause current track
+                                    Button(action: {
+                                        spotifyController.togglePlayPause()
+                                    }) {
+                                        // Conditional icon based on playback state
+                                        Image(systemName: spotifyController.isPaused ? "play.fill" : "pause.fill")
+                                            .resizable()
+                                            .frame(width: 20, height: 20)
+                                            .padding()
+                                            .foregroundColor(.black)
+                                    }
+                                    
+                                    // Button to skip to the next song
+                                    Button(action: {
+                                        spotifyController.skipToNext()
+                                    }) {
+                                        Image(systemName: "forward.fill")
+                                            .resizable()
+                                            .frame(width: 20, height: 20)
+                                            .padding()
+                                            .foregroundColor(.black)
+                                    }
                                 }
-                                Spacer()
-
-                                // Button to skip to the previously played song
-                                Button(action: {
-                                    spotifyController.skipToPrevious()
-                                }) {
-                                    Image(systemName: "backward.fill")
-                                        .resizable()
-                                        .frame(width: 20, height: 20)
-                                        .padding()
-                                        .foregroundColor(.black)
-                                }
-
-                                // Button to play/pause current track
-                                Button(action: {
-                                    spotifyController.togglePlayPause()
-                                }) {
-                                    // Conditional icon based on playback state
-                                    Image(systemName: spotifyController.isPaused ? "play.fill" : "pause.fill")
-                                        .resizable()
-                                        .frame(width: 20, height: 20)
-                                        .padding()
-                                        .foregroundColor(.black)
-                                }
-
-                                // Button to skip to the next song
-                                Button(action: {
-                                    spotifyController.skipToNext()
-                                }) {
-                                    Image(systemName: "forward.fill")
-                                        .resizable()
-                                        .frame(width: 20, height: 20)
-                                        .padding()
-                                        .foregroundColor(.black)
-                                }
+                                // Horizontal padding within the box
+                                .padding(.horizontal)
                             }
-                            // Horizontal padding within the box
+                            // Padding on the outside for better spacing
                             .padding(.horizontal)
                         }
-                        // Padding on the outside for better spacing
-                        .padding(.horizontal)
                         
                         Spacer()
-                        
-                        .navigationDestination(isPresented: $navigateToSpotify) {
-                            ConnectToSpotifyDisplay(spotifyController: spotifyController)
-                        }
-
                     }
                     .padding(.top, 60)
                 }
                 .alert(isPresented: $showingAlert) {
                     Alert(title: Text("Error"), message: Text(alertMessage), dismissButton: .default(Text("OK")))
+                }
+                .navigationDestination(isPresented: $navigateToSpotify) {
+                    ConnectToSpotifyDisplay(spotifyController: spotifyController)
+                        .onDisappear {
+                            // Set flag when user completes Spotify connection
+                            if spotifyController.accessToken != nil {
+                                hasConnectedSpotify = true
+                            }
+                        }
                 }
             }
             
@@ -217,7 +221,10 @@ struct homePageView: View {
                     }
                 }
         }.onAppear {
-            spotifyController.connect()
+            // Only check connection if user has previously connected
+            if hasConnectedSpotify {
+                spotifyController.ensureSpotifyConnection()
+            }
         }
     }
     
