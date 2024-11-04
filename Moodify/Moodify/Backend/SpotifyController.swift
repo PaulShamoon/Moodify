@@ -21,6 +21,9 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
     // Redirect URL after authorization
     private let spotifyRedirectURL = URL(string: "spotify-ios-quick-start://spotify-login-callback")!
     
+    // Initialize the MoodHandler
+    private let moodQueueHandler = MoodQueueHandler() // Initialize the MoodQueueHandler
+
     // Scopes for Spotify access
     private let spotifyScopes = "user-read-private user-read-email playlist-modify-public playlist-modify-private"
     
@@ -243,24 +246,10 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
      */
     @objc func appRemote(_ appRemote: SPTAppRemote, didFailConnectionAttemptWithError error: Error?) {
         print("Failed to connect to Spotify App Remote: \(String(describing: error?.localizedDescription))")
-
-        // Retry logic
-        guard retryCount < 3 else {
-            print("Maximum retry attempts reached. Connection failed.")
-            return
-        }
-
-        retryCount += 1
-        print("Retrying connection attempt \(retryCount)...")
-
-        // Reinitialize the App Remote before retrying
-        self.appRemote.disconnect()
-        self.appRemote = SPTAppRemote(configuration: configuration, logLevel: .debug)
-        self.appRemote.delegate = self
-
-        // Attempt to reconnect after a short delay
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-            self.connect()
+        
+        // Attempt to reconnect immediately without retry logic
+        reconnectAndExecute {
+            print("Reattempted connection after failure.")
         }
     }
     
@@ -269,9 +258,6 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
      */
     @objc func appRemote(_ appRemote: SPTAppRemote, didDisconnectWithError error: Error?) {
         print("Disconnected from Spotify App Remote: \(String(describing: error?.localizedDescription))")
-
-        // Cleanly disconnect to reset the state
-        appRemote.disconnect()
         
         // Attempt to reconnect after a delay
         DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
@@ -304,8 +290,6 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
                 appRemote.playerAPI?.resume { [weak self] result, error in
                     if let error = error {
                         print("Error resuming playback: \(error.localizedDescription)")
-                        // Attempt to handle the error
-                        self?.handlePlayerAPIError()
                     } else {
                         self?.isPaused = false
                         print("Music resumed.")
@@ -315,8 +299,6 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
                 appRemote.playerAPI?.pause { [weak self] result, error in
                     if let error = error {
                         print("Error pausing playback: \(error.localizedDescription)")
-                        // Attempt to handle the error
-                        self?.handlePlayerAPIError()
                     } else {
                         self?.isPaused = true
                         print("Music paused.")
@@ -324,12 +306,12 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
                 }
             }
         } else {
-            print("App Remote is not connected. Attempting to reconnect...")
             reconnectAndExecute {
                 self.togglePlayPause()
             }
         }
     }
+
 
     
     
@@ -411,11 +393,10 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
      */
     func addSongsToQueue(mood: String, userGenres: [String]) {
         if appRemote.isConnected {
-            // Get feature parameters based on mood
-            let (minValence, maxValence, minEnergy, maxEnergy, minLoudness, maxLoudness, minAcousticness, maxAcousticness, minDanceability, maxDanceability) = getMoodParameters(for: mood)
+            // Use MoodQueueHandler to get mood parameters and build the recommendation URL
+            let (minValence, maxValence, minEnergy, maxEnergy, minLoudness, maxLoudness, minAcousticness, maxAcousticness, minDanceability, maxDanceability) = moodQueueHandler.getMoodParameters(for: mood)
             
-            // Build the recommendation URL
-            guard let url = buildRecommendationURL(userGenres: userGenres, limit: 20, minValence: minValence, maxValence: maxValence, minEnergy: minEnergy, maxEnergy: maxEnergy, minLoudness: minLoudness, maxLoudness: maxLoudness, minAcousticness: minAcousticness, maxAcousticness: maxAcousticness, minDanceability: minDanceability, maxDanceability: maxDanceability),
+            guard let url = moodQueueHandler.buildRecommendationURL(userGenres: userGenres, limit: 20, minValence: minValence, maxValence: maxValence, minEnergy: minEnergy, maxEnergy: maxEnergy, minLoudness: minLoudness, maxLoudness: maxLoudness, minAcousticness: minAcousticness, maxAcousticness: maxAcousticness, minDanceability: minDanceability, maxDanceability: maxDanceability),
                   let accessToken = self.accessToken else {
                 print("Invalid URL or missing access token")
                 return
@@ -424,100 +405,10 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
             // Fetch recommendations and handle the response
             fetchRecommendations(url: url, accessToken: accessToken)
         } else {
-            print("App Remote is not connected. Attempting to reconnect...")
             reconnectAndExecute {
                 self.addSongsToQueue(mood: mood, userGenres: userGenres)
             }
         }
-    }
-    
-    /*
-     Function that determines the mood-based audio feature ranges (e.g., valence, energy) based on the provided mood. It returns a tuple with the appropriate values for each feature.
-     
-     Created by: Mohammad Sulaiman
-     */
-    private func getMoodParameters(for mood: String) -> (Double, Double, Double, Double, Double?, Double?, Double?, Double?, Double?, Double?) {
-        var minValence: Double = 0.5
-        var maxValence: Double = 0.5
-        var minEnergy: Double = 0.5
-        var maxEnergy: Double = 0.5
-        var minLoudness: Double? = nil
-        var maxLoudness: Double? = nil
-        var minAcousticness: Double? = nil
-        var maxAcousticness: Double? = nil
-        var minDanceability: Double? = nil
-        var maxDanceability: Double? = nil
-        
-        switch mood.lowercased() {
-        case "happy", "surprise":
-            minValence = 0.7
-            maxValence = 1.0
-            minEnergy = 0.6
-            maxEnergy = 0.9
-            /*
-             minDanceability = 0.7
-             maxDanceability = 1.0 // Danceable, upbeat tracks
-             */
-            
-        case "sad", "disgust", "fear":
-            minValence = 0.0
-            maxValence = 0.3
-            minEnergy = 0.3
-            maxEnergy = 0.5
-            minAcousticness = 0.6
-            maxAcousticness = 1.0
-        case "angry":
-            minValence = 0.0
-            maxValence = 0.3
-            minEnergy = 0.8
-            maxEnergy = 1.0
-            minLoudness = -5.0
-            
-        case "neutral":
-            minValence = 0.4
-            maxValence = 0.6
-            minEnergy = 0.4
-            maxEnergy = 0.6
-            minAcousticness = 0.3
-            maxAcousticness = 0.6
-        default:
-            break
-        }
-        
-        return (minValence, maxValence, minEnergy, maxEnergy, minLoudness, maxLoudness, minAcousticness, maxAcousticness, minDanceability, maxDanceability)
-    }
-    
-    /*
-     Function that constructs the Spotify API recommendation URL using the provided genres and audio feature ranges. It dynamically includes each feature parameter in the URL if it’s not nil.
-     
-     Created by: Mohammad Sulaiman
-     */
-    private func buildRecommendationURL(userGenres: [String], limit: Int, minValence: Double, maxValence: Double, minEnergy: Double, maxEnergy: Double, minLoudness: Double?, maxLoudness: Double?, minAcousticness: Double?, maxAcousticness: Double?, minDanceability: Double?, maxDanceability: Double?) -> URL? {
-        // TODO: Shuffle the usergenres if more than 5 moods are selected.
-        // Convert user-selected genres to API-compatible genres
-        let seedGenres = userGenres.prefix(5).map { apiGenre(from: $0) }.joined(separator: ",")
-        
-        var urlString = """
-            https://api.spotify.com/v1/recommendations?seed_genres=\(seedGenres)&limit=\(limit)&min_valence=\(minValence)&max_valence=\(maxValence)&min_energy=\(minEnergy)&max_energy=\(maxEnergy)
-            """
-        // Organize optional parameters in a dictionary
-        let optionalParameters: [String: Double?] = [
-            "min_loudness": minLoudness,
-            "max_loudness": maxLoudness,
-            "min_acousticness": minAcousticness,
-            "max_acousticness": maxAcousticness,
-            "min_danceability": minDanceability,
-            "max_danceability": maxDanceability
-        ]
-        
-        // Iterate over optional parameters and append if non-nil
-        for (key, value) in optionalParameters {
-            if let value = value {
-                urlString += "&\(key)=\(value)"
-            }
-        }
-        
-        return URL(string: urlString)
     }
     
     
@@ -605,13 +496,4 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
         })
     }
     
-    // Function to convert user-facing genre names to API-compatible genre names
-    private func apiGenre(from genre: String) -> String {
-        switch genre {
-        case "R&B": return "r-n-b"
-        case "World Music": return "world-music"
-        case "Film Scores": return "movie"
-        default: return genre.lowercased()
-        }
-    }
 }
