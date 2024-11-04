@@ -4,11 +4,13 @@ import SwiftUI
  A view that displays a button allowing the user to
  connect their Spotify account to the application
  
- Created by Paul Shamoon on 9/12/24.
+ Created By: Paul Shamoon
  */
-struct ConnectToSpotifyDisplay: View {
+struct ConnectToSpotifyView: View {
     @ObservedObject var spotifyController: SpotifyController
-    @Environment(\.dismiss) var dismiss // Environment property to handle view dismissal
+    
+    // Environment property to handle view dismissal
+    @Environment(\.dismiss) var dismiss
 
     var body: some View {
         VStack(spacing: 20) {
@@ -40,7 +42,7 @@ struct ConnectToSpotifyDisplay: View {
         }
         .padding()
         
-         // We can access the url when spotift redirects us to Moodify
+         // We can access the url when spotify redirects us to Moodify
         .onOpenURL { url in
             // We call setAccessToken passing in the url so it can retrieve the access token from it
             spotifyController.setAccessToken(from: url)

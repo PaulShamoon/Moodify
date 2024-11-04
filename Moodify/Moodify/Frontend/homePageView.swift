@@ -21,7 +21,7 @@ struct homePageView: View {
     @State private var showMenu = false
     
     // NOTE - this URL is temporary and needs to be updated each time from the backend side to detect mood properly
-    let backendURL = "/analyze"
+    let backendURL = "https://b253-24-192-192-234.ngrok-free.app/analyze"
     
     var body: some View {
         ZStack {
@@ -123,75 +123,16 @@ struct homePageView: View {
                              .shadow(radius: 10)
                          }
                         
-                        // Player to control Spotify
-                        ZStack {
-                            // Rounded rectangle for the background
-                            RoundedRectangle(cornerRadius: 10)
-                                // Background color of the box
-                                .fill(Color(red: 0.96, green: 0.87, blue: 0.70))
-                                // Fixed height for the player bar
-                                .frame(height: 60)
-                                // Shadow effect
-                                .shadow(color: .gray, radius: 5, x: 0, y: 5)
-
-                            HStack {
-                                VStack(alignment: .leading) {
-                                        Text(spotifyController.currentTrackName)
-                                        .font(.headline)
-                                        .foregroundColor(.black)
-                                        .padding(.leading, 10)
-
-                                    Text(spotifyController.currentAlbumName)
-                                        .font(.subheadline)
-                                        .foregroundColor(.black)
-                                        .padding(.leading, 10)
-                                }
-                                Spacer()
-
-                                // Button to skip to the previously played song
-                                Button(action: {
-                                    spotifyController.skipToPrevious()
-                                }) {
-                                    Image(systemName: "backward.fill")
-                                        .resizable()
-                                        .frame(width: 20, height: 20)
-                                        .padding()
-                                        .foregroundColor(.black)
-                                }
-
-                                // Button to play/pause current track
-                                Button(action: {
-                                    spotifyController.togglePlayPause()
-                                }) {
-                                    // Conditional icon based on playback state
-                                    Image(systemName: spotifyController.isPaused ? "play.fill" : "pause.fill")
-                                        .resizable()
-                                        .frame(width: 20, height: 20)
-                                        .padding()
-                                        .foregroundColor(.black)
-                                }
-
-                                // Button to skip to the next song
-                                Button(action: {
-                                    spotifyController.skipToNext()
-                                }) {
-                                    Image(systemName: "forward.fill")
-                                        .resizable()
-                                        .frame(width: 20, height: 20)
-                                        .padding()
-                                        .foregroundColor(.black)
-                                }
-                            }
-                            // Horizontal padding within the box
-                            .padding(.horizontal)
-                        }
+                        // View to display the player
+                        PlayerView(spotifyController: spotifyController)
+                        
                         // Padding on the outside for better spacing
                         .padding(.horizontal)
                         
                         Spacer()
                         
                         .navigationDestination(isPresented: $navigateToSpotify) {
-                            ConnectToSpotifyDisplay(spotifyController: spotifyController)
+                            ConnectToSpotifyView(spotifyController: spotifyController)
                         }
 
                     }
