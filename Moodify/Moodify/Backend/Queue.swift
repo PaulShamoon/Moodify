@@ -6,8 +6,7 @@
 //
 
 /*
- Song objects to contain detail information about a song.
- This is used to populate the queue
+ A "Song" object to contain detail information about a song.
  
  Created By: Paul Shamoon
  */

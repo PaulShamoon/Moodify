@@ -36,6 +36,7 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
     // Variable to hold album cover
     @Published var albumCover: UIImage? = nil
     
+    // Array of "Song" objects to hold the state of the queue
     @Published var currentQueue: [Song] = []
     
     // Spotify App Remote instance
@@ -158,7 +159,7 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
      */
     func playerStateDidChange(_ playerState: SPTAppRemotePlayerState) {
         DispatchQueue.main.async {
-            self.queueManager.removeSongsFromQueue(trackURI: self.currentTrackURI)
+            self.currentQueue = self.queueManager.removeSongsFromQueue(trackURI: self.currentTrackURI)
             self.currentTrackValue = playerState.track
             self.currentTrackName = playerState.track.name
             self.currentTrackURI = playerState.track.uri
@@ -199,6 +200,29 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
      */
     func skipToPrevious() {
         playbackController.skipToPrevious()
+    }
+    
+    
+    /*
+    Method to clear the current queue
+     
+    NOTE: The Spotify Web API nor the Spotify iOS SDK provide an API endpoint to clear the current queue.
+     Because of this, our only option is to skip through every song in the currentQueue to "clear" the queue.
+     These "skip" requests happen almost instantanous and are barley noticable to the user, making it a effective loophole.
+    
+     Created By: Paul Shamoon
+    */
+    func clearCurrentQueue() {
+        // Check if currentQueue is empty
+        guard !currentQueue.isEmpty else {
+            print("Queue was empty, no need to clear.")
+            return
+        }
+        
+        // Call skipToNext for every item in the currentQueue
+        currentQueue.forEach { _ in
+            skipToNext()
+        }
     }
     
     /*
@@ -348,11 +372,7 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
                 // Try parsing the JSON
                 if let json = try JSONSerialization.jsonObject(with: data) as? [String: Any],
                    let tracks = json["tracks"] as? [[String: Any]] {
-                    let uris = tracks.compactMap { $0["uri"] as? String }
                     
-                    // Log the parsed URIs for better understanding of the data
-                    print("Parsed URIs: \(uris)")
-//                    print("Tracks: \(tracks)")
                     self.enqueueTracks(tracks: tracks)
                 } else {
                     print("Unexpected JSON structure")
@@ -365,9 +385,13 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
     
     /*
      Method to enqueue a list of track URIs.
-     @param uris: Array of Spotify track URIs.
+     
+     @param tracks: Array of Spotify tracks.
      */
     private func enqueueTracks(tracks: [[String: Any]]) {
+        // Clear the currentQueue before queueing new songs
+        clearCurrentQueue()
+        
         for (index, track) in tracks.enumerated() {
             // Extract the URI from each track dictionary
             guard let uri = track["uri"] as? String else {
@@ -383,13 +407,15 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
                         print("Failed to enqueue song URI \(uri): \(error.localizedDescription)")
                     } else {
                         print("Enqueued song URI: \(uri)")
+
                         // Only want to parse the track after succesfully queueing a song
-                        self.queueManager.parseTrack(data: track)
+                        self.currentQueue = self.queueManager.parseTrack(track: track)
                     }
                 })
             }
         }
     }
+    
     /*
      Method fetches the current tracks album cover
      
@@ -425,5 +451,33 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
         case "Film Scores": return "movie"
         default: return genre.lowercased()
         }
+    }
+    
+    /*
+     Method to play the passed-in "Song" object from the currentQueue
+     
+     @param song: "Song" object from the queue to play
+     
+     Created By: Paul Shamoon
+    */
+    func playSongFromQueue(song: Song) {
+        // Get the song to play's index in the currentQueue
+        if let index = currentQueue.firstIndex(where: { $0.songURI == song.songURI }) {
+            
+            // This skips all songs in the queue leading up to the
+            // one we intend to play, essentially "clearing" the queue
+            for _ in 0..<(index + 1) {
+                skipToNext()
+            }
+        }
+        
+        // Play the passed in song from the currentQueue
+        appRemote.playerAPI?.play(song.songURI, callback: { result, error in
+            if let error = error {
+                print("Failed to play song: \(error.localizedDescription)")
+            } else {
+                print("Successfully started playing \(song.trackName) by \(song.artistName).")
+            }
+        })
     }
 }
