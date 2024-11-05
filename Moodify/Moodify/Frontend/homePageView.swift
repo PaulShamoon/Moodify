@@ -144,6 +144,16 @@ struct homePageView: View {
                                     }
                                     Spacer()
                                     
+                                    Button(action: {
+                                        spotifyController.ensureSpotifyConnection()
+                                    }) {
+                                        Image(systemName: "arrow.clockwise")
+                                            .resizable()
+                                            .frame(width: 20, height: 20)
+                                            .padding()
+                                            .foregroundColor(.black)
+                                    }
+                                    
                                     // Button to skip to the previously played song
                                     Button(action: {
                                         spotifyController.skipToPrevious()
@@ -224,6 +234,12 @@ struct homePageView: View {
             // Only check connection if user has previously connected
             if hasConnectedSpotify {
                 spotifyController.ensureSpotifyConnection()
+            }
+        }
+        .onChange(of: spotifyController.isConnected) {
+            isConnected in
+            if isConnected {
+                spotifyController.updatePlayerState()
             }
         }
     }

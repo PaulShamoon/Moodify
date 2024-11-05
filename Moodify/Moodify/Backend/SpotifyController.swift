@@ -9,6 +9,9 @@ import SpotifyiOS
 
 class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDelegate, SPTAppRemoteDelegate {
     
+    
+    @Published private(set) var isConnected: Bool = false
+
     // Stores token expiration
     private var tokenExpirationDate: Date? {
         get {
@@ -293,6 +296,11 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
     // Delegate method for successful connection
     @objc func appRemoteDidEstablishConnection(_ appRemote: SPTAppRemote) {
         print("Spotify App Remote connected successfully.")
+        
+        DispatchQueue.main.async {
+            self.isConnected = true  // Update connection status
+        }
+        
         retryCount = 0 // Reset the retry counter on a successful connection
         
         // Set up the player API and subscribe to player state
@@ -332,6 +340,12 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
      */
     @objc func appRemote(_ appRemote: SPTAppRemote, didDisconnectWithError error: Error?) {
         print("Disconnected from Spotify App Remote: \(String(describing: error?.localizedDescription))")
+        
+        DispatchQueue.main.async {
+            self.isConnected = false  // Update connection status
+            self.currentTrackName = "No track playing"  // Reset track info
+            self.currentAlbumName = ""
+        }
         
         // Attempt to reconnect after a delay
         DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
@@ -590,7 +604,13 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
             }
         })
     }
-    
+    func updatePlayerState() {
+        appRemote.playerAPI?.getPlayerState { [weak self] (result, error) in
+            if let playerState = result as? SPTAppRemotePlayerState {
+                self?.playerStateDidChange(playerState)
+            }
+        }
+    }
 }
 
 extension SpotifyController {
