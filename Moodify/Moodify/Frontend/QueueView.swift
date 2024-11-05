@@ -95,19 +95,22 @@ struct QueueView: View {
                     .padding()
             } else {
                 List(spotifyController.currentQueue) { song in
-                    VStack(alignment: .leading) {
+                    VStack(alignment: .leading, spacing: 2) {
                         Button(action: {
                             spotifyController.playSongFromQueue(song: song)
                         }) {
-                        Text(song.trackName)
-                            .font(.headline)
-                            .foregroundColor(.white)
-                        Text(song.artistName)
-                            .font(.subheadline)
-                            .foregroundColor(.gray)
-                                            }
+                            Text(song.trackName)
+                                .font(.headline)
+                                .foregroundColor(.white)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+
+                            Text(song.artistName)
+                                .font(.subheadline)
+                                .foregroundColor(.gray)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                        }
+                        .padding(.vertical, 5)
                     }
-                    .padding(.vertical, 5)
                 }
                 .listStyle(PlainListStyle())
             }
