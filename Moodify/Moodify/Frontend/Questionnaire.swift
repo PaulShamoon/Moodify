@@ -8,7 +8,7 @@ struct QuestionnaireView: View {
     @Binding var isCreatingNewProfile: Bool
     
     @Environment(\.presentationMode) var presentationMode
-    @State private var showingPDF = false
+    @State private var showingTOS = false
     @State private var showingTooltip = false
     @State private var showingTooltip1 = false
     
@@ -52,37 +52,8 @@ struct QuestionnaireView: View {
                                 .padding(.vertical, 40)
                         }
                     }
-                    
-                    if !(profileManager.currentProfile?.hasAgreedToTerms ?? false) {
-                        FormCard(title: "Terms & Conditions") {
-                            VStack(alignment: .leading, spacing: 15) {
-                                HStack(spacing: 12) {
-                                    Toggle("", isOn: $agreedToTerms)
-                                        .labelsHidden()
-                                        .toggleStyle(SwitchToggleStyle(tint: .green))
-                                    
-                                    Text("I agree to the")
-                                        .foregroundColor(.gray)
-                                    
-                                    Button(action: { showingPDF = true }) {
-                                        Text("Terms of Service")
-                                            .foregroundColor(.green)
-                                            .underline()
-                                            .padding(.leading, -9)
-                                    }
-                                }
-                                
-                                if showErrorMessages, let termsError = termsError {
-                                    Text(termsError)
-                                        .font(.system(size: 14))
-                                        .foregroundColor(.red)
-                                }
-                            }
-                        }
-                    }
+                    termsSection
                 }
-                
-
                 submitButton
             }
             .padding()
@@ -96,9 +67,6 @@ struct QuestionnaireView: View {
             .edgesIgnoringSafeArea(.all)
         )
         .onAppear(perform: loadProfileData)
-        .sheet(isPresented: $showingPDF) {
-            PDFViewerView()
-        }
     }
     
     private var headerSection: some View {
@@ -133,6 +101,31 @@ struct QuestionnaireView: View {
                 .foregroundColor(.white)
                 .padding(.top, 5)
         }
+    }
+    
+    private var termsSection: some View {
+            VStack(alignment: .leading, spacing: 15) {
+                HStack(spacing: 12) {
+                    Toggle("", isOn: $agreedToTerms)
+                        .labelsHidden()
+                        .toggleStyle(SwitchToggleStyle(tint: .green))
+                    
+                    Text("I agree to the")
+                        .foregroundColor(.gray)
+                    
+                    NavigationLink(destination: TermsOfServicePage(agreedToTerms: $agreedToTerms)) {
+                        Text("Terms of Service")
+                            .foregroundColor(.green)
+                            .underline()
+                    }
+                }
+                
+                if showErrorMessages, let termsError = termsError {
+                    Text(termsError)
+                        .font(.system(size: 14))
+                        .foregroundColor(.red)
+                }
+            }
     }
     
     private var submitButton: some View {
