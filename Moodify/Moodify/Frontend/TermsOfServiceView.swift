@@ -7,7 +7,7 @@
 
 import SwiftUI
 // TermsOfServicePage: Separate Page for TOS
-struct TermsOfServicePage: View {
+struct TermsOfServiceView: View {
     @Binding var agreedToTerms: Bool
     @Environment(\.presentationMode) var presentationMode
     
@@ -118,19 +118,32 @@ struct TermsOfServicePage: View {
                 .padding()
                 .font(.body)
             }
-            
-            Button(action: {
-                agreedToTerms = true
-                presentationMode.wrappedValue.dismiss()
-            }) {
-                Text("Agree and Continue")
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(Color.green)
-                    .foregroundColor(.white)
-                    .cornerRadius(8)
+            if agreedToTerms == false {
+                Button(action: {
+                    agreedToTerms = true
+                    presentationMode.wrappedValue.dismiss()
+                }) {
+                    Text("Agree and Continue")
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.green)
+                        .foregroundColor(.white)
+                        .cornerRadius(8)
+                }
+                .padding()
+            } else {
+                Button(action: {
+                    presentationMode.wrappedValue.dismiss()
+                }) {
+                    Text("Done")
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.green)
+                        .foregroundColor(.white)
+                        .cornerRadius(8)
+                }
+                .padding()
             }
-            .padding()
         }
     }
 }

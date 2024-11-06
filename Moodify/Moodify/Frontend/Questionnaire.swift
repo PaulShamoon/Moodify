@@ -113,7 +113,7 @@ struct QuestionnaireView: View {
                     Text("I agree to the")
                         .foregroundColor(.gray)
                     
-                    NavigationLink(destination: TermsOfServicePage(agreedToTerms: $agreedToTerms)) {
+                    NavigationLink(destination: TermsOfServiceView(agreedToTerms: $agreedToTerms)) {
                         Text("Terms of Service")
                             .foregroundColor(.green)
                             .underline()
@@ -290,29 +290,4 @@ struct CustomTextField: View {
         .background(Color(white: 0.2))
         .cornerRadius(10)
     }
-}
-
-// PDF Viewer Components (unchanged)
-struct PDFViewerView: View {
-    var body: some View {
-        if let pdfURL = Bundle.main.url(forResource: "TermsofService", withExtension: "pdf") {
-            PDFKitView(url: pdfURL)
-        } else {
-            Text("PDF not found")
-                .foregroundColor(.red)
-        }
-    }
-}
-
-struct PDFKitView: UIViewRepresentable {
-    let url: URL
-    
-    func makeUIView(context: Context) -> PDFView {
-        let pdfView = PDFView()
-        pdfView.document = PDFDocument(url: url)
-        pdfView.autoScales = true
-        return pdfView
-    }
-    
-    func updateUIView(_ uiView: PDFView, context: Context) {}
 }
