@@ -15,7 +15,7 @@ import SwiftUI
 struct PlayerView: View {
     @ObservedObject var spotifyController: SpotifyController
     @State private var navigateToQueue = false
-
+    @AppStorage("hasConnectedSpotify") private var hasConnectedSpotify = false  // Store the connection status in UserDefaults
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 10)

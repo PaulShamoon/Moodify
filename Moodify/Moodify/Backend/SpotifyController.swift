@@ -293,13 +293,15 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
             if let refreshToken = parameters?["refresh_token"] as? String {
                 self.refreshToken = refreshToken
                 UserDefaults.standard.set(refreshToken, forKey: "SpotifyRefreshToken")
-            } else {
-                print("No refresh token found in URL parameters.")
             }
             
+            // Connect and initialize player state
             appRemote.connect()
-        } else if let errorDescription = parameters?[SPTAppRemoteErrorDescriptionKey] {
-            print("Error setting access token: \(errorDescription)")
+            
+            // Add a slight delay to ensure connection is established before getting player state
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
+                self?.updatePlayerState()
+            }
         }
     }
     
@@ -496,6 +498,7 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
                 print("Failed to reconnect to Spotify.")
             }
         }
+        ensureSpotifyConnection()
     }
 
     private func handlePlayerAPIError() {
@@ -692,30 +695,33 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
 extension SpotifyController {
     /// Checks connection state and token validity before attempting to connect
     func ensureSpotifyConnection() {
-        // If we're already connected and token is valid, do nothing
-        guard !appRemote.isConnected || isAccessTokenExpired() else {
+        guard !appRemote.isConnected else {
             print("Spotify already connected with valid token")
             return
         }
         
-        // If we have a token but it's expired, try refreshing
-        if accessToken != nil && isAccessTokenExpired() {
-            Task {
-                do {
-                    try await refreshAccessToken()
-                    if !appRemote.isConnected {
-                        appRemote.connect()
+        // If we have a token, check if it's expired
+        if let _ = accessToken {
+            if isAccessTokenExpired() {
+                Task {
+                    do {
+                        try await refreshAccessToken()
+                        DispatchQueue.main.async {
+                            self.connect()
+                        }
+                    } catch {
+                        print("Token refresh failed: \(error.localizedDescription)")
+                        DispatchQueue.main.async {
+                            self.disconnect()
+                            self.connect()  // This will trigger new authorization if needed
+                        }
                     }
-                } catch {
-                    print("Token refresh failed, initiating new connection: \(error.localizedDescription)")
-                    connect() // This will trigger new authorization if needed
                 }
+            } else {
+                connect()
             }
-            return
-        }
-        
-        // If no token or not connected, initiate connection
-        if !appRemote.isConnected {
+        } else {
+            // No token, initiate fresh connection
             connect()
         }
     }
