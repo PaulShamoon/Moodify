@@ -7,11 +7,11 @@ import SwiftUI
  Created by Paul Shamoon on 9/12/24.
  Updated by [Assistant] on 11/04/24
  */
-struct ConnectToSpotifyDisplay: View {
+struct ConnectToSpotifyView: View {
     @ObservedObject var spotifyController: SpotifyController
     @Environment(\.dismiss) var dismiss // Environment property to handle view dismissal
     @AppStorage("hasConnectedSpotify") private var hasConnectedSpotify = false
-    
+
     var body: some View {
         VStack(spacing: 20) {
             Text("Choose your streaming provider to continue")
@@ -43,7 +43,7 @@ struct ConnectToSpotifyDisplay: View {
         }
         .padding()
         
-         // We can access the url when spotift redirects us to Moodify
+         // We can access the url when spotify redirects us to Moodify
         .onOpenURL { url in
             print("Received Spotify redirect URL")
             spotifyController.setAccessToken(from: url)
