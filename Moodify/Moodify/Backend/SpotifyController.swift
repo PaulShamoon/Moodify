@@ -9,6 +9,8 @@ import SpotifyiOS
 
 class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDelegate, SPTAppRemoteDelegate {
     
+    // Tracks if reconnect was attempted
+    private var reconnectAttempted = false
     
     @Published private(set) var isConnected: Bool = false
 
@@ -307,6 +309,8 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
     
     // Delegate method for successful connection
     @objc func appRemoteDidEstablishConnection(_ appRemote: SPTAppRemote) {
+        updatePlayerState()
+        reconnectAttempted = false
         print("Spotify App Remote connected successfully.")
         
         DispatchQueue.main.async {
@@ -342,8 +346,13 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
         print("Failed to connect to Spotify App Remote: \(String(describing: error?.localizedDescription))")
         
         // Attempt to reconnect immediately without retry logic
-        reconnectAndExecute {
-            print("Reattempted connection after failure.")
+        if !reconnectAttempted {
+            reconnectAttempted = true  // Set the flag to prevent further retries
+            reconnectAndExecute {
+                print("Reattempted connection after failure.")
+            }
+        } else {
+            print("Reconnect attempt already made, will not retry.")
         }
     }
     

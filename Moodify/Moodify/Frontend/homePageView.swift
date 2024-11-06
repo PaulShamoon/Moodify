@@ -163,17 +163,6 @@ struct homePageView: View {
                         showingAlert = true
                     }
                 }
-        }.onAppear {
-            // Only check connection if user has previously connected
-            if hasConnectedSpotify {
-                spotifyController.ensureSpotifyConnection()
-            }
-        }
-        .onChange(of: spotifyController.isConnected) {
-            isConnected in
-            if isConnected {
-                spotifyController.updatePlayerState()
-            }
         }
     }
     

@@ -15,7 +15,7 @@ import SwiftUI
 struct PlayerView: View {
     @ObservedObject var spotifyController: SpotifyController
     @State private var navigateToQueue = false
-    @AppStorage("hasConnectedSpotify") private var hasConnectedSpotify = false  // Store the connection status in UserDefaults
+    @AppStorage("hasConnectedSpotify") private var hasConnectedSpotify = false
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 10)
@@ -77,6 +77,20 @@ struct PlayerView: View {
             .padding()
         }
         .padding()
+        // When hasConnectedSpotify changes, re-attempt connection
+        .onChange(of: hasConnectedSpotify) { newValue in
+            if newValue {
+                spotifyController.ensureSpotifyConnection()
+            }
+        }
+        // Timer-based connection check
+        .onAppear {
+            Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { _ in
+                if !spotifyController.isConnected && hasConnectedSpotify {
+                    spotifyController.ensureSpotifyConnection()
+                }
+            }
+        }
     }
 }
 
