@@ -30,7 +30,7 @@ struct PlayerView: View {
                             .foregroundColor(.black)
                             .padding(.leading, 10)
                         
-                        Text(spotifyController.currentAlbumName)
+                        Text(spotifyController.currentArtistName)
                             .font(.subheadline)
                             .foregroundColor(.black)
                             .padding(.leading, 10)
