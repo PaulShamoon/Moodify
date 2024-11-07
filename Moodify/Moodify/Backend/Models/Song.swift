@@ -10,7 +10,7 @@
  
  Created By: Paul Shamoon
  */
-struct Song: Identifiable {
+struct Song: Identifiable, Codable {
     var id = UUID()
     var trackName: String
     var albumName: String

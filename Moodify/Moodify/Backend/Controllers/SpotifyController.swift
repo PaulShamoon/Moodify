@@ -15,14 +15,16 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
     // Redirect URL after authorization
     private let spotifyRedirectURL = URL(string: "spotify-ios-quick-start://spotify-login-callback")!
     
-    // Published property to hold the current track name
+    // Published properties to hold info about the current track
     @Published var currentTrackName: String = "No track playing"
-    
-    // Published property to hold the current track uri
     @Published var currentTrackURI: String = ""
-    
-    // Published property to hold the current track album
     @Published var currentAlbumName: String = ""
+    @Published var currentArtistName: String = ""
+    @Published var albumCover: UIImage? = nil
+    @Published var accessToken: String? = nil
+
+    // Array of "Song" objects to hold the state of the queue
+    @Published var currentQueue: [Song] = []
     
     // Stores all data for the current track, used to fetch album covers
     var currentTrackValue: SPTAppRemoteTrack? = nil
@@ -30,14 +32,10 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
     // Variable to store the last known player state
     var isPaused: Bool = false
     
-    // Access token for API requests
-    @Published var accessToken: String? = nil
-    
-    // Variable to hold album cover
-    @Published var albumCover: UIImage? = nil
-    
-    // Array of "Song" objects to hold the state of the queue
-    @Published var currentQueue: [Song] = []
+    private lazy var configuration = SPTConfiguration(
+        clientID: spotifyClientID,
+        redirectURL: spotifyRedirectURL
+    )
     
     // Spotify App Remote instance
     private lazy var appRemote: SPTAppRemote = {
@@ -47,18 +45,25 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
         return appRemote
     }()
     
-    private lazy var configuration = SPTConfiguration(
-        clientID: spotifyClientID,
-        redirectURL: spotifyRedirectURL
-    )
     
-    // Lazy initialization of the playbackController
+    // Initialization of the playbackController
     private lazy var playbackController: PlaybackController = {
         return PlaybackController(appRemote: appRemote)
     }()
     
+    // Initialization of the queueManager
     private lazy var queueManager: QueueManager = {
         return QueueManager()
+    }()
+    
+    // Initialization of the playlistManager
+    lazy var playlistManager: PlaylistManager = {
+        return PlaylistManager(appRemote: appRemote, queueManager: queueManager, spotifyController: self)
+    }()
+    
+    // Initialization of the profileManager
+    private lazy var profileManager: ProfileManager = {
+        return ProfileManager()
     }()
     
     override init() {
@@ -162,6 +167,7 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
             self.currentQueue = self.queueManager.removeSongsFromQueue(trackURI: self.currentTrackURI)
             self.currentTrackValue = playerState.track
             self.currentTrackName = playerState.track.name
+            self.currentArtistName = playerState.track.artist.name
             self.currentTrackURI = playerState.track.uri
             self.currentAlbumName = playerState.track.album.name
             self.fetchAlbumCover()
@@ -223,29 +229,6 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
         currentQueue.forEach { _ in
             skipToNext()
         }
-    }
-    
-    /*
-     Method that retrieves the mood parameters, constructs the recommendation URL, and then fetches the recommendations
-     
-     @param mood: the users detected mood
-     
-     Created by: Paul Shamoon
-     Updated by: Mohammad Sulaiman
-     */
-    func addSongsToQueue(mood: String, userGenres: [String]) {
-        // Get feature parameters based on mood
-        let (minValence, maxValence, minEnergy, maxEnergy, minLoudness, maxLoudness, minAcousticness, maxAcousticness, minDanceability, maxDanceability) = getMoodParameters(for: mood)
-        
-        // Build the recommendation URL
-        guard let url = buildRecommendationURL(userGenres: userGenres, limit: 20, minValence: minValence, maxValence: maxValence, minEnergy: minEnergy, maxEnergy: maxEnergy, minLoudness: minLoudness, maxLoudness: maxLoudness, minAcousticness: minAcousticness, maxAcousticness: maxAcousticness, minDanceability: minDanceability, maxDanceability: maxDanceability),
-              let accessToken = self.accessToken else {
-            print("Invalid URL or missing access token")
-            return
-        }
-        
-        // Fetch recommendations and handle the response
-        fetchRecommendations(url: url, accessToken: accessToken)
     }
     
     /*
@@ -348,7 +331,17 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
      
      Created by: Mohammad Sulaiman
      */
-    private func fetchRecommendations(url: URL, accessToken: String) {
+    func fetchRecommendations(mood: String, profile: Profile, userGenres: [String]) {
+        // Get feature parameters based on mood
+        let (minValence, maxValence, minEnergy, maxEnergy, minLoudness, maxLoudness, minAcousticness, maxAcousticness, minDanceability, maxDanceability) = getMoodParameters(for: mood)
+        
+        // Build the recommendation URL
+        guard let url = buildRecommendationURL(userGenres: userGenres, limit: 20, minValence: minValence, maxValence: maxValence, minEnergy: minEnergy, maxEnergy: maxEnergy, minLoudness: minLoudness, maxLoudness: maxLoudness, minAcousticness: minAcousticness, maxAcousticness: maxAcousticness, minDanceability: minDanceability, maxDanceability: maxDanceability),
+              let accessToken = self.accessToken else {
+            print("Invalid URL or missing access token")
+            return
+        }
+        
         var request = URLRequest(url: url)
         request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
         
@@ -373,7 +366,7 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
                 if let json = try JSONSerialization.jsonObject(with: data) as? [String: Any],
                    let tracks = json["tracks"] as? [[String: Any]] {
                     
-                    self.enqueueTracks(tracks: tracks)
+                    self.enqueueTracks(mood: mood, profile: profile, tracks: tracks)
                 } else {
                     print("Unexpected JSON structure")
                 }
@@ -388,31 +381,55 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
      
      @param tracks: Array of Spotify tracks.
      */
-    private func enqueueTracks(tracks: [[String: Any]]) {
+    private func enqueueTracks(mood: String, profile: Profile, tracks: [[String: Any]]) {
         // Clear the currentQueue before queueing new songs
+        // FIXME: This is clearing the queue, but since we clear it before we queue new songs
+        // Spotify is automatically queuing a new song once the current queue clears out.
+        // This is an issue because the song it queues may not match the new mood
         clearCurrentQueue()
-        
+
+        // This will store all song objects created after enqueuing the track
+        var songs: [Song] = []
+
+        // Create a DispatchGroup to track asynchronous tasks
+        let dispatchGroup = DispatchGroup()
+
         for (index, track) in tracks.enumerated() {
             // Extract the URI from each track dictionary
             guard let uri = track["uri"] as? String else {
                 print("Failed to find URI in track at index \(index)")
                 continue
             }
-
-
+            
+            // Notify the group that a task is starting
+            dispatchGroup.enter()
+            
             // Add a small delay between requests to prevent rate limiting
             DispatchQueue.main.asyncAfter(deadline: .now() + Double(index) * 0.5) {
-                self.appRemote.playerAPI?.enqueueTrackUri(uri, callback: { (result, error) in
-                    if let error = error {
-                        print("Failed to enqueue song URI \(uri): \(error.localizedDescription)")
-                    } else {
-                        print("Enqueued song URI: \(uri)")
-
-                        // Only want to parse the track after succesfully queueing a song
-                        self.currentQueue = self.queueManager.parseTrack(track: track)
-                    }
-                })
+                // If it's the first song, play it immediately
+                if index == 0 {
+                    self.appRemote.playerAPI?.play(uri)
+                    print("Started playing first song URI: \(uri)")
+                } else {
+                    self.appRemote.playerAPI?.enqueueTrackUri(uri, callback: { (result, error) in
+                        if let error = error {
+                            print("Failed to enqueue song URI \(uri): \(error.localizedDescription)")
+                        } else {
+                            print("Enqueued song URI: \(uri)")
+                            songs.append(self.parseTrack(track: track))
+                        }
+                        
+                        // Notify the group that this task is finished
+                        dispatchGroup.leave()
+                    })
+                }
             }
+        }
+
+        // This will run after all tracks have been enqueued
+        dispatchGroup.notify(queue: .main) {
+            // Now all tracks have been enqueued, and songs array is populated
+            self.playlistManager.updateOrCreatePlaylist(mood: mood, profile: profile, songs: songs)
         }
     }
     
@@ -479,5 +496,36 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
                 print("Successfully started playing \(song.trackName) by \(song.artistName).")
             }
         })
+    }
+    
+    /*
+     Function to parse the current track and extract relevant data from it
+     
+     @param track: the track to extract data from
+     
+     Created By: Paul Shamoon
+     */
+    func parseTrack(track: [String: Any]) -> Song {
+        // Extract track name
+        let trackName = track["name"] as? String ?? "Unknown Track"
+        
+        // Extract album name from the album
+        let album = track["album"] as? [String: Any]
+        let albumName = album?["name"] as? String ?? "Unknown Album"
+        
+        // Extract artists name from the artist
+        let artists = track["artists"] as? [[String: Any]] ?? []
+        let artistNames = artists.compactMap { $0["name"] as? String }.joined(separator: ", ")
+        
+        // Extract song URI
+        let songURI = track["uri"] as? String ?? "Unknown URI"
+        
+        // Create a "Song" object
+        let song = Song(trackName: trackName, albumName: albumName, artistName: artistNames, songURI: songURI)
+        
+        // Add the "Song" object to the current queue
+        currentQueue = queueManager.addSongToQueue(song: song)
+        
+        return song
     }
 }
