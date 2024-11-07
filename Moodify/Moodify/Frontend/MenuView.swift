@@ -11,6 +11,7 @@ struct MenuView: View {
     @State private var showingPlaylists = false
     @State private var showingDeleteAlert = false
     @State private var showingPinSetup = false
+    @State private var showingTOS = false  // New state for TOS navigation
     @State private var selectedTab: MenuTab? = nil
     @ObservedObject var spotifyController: SpotifyController
 
@@ -23,6 +24,7 @@ struct MenuView: View {
         case user = "Switch User"
         case pin = "Set/Change PIN"
         case delete = "Delete Profile"
+        case tos = "Terms of Service"  // New case for TOS
         
         var icon: String {
             switch self {
@@ -32,6 +34,7 @@ struct MenuView: View {
             case .user: return "arrow.triangle.2.circlepath"
             case .pin: return "lock.circle"
             case .delete: return "trash.circle"
+            case .tos: return "doc.text"  // Icon for TOS
             }
         }
         
@@ -43,6 +46,7 @@ struct MenuView: View {
             case .user: return .green
             case .pin: return .orange
             case .delete: return .red
+            case .tos: return .gray  // Color for TOS
             }
         }
     }
@@ -122,6 +126,15 @@ struct MenuView: View {
                         PinSetupView(profile: profileManager.currentProfile)
                             .environmentObject(profileManager)
                     }
+                    NavigationLink(
+                      destination: TermsOfServiceView(
+                        agreedToTerms: Binding(
+                            get: { profileManager.currentProfile?.hasAgreedToTerms ?? false },
+                            set: { profileManager.currentProfile?.hasAgreedToTerms = $0 }
+                        )
+                      ).environmentObject(profileManager),
+                      isActive: $showingTOS
+                  ) { EmptyView() }
                 }
                 .alert(isPresented: $showingDeleteAlert) {
                     Alert(
@@ -156,6 +169,8 @@ struct MenuView: View {
             showingPinSetup = true
         case .delete:
             showingDeleteAlert = true
+        case .tos:
+            showingTOS = true  // Handle TOS tab selection
         }
     }
     
