@@ -126,15 +126,15 @@ struct MenuView: View {
                         PinSetupView(profile: profileManager.currentProfile)
                             .environmentObject(profileManager)
                     }
-                    NavigationLink(
-                      destination: TermsOfServiceView(
-                        agreedToTerms: Binding(
-                            get: { profileManager.currentProfile?.hasAgreedToTerms ?? false },
-                            set: { profileManager.currentProfile?.hasAgreedToTerms = $0 }
-                        )
-                      ).environmentObject(profileManager),
-                      isActive: $showingTOS
-                  ) { EmptyView() }
+                    
+                    .navigationDestination(isPresented: $showingTOS) {
+                        TermsOfServiceView(
+                            agreedToTerms: Binding(
+                                get: { profileManager.currentProfile?.hasAgreedToTerms ?? false },
+                                set: { profileManager.currentProfile?.hasAgreedToTerms = $0 }
+                            )
+                        ).environmentObject(profileManager)
+                    }
                 }
                 .alert(isPresented: $showingDeleteAlert) {
                     Alert(
