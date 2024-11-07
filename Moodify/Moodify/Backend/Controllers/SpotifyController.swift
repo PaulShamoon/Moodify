@@ -383,9 +383,6 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
      */
     private func enqueueTracks(mood: String, profile: Profile, tracks: [[String: Any]]) {
         // Clear the currentQueue before queueing new songs
-        // FIXME: This is clearing the queue, but since we clear it before we queue new songs
-        // Spotify is automatically queuing a new song once the current queue clears out.
-        // This is an issue because the song it queues may not match the new mood
         clearCurrentQueue()
 
         // This will store all song objects created after enqueuing the track
@@ -400,16 +397,20 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
                 print("Failed to find URI in track at index \(index)")
                 continue
             }
-            
+
             // Notify the group that a task is starting
             dispatchGroup.enter()
-            
+
             // Add a small delay between requests to prevent rate limiting
             DispatchQueue.main.asyncAfter(deadline: .now() + Double(index) * 0.5) {
                 // If it's the first song, play it immediately
                 if index == 0 {
                     self.appRemote.playerAPI?.play(uri)
+                    songs.append(self.parseTrack(track: track))
                     print("Started playing first song URI: \(uri)")
+                    
+                    // Leave the group immediately for the first track
+                    dispatchGroup.leave()
                 } else {
                     self.appRemote.playerAPI?.enqueueTrackUri(uri, callback: { (result, error) in
                         if let error = error {
