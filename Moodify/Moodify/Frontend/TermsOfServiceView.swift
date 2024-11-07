@@ -12,7 +12,7 @@ struct TermsOfServiceView: View {
     @Environment(\.presentationMode) var presentationMode
     
     var body: some View {
-        VStack(spacing: 20) {
+        VStack(spacing: 1) {
             
             ScrollView {
                 VStack(alignment: .leading, spacing: 15) {
@@ -118,32 +118,29 @@ struct TermsOfServiceView: View {
                 .padding()
                 .font(.body)
             }
-            if agreedToTerms == false {
-                Button(action: {
-                    agreedToTerms = true
-                    presentationMode.wrappedValue.dismiss()
-                }) {
-                    Text("Agree and Continue")
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(Color.green)
-                        .foregroundColor(.white)
-                        .cornerRadius(8)
-                }
-                .padding()
-            } else {
-                Button(action: {
-                    presentationMode.wrappedValue.dismiss()
-                }) {
-                    Text("Done")
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(Color.green)
-                        .foregroundColor(.white)
-                        .cornerRadius(8)
-                }
-                .padding()
+            Button(action: {
+                agreedToTerms = true
+                presentationMode.wrappedValue.dismiss()
+            }) {
+                Text(agreedToTerms ? "Done" : "Agree and Continue")
+                    .font(.system(size: 20, weight: .bold, design: .rounded))
+                
+                    .foregroundColor(.black)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 16)
+                    .background(Color.green)
+                    .cornerRadius(35)
+                    .shadow(color: Color.green.opacity(0.3), radius: 10, x: 0, y: 5)
             }
         }
+    }
+}
+
+struct TermsOfServiceView_Previews: PreviewProvider {
+    static var previews: some View {
+        // Wrapping in a State for preview purposes
+        TermsOfServiceView(agreedToTerms: .constant(false))
+            .previewLayout(.sizeThatFits) // Ensures the view resizes for the preview
+            .padding() // Adds some padding for better preview visibility
     }
 }

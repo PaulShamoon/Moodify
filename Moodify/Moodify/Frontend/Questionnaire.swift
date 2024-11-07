@@ -52,7 +52,10 @@ struct QuestionnaireView: View {
                                 .padding(.vertical, 40)
                         }
                     }
-                    termsSection
+                    if !(profileManager.currentProfile?.hasAgreedToTerms ?? false) {
+                        
+                        termsSection
+                    }
                 }
                 submitButton
             }
@@ -104,6 +107,7 @@ struct QuestionnaireView: View {
     }
     
     private var termsSection: some View {
+        FormCard(title: "Terms & Conditions") {
             VStack(alignment: .leading, spacing: 15) {
                 HStack(spacing: 12) {
                     Toggle("", isOn: $agreedToTerms)
@@ -126,6 +130,7 @@ struct QuestionnaireView: View {
                         .foregroundColor(.red)
                 }
             }
+        }
     }
     
     private var submitButton: some View {
