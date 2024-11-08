@@ -1,10 +1,3 @@
-//
-//  Player.swift
-//  Moodify
-//
-//  Created by Paul Shamoon on 10/29/24.
-//
-
 import SwiftUI
 
 /*
@@ -16,6 +9,8 @@ struct PlayerView: View {
     @ObservedObject var spotifyController: SpotifyController
     @State private var navigateToQueue = false
     @AppStorage("hasConnectedSpotify") private var hasConnectedSpotify = false
+    @State private var showResyncButton = false
+
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 10)
@@ -30,13 +25,13 @@ struct PlayerView: View {
                             .foregroundColor(.black)
                             .padding(.leading, 10)
                         
-                        Text(spotifyController.currentAlbumName)
+                        Text(spotifyController.currentArtistName)
                             .font(.subheadline)
                             .foregroundColor(.black)
                             .padding(.leading, 10)
                     }
                     Spacer()
-
+                    
                     Button(action: { spotifyController.skipToPrevious() }) {
                         Image(systemName: "backward.fill")
                             .resizable()
@@ -73,27 +68,56 @@ struct PlayerView: View {
                             .transition(.blurReplace)
                     }
                 }
+                
+                // Resync button with dynamic visibility based on connection status
+                if showResyncButton {
+                    Button(action: {
+                        // First call to ensureSpotifyConnection
+                        spotifyController.ensureSpotifyConnection()
+                        
+                        // Second call to ensureSpotifyConnection after 4 seconds
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
+                            spotifyController.ensureSpotifyConnection()
+                        }
+                        
+                    }) {
+                        Text("Resync")
+                            .font(.headline)
+                            .padding()
+                            .background(Color.green)
+                            .foregroundColor(.white)
+                            .cornerRadius(8)
+                    }
+                    .padding()
+                }
             }
             .padding()
         }
         .padding()
-        // When hasConnectedSpotify changes, re-attempt connection
-        .onChange(of: hasConnectedSpotify) { newValue in
-            if newValue {
-                spotifyController.ensureSpotifyConnection()
+        
+        // Initial check on view appearance
+        .onAppear {
+            if !spotifyController.isConnected && hasConnectedSpotify {
+                updateResyncButtonVisibility()
             }
         }
-        // Timer-based connection check
-        .onAppear {
-            Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { _ in
-                if !spotifyController.isConnected && hasConnectedSpotify {
-                    spotifyController.ensureSpotifyConnection()
-                }
-            }
+        
+        // React to changes in connection status
+        .onChange(of: spotifyController.isConnected) { _ in
+            updateResyncButtonVisibility()
+
+        }
+        
+        // React to changes in hasConnectedSpotify value
+        .onChange(of: hasConnectedSpotify) { _ in
+            updateResyncButtonVisibility()
         }
     }
+    
+    private func updateResyncButtonVisibility() {
+        showResyncButton = !spotifyController.isConnected && hasConnectedSpotify
+    }
 }
-
 
 struct PlayerView_Previews: PreviewProvider {
     static var previews: some View {

@@ -8,7 +8,7 @@ struct QuestionnaireView: View {
     @Binding var isCreatingNewProfile: Bool
     
     @Environment(\.presentationMode) var presentationMode
-    @State private var showingPDF = false
+    @State private var showingTOS = false
     @State private var showingTooltip = false
     @State private var showingTooltip1 = false
     
@@ -52,37 +52,11 @@ struct QuestionnaireView: View {
                                 .padding(.vertical, 40)
                         }
                     }
-                    
                     if !(profileManager.currentProfile?.hasAgreedToTerms ?? false) {
-                        FormCard(title: "Terms & Conditions") {
-                            VStack(alignment: .leading, spacing: 15) {
-                                HStack(spacing: 12) {
-                                    Toggle("", isOn: $agreedToTerms)
-                                        .labelsHidden()
-                                        .toggleStyle(SwitchToggleStyle(tint: .green))
-                                    
-                                    Text("I agree to the")
-                                        .foregroundColor(.gray)
-                                    
-                                    Button(action: { showingPDF = true }) {
-                                        Text("Terms of Service")
-                                            .foregroundColor(.green)
-                                            .underline()
-                                            .padding(.leading, -9)
-                                    }
-                                }
-                                
-                                if showErrorMessages, let termsError = termsError {
-                                    Text(termsError)
-                                        .font(.system(size: 14))
-                                        .foregroundColor(.red)
-                                }
-                            }
-                        }
+                        
+                        termsSection
                     }
                 }
-                
-
                 submitButton
             }
             .padding()
@@ -96,9 +70,6 @@ struct QuestionnaireView: View {
             .edgesIgnoringSafeArea(.all)
         )
         .onAppear(perform: loadProfileData)
-        .sheet(isPresented: $showingPDF) {
-            PDFViewerView()
-        }
     }
     
     private var headerSection: some View {
@@ -132,6 +103,33 @@ struct QuestionnaireView: View {
                 .font(.system(size: 24, weight: .medium))
                 .foregroundColor(.white)
                 .padding(.top, 5)
+        }
+    }
+    
+    private var termsSection: some View {
+        FormCard(title: "Terms & Conditions") {
+            VStack(alignment: .leading, spacing: 15) {
+                HStack(spacing: 12) {
+                    Toggle("", isOn: $agreedToTerms)
+                        .labelsHidden()
+                        .toggleStyle(SwitchToggleStyle(tint: .green))
+                    
+                    Text("I agree to the")
+                        .foregroundColor(.gray)
+                    
+                    NavigationLink(destination: TermsOfServiceView(agreedToTerms: $agreedToTerms)) {
+                        Text("Terms of Service")
+                            .foregroundColor(.green)
+                            .underline()
+                    }
+                }
+                
+                if showErrorMessages, let termsError = termsError {
+                    Text(termsError)
+                        .font(.system(size: 14))
+                        .foregroundColor(.red)
+                }
+            }
         }
     }
     
@@ -297,29 +295,4 @@ struct CustomTextField: View {
         .background(Color(white: 0.2))
         .cornerRadius(10)
     }
-}
-
-// PDF Viewer Components (unchanged)
-struct PDFViewerView: View {
-    var body: some View {
-        if let pdfURL = Bundle.main.url(forResource: "TermsofService", withExtension: "pdf") {
-            PDFKitView(url: pdfURL)
-        } else {
-            Text("PDF not found")
-                .foregroundColor(.red)
-        }
-    }
-}
-
-struct PDFKitView: UIViewRepresentable {
-    let url: URL
-    
-    func makeUIView(context: Context) -> PDFView {
-        let pdfView = PDFView()
-        pdfView.document = PDFDocument(url: url)
-        pdfView.autoScales = true
-        return pdfView
-    }
-    
-    func updateUIView(_ uiView: PDFView, context: Context) {}
 }
