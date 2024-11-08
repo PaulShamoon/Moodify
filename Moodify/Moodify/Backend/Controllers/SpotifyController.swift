@@ -498,7 +498,6 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
     
     private func reconnectAndExecute(_ action: @escaping () -> Void) {
          appRemote.authorizeAndPlayURI("") // Opens Spotify to establish a connection
-        /*
          DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
              if self.appRemote.isConnected {
                  action() // Execute the action once reconnected
@@ -506,8 +505,9 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
                  print("Failed to reconnect to Spotify.")
              }
          }
-        */
-         ensureSpotifyConnection()
+        Timer.scheduledTimer(withTimeInterval: 4.0, repeats: false) { _ in
+            self.ensureSpotifyConnection()
+        }
      }
 
      private func handlePlayerAPIError() {
@@ -540,10 +540,18 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
     
     /*
      Function that sends the recommendation request to Spotify, handles the response, parses the track URIs, and then calls enqueueTracks with the list of track URIs.
-     
+
      Created by: Mohammad Sulaiman
      */
     func fetchRecommendations(mood: String, profile: Profile, userGenres: [String]) {
+        guard appRemote.isConnected else {
+            print("Spotify is not connected. Attempting to reconnect...")
+            reconnectAndExecute {
+                self.fetchRecommendations(mood: mood, profile: profile, userGenres: userGenres)
+            }
+            return
+        }
+        
         // Get feature parameters based on mood
         let (minValence, maxValence, minEnergy, maxEnergy, minLoudness, maxLoudness, minAcousticness, maxAcousticness, minDanceability, maxDanceability) = moodQueueHandler.getMoodParameters(for: mood)
         

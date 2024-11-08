@@ -21,7 +21,7 @@ struct homePageView: View {
     @State private var showMenu = false
     
     // NOTE - this URL is temporary and needs to be updated each time from the backend side to detect mood properly
-    let backendURL = "https://6e9f-143-59-31-134.ngrok-free.app/analyze"
+    let backendURL = "https://e896-50-4-216-192.ngrok-free.app/analyze"
     
     var body: some View {
         ZStack {
@@ -169,6 +169,12 @@ struct homePageView: View {
                         showingAlert = true
                     }
                 }
+        }
+        .onChange(of: spotifyController.isConnected) {
+            isConnected in
+            if isConnected {
+                spotifyController.updatePlayerState()
+            }
         }
     }
     

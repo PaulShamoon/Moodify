@@ -112,6 +112,13 @@ struct PlayerView: View {
         .onChange(of: hasConnectedSpotify) { _ in
             updateResyncButtonVisibility()
         }
+        
+        // When hasConnectedSpotify changes, re-attempt connection
+        .onChange(of: hasConnectedSpotify) { newValue in
+            if newValue {
+                spotifyController.ensureSpotifyConnection()
+            }
+        }
     }
     
     private func updateResyncButtonVisibility() {
