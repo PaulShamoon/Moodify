@@ -15,40 +15,21 @@ class QueueManager: ObservableObject {
     @Published var currentQueue: [Song] = []
     init() {}
     
+    
     /*
-     Function to parse the current track and extract relevant data from it
+     Method to add song to the queue
      
-     @param track: the track to extract data from
-     @returns: an array of "Song" objects
+     @param song: a "Song" object to be added to the queue
+     @return: an array of "Song" objects
      
      Created By: Paul Shamoon
      */
-    func parseTrack(track: [String: Any]) -> [Song] {
-        // Extract track name
-        let trackName = track["name"] as? String ?? "Unknown Track"
-        
-        // Extract album name from the album
-        let album = track["album"] as? [String: Any]
-        let albumName = album?["name"] as? String ?? "Unknown Album"
-        
-        // Extract artists name from the artist
-        let artists = track["artists"] as? [[String: Any]] ?? []
-        let artistNames = artists.compactMap { $0["name"] as? String }.joined(separator: ", ")
-        
-        // Extract song URI
-        let songURI = track["uri"] as? String ?? "Unknown URI"
-        
-        // Create a "Song" object
-        let song = Song(trackName: trackName, albumName: albumName, artistName: artistNames, songURI: songURI)
-        
-        // Append the "Song" object to the currentQueue
+    func addSongToQueue(song: Song) -> [Song] {
         currentQueue.append(song)
-        print("Current Queue Contains: \(currentQueue)")
-        
-        // Return the updated state of currentQueue
         return currentQueue
     }
 
+    
     /*
      Function to remove a specified track URI and
      everything that appears before it from the queue

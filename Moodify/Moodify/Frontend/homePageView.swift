@@ -145,7 +145,13 @@ struct homePageView: View {
             
             // Slide-in menu
             if showMenu {
-                MenuView(showMenu: $showMenu, navigateToHomePage: $navigateToHomePage, isCreatingNewProfile: $isCreatingProfile, navigateToMusicPreferences: $navigateToMusicPreferences)
+                MenuView(
+                    showMenu: $showMenu,
+                    navigateToHomePage: $navigateToHomePage,
+                    isCreatingNewProfile: $isCreatingProfile,
+                    navigateToMusicPreferences: $navigateToMusicPreferences,
+                    spotifyController: spotifyController
+                )
                     .transition(.move(edge: .trailing)) // Slide in from the right
                     .zIndex(1) // Ensure the menu is above the main content
             }
@@ -235,7 +241,7 @@ struct homePageView: View {
                     probabilities = sortedProbabilities.map { ($0.key, $0.value) }
                     currentMood = moodEmoji(for: emotion)
                     currentMoodText = "You seem to be \(emotion.capitalized)."
-                    spotifyController.addSongsToQueue(mood: emotion, userGenres: profile.favoriteGenres)
+                    spotifyController.fetchRecommendations(mood: emotion, profile: profile, userGenres: profile.favoriteGenres)
 
                 }
             } else {
