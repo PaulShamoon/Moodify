@@ -1,4 +1,6 @@
-// MoodifyApp.swift
+/*
+    This is the main entry point for the Moodify app.
+*/
 
 import SwiftUI
 
@@ -6,22 +8,25 @@ import SwiftUI
 struct MoodifyApp: App {
     @StateObject var profileManager = ProfileManager()
     @AppStorage("hasCompletedQuestionnaire") var hasCompletedQuestionnaire: Bool = false
+    @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding = false
     @State private var navigateToMusicPreferences = false
     @State private var navigateToHomePage = false
-    @State private var showSplash = true  // Control splash screen visibility
-    @State private var isCreatingNewProfile = false  // Track if a new profile is being created
-    @State private var isCreatingProfile = false  // Initialize with a default value
+    @State private var showSplash = true
+    @State private var isCreatingNewProfile = false
+    @State private var isCreatingProfile = false
 
     var body: some Scene {
         WindowGroup {
             NavigationStack {
                 if showSplash {
-                    SplashPageView()
-                        .onAppear {
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-                                showSplash = false
-                            }
-                        }
+                    SplashPageView(showSplash: $showSplash)
+                    /* this is where the splash page is displayed and then the onboarding view is displayed
+                    */
+                } else if !hasCompletedOnboarding {
+                    OnboardingView {
+                        hasCompletedOnboarding = true
+                        isCreatingNewProfile = true /* User gets taken to the account set up page */
+                    }
                 } else {
                     if isCreatingNewProfile || !hasCompletedQuestionnaire {
                         if navigateToMusicPreferences {
