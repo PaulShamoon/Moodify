@@ -152,6 +152,8 @@ struct PinSetupView: View {
         HStack(spacing: 16) {
             if currentStep > 1 && profile?.userPin == nil {
                 Button(action: {
+                    // Reset showError when going back
+                    showError = false
                     currentStep -= 1
                     isPinFieldsDisabled = false // Re-enable PIN fields when going back
                 }) {
@@ -185,6 +187,9 @@ struct PinSetupView: View {
     }
     
     private func handleNextStep() {
+        // Reset the error flag when the user clicks "Next"
+        showError = false
+
         if profile?.userPin == nil {
             handleNewPinSetup()
         } else {
@@ -218,6 +223,9 @@ struct PinSetupView: View {
     }
     
     private func validateNewPin() -> Bool {
+        // Reset showError flag before starting validation
+        showError = false
+
         guard pin.count == 4, pin.allSatisfy({ $0.isNumber }) else {
             showError = true
             errorMessage = "PIN must be exactly 4 digits"
@@ -247,6 +255,9 @@ struct PinSetupView: View {
     }
     
     private func validateSecurityQuestion() -> Bool {
+        // Reset showError flag before starting validation
+        showError = false
+
         guard !securityQuestion.isEmpty && !securityQuestionAnswer.isEmpty else {
             showError = true
             errorMessage = "Please complete security question and answer"
