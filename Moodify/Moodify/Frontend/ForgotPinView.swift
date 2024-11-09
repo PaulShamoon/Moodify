@@ -11,77 +11,103 @@ struct ForgotPinView: View {
     @Binding var navigateBackToSelection: Bool
     
     var profile: Profile
-
+    
     var body: some View {
-        VStack {
-            Text("Forgot PIN")
-                .font(.largeTitle)
-                .padding()
-
-            Text(profile.personalSecurityQuestion ?? "No security question set")
-                .font(.headline)
-                .padding()
-
-            SecureField("Enter your answer", text: $enteredAnswer)
-                .padding()
-                .background(Color.gray.opacity(0.2))
-                .cornerRadius(10)
-                .padding(.horizontal)
+        ZStack {
+            Color.black.edgesIgnoringSafeArea(.all)
             
-            if showError {
-                Text(errorMessage)
-                    .foregroundColor(.red)
-                    .padding()
+            VStack {
+                if showError {
+                    Text(errorMessage)
+                        .foregroundColor(.red)
+                        .padding(.top, 100)
+                }
+                Spacer()
             }
-
-            SecureField("Enter New 4-digit PIN", text: $newPin)
-                .keyboardType(.numberPad)
-                .padding()
-                .background(Color.gray.opacity(0.2))
-                .cornerRadius(10)
-                .frame(width: 200)
-
-            SecureField("Confirm New PIN", text: $confirmNewPin)
-                .keyboardType(.numberPad)
-                .padding()
-                .background(Color.gray.opacity(0.2))
-                .cornerRadius(10)
-                .frame(width: 200)
-
-            Button(action: resetPin) {
-                Text("Reset PIN")
+            .edgesIgnoringSafeArea(.top)
+            
+            VStack(spacing: 30) {
+                Text("Forgot PIN")
+                    .font(.title)
+                    .foregroundColor(.green)
+                    .padding(.top)
+                
+                Spacer()
+                Text("Your Security Question")
+                    .font(.title2)
+                    .foregroundColor(.white)
+                Text(profile.personalSecurityQuestion ?? "No security question set")
                     .font(.headline)
                     .foregroundColor(.white)
+                SecureField("Enter your answer", text: $enteredAnswer)
                     .padding()
-                    .background(Color.green)
+                    .background(Color.gray.opacity(0.2))
                     .cornerRadius(10)
+                    .foregroundColor(.white)
+                
+                Text("Enter your new 4 digit PIN")
+                    .font(.title2)
+                    .foregroundColor(.white)
+                SecureField("Enter New 4-digit PIN", text: $newPin)
+                    .keyboardType(.numberPad)
+                    .padding()
+                    .background(Color.gray.opacity(0.2))
+                    .cornerRadius(10)
+                    .foregroundColor(.white)
+                    .frame(width: 200)
+                SecureField("Confirm New PIN", text: $confirmNewPin)
+                    .keyboardType(.numberPad)
+                    .padding()
+                    .background(Color.gray.opacity(0.2))
+                    .cornerRadius(10)
+                    .foregroundColor(.white)
+                    .frame(width: 200)
+
+                Button(action: resetPin) {
+                    Text("Reset PIN")
+                        .font(.headline)
+                        .foregroundColor(.black)
+                        .padding()
+                        .background(Color.green)
+                        .cornerRadius(10)
+                }
+                .padding()
+                
+                Spacer()
             }
             .padding()
-
-            Spacer()
+            .frame(maxWidth: 400)
         }
-        .padding()
         .onDisappear {
             // Ensure the profile data is reloaded when this view is dismissed
             profileManager.loadProfiles()
         }
     }
-
+    
     private func resetPin() {
         guard !enteredAnswer.isEmpty else {
-            errorMessage = "Answer cannot be empty."
+            errorMessage = "Security answer cannot be empty."
             showError = true
             return
         }
 
         guard enteredAnswer == profile.securityQuestionAnswer else {
-            errorMessage = "Incorrect answer. Please try again."
+            errorMessage = "Incorrect security answer. Please try again."
             showError = true
             return
         }
+        
+        errorMessage = ""
+        showError = false
 
         guard newPin.count == 4 else {
             errorMessage = "PIN must be 4 digits."
+            showError = true
+            return
+        }
+        
+        guard confirmNewPin.count == 4 else {
+            errorMessage = "New PIN must be 4 digits."
             showError = true
             return
         }
@@ -91,6 +117,9 @@ struct ForgotPinView: View {
             showError = true
             return
         }
+        
+        errorMessage = ""
+        showError = false
 
         // Update the profile with the new PIN
         if let profileIndex = profileManager.profiles.firstIndex(where: { $0.id == profile.id }) {

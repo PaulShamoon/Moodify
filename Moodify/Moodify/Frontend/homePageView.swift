@@ -148,8 +148,7 @@ struct homePageView: View {
                 MenuView(
                     showMenu: $showMenu,
                     navigateToHomePage: $navigateToHomePage,
-                    isCreatingNewProfile: $isCreatingProfile,
-                    navigateToMusicPreferences: $navigateToMusicPreferences,
+                    navigateToMusicPreferences: $navigateToMusicPreferences, isCreatingNewProfile: $isCreatingProfile,
                     spotifyController: spotifyController
                 )
                     .transition(.move(edge: .trailing)) // Slide in from the right
