@@ -26,6 +26,7 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
             UserDefaults.standard.set(newValue?.timeIntervalSince1970, forKey: "SpotifyTokenExpiration")
         }
     }
+    
     // Reset retry counter
     var retryCount = 0
     
@@ -36,18 +37,10 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
     private let spotifyRedirectURL = URL(string: "spotify-ios-quick-start://spotify-login-callback")!
     
     // Initialize the MoodHandler
-    private let moodQueueHandler = MoodQueueHandler() // Initialize the MoodQueueHandler
+    private let moodQueueHandler = MoodQueueHandler()
     
     // Scopes for Spotify access
     private let spotifyScopes = "user-read-private user-read-email playlist-modify-public playlist-modify-private"
-    
-    // Unique Spotify Client secret
-    private let spotifyClientSecret = "62247b1969084878b7f872abb42bbf8d"
-    
-    @Published private(set) var isRefreshing = false
-    private var refreshTask: Task<Void, Never>?
-    
-    private let refreshQueue = DispatchQueue(label: "com.moodify.tokenRefresh")
     
     // Published properties to hold info about the current track
     @Published var currentTrackName: String = "No track playing"
@@ -62,15 +55,9 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
             appRemote.connectionParameters.accessToken = accessToken
         }
     }
-    // Stores the refresh token
-    private var refreshToken: String? {
-        get { UserDefaults.standard.string(forKey: "SpotifyRefreshToken") }
-        set { UserDefaults.standard.set(newValue, forKey: "SpotifyRefreshToken") }
-    }
     
     // Array of "Song" objects to hold the state of the queue
     @Published var currentQueue: [Song] = []
-    
     
     // Stores all data for the current track, used to fetch album covers
     var currentTrackValue: SPTAppRemoteTrack? = nil
@@ -90,7 +77,6 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
         appRemote.delegate = self
         return appRemote
     }()
-    
     
     // Lazy initialization of the playbackController
     private lazy var playbackController: PlaybackController = {
@@ -116,109 +102,6 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
         retrieveAccessToken()
     }
     
-    // Improved token refresh with proper error handling and retry logic
-    func refreshAccessToken() async throws {
-        return try await withCheckedThrowingContinuation { continuation in
-            // Ensure we're not already refreshing
-            guard !isRefreshing else {
-                continuation.resume(throwing: NSError(domain: "com.moodify", code: -1,
-                                                      userInfo: [NSLocalizedDescriptionKey: "Token refresh already in progress"]))
-                return
-            }
-            
-            guard let refreshToken = self.refreshToken else {
-                continuation.resume(throwing: NSError(domain: "com.moodify", code: -2,
-                                                      userInfo: [NSLocalizedDescriptionKey: "No refresh token available"]))
-                return
-            }
-            
-            isRefreshing = true
-            
-            // Create authorization header
-            let authString = "\(spotifyClientID):\(spotifyClientSecret)".data(using: .utf8)!.base64EncodedString()
-            
-            // Prepare request
-            var request = URLRequest(url: URL(string: "https://accounts.spotify.com/api/token")!)
-            request.httpMethod = "POST"
-            request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
-            request.setValue("Basic \(authString)", forHTTPHeaderField: "Authorization")
-            
-            let body = [
-                "grant_type": "refresh_token",
-                "refresh_token": refreshToken
-            ].map { "\($0)=\($1)" }.joined(separator: "&")
-            
-            request.httpBody = body.data(using: .utf8)
-            
-            URLSession.shared.dataTask(with: request) { [weak self] data, response, error in
-                guard let self = self else { return }
-                
-                defer { self.isRefreshing = false }
-                
-                if let error = error {
-                    continuation.resume(throwing: error)
-                    return
-                }
-                
-                guard let data = data else {
-                    continuation.resume(throwing: NSError(domain: "com.moodify", code: -3,
-                                                          userInfo: [NSLocalizedDescriptionKey: "No data received"]))
-                    return
-                }
-                
-                do {
-                    let decoder = JSONDecoder()
-                    decoder.keyDecodingStrategy = .convertFromSnakeCase
-                    
-                    let response = try decoder.decode(TokenResponse.self, from: data)
-                    
-                    DispatchQueue.main.async {
-                        self.accessToken = response.accessToken
-                        self.tokenExpirationDate = Date().addingTimeInterval(TimeInterval(response.expiresIn))
-                        
-                        if let newRefreshToken = response.refreshToken {
-                            self.refreshToken = newRefreshToken
-                        }
-                        
-                        // Update app remote connection
-                        self.appRemote.connectionParameters.accessToken = response.accessToken
-                        
-                        // Reconnect if needed
-                        if !self.appRemote.isConnected {
-                            self.connect()
-                        }
-                        
-                        continuation.resume()
-                    }
-                } catch {
-                    continuation.resume(throwing: error)
-                }
-            }.resume()
-        }
-    }
-    
-    // Helper method to handle token refresh
-    private func handleTokenRefresh() async {
-        guard refreshTask == nil else { return }
-        
-        refreshTask = Task {
-            do {
-                try await refreshAccessToken()
-                print("Token refreshed successfully")
-            } catch {
-                print("Token refresh failed: \(error.localizedDescription)")
-                // Handle failed refresh - maybe trigger reauthorization
-                DispatchQueue.main.async {
-                    self.disconnect()
-                    self.connect() // This will trigger new authorization
-                }
-            }
-            refreshTask = nil
-        }
-        
-        await refreshTask?.value
-    }
-    
     // Function to retrieve the access token from UserDefaults
     private func retrieveAccessToken() {
         if let storedAccessToken = UserDefaults.standard.string(forKey: "SpotifyAccessToken"),
@@ -237,7 +120,6 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
         return Date().addingTimeInterval(60) >= expirationDate
     }
     
-    
     /*
      Method connects the application to Spotify and or authorizes Moodify
      */
@@ -247,29 +129,14 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
             return
         }
         
-        // Check token status
-        if let token = accessToken {
-            if isAccessTokenExpired() {
-                Task {
-                    await handleTokenRefresh()
-                }
-            } else {
-                appRemote.connectionParameters.accessToken = token
-                appRemote.connect()
-            }
+        if let token = accessToken, !isAccessTokenExpired() {
+            appRemote.connectionParameters.accessToken = token
+            appRemote.connect()
         } else {
-            // No token - need new authorization
+            // No valid token - need new authorization
+            disconnect()
             appRemote.authorizeAndPlayURI("")
         }
-    }
-    
-    // Token response model
-    private struct TokenResponse: Codable {
-        let accessToken: String
-        let tokenType: String
-        let scope: String
-        let expiresIn: Int
-        let refreshToken: String?
     }
     
     /*
@@ -283,6 +150,8 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
         currentTrackName = "No track playing"
         currentAlbumName = ""
         accessToken = nil
+        UserDefaults.standard.removeObject(forKey: "SpotifyAccessToken")
+        UserDefaults.standard.removeObject(forKey: "SpotifyTokenExpiration")
     }
     
     // Handle incoming URL after authorization
@@ -299,11 +168,6 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
             UserDefaults.standard.set(accessToken, forKey: "SpotifyAccessToken")
             UserDefaults.standard.set(self.tokenExpirationDate?.timeIntervalSince1970, forKey: "SpotifyTokenExpiration")
             
-            if let refreshToken = parameters?["refresh_token"] as? String {
-                self.refreshToken = refreshToken
-                UserDefaults.standard.set(refreshToken, forKey: "SpotifyRefreshToken")
-            }
-            
             // Connect and initialize player state
             appRemote.connect()
             
@@ -313,6 +177,9 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
             }
         }
     }
+    
+    // ... [Rest of the code remains exactly the same, including all delegate methods,
+    //     player control methods, queue management, etc.]
     
     // Delegate method for successful connection
     @objc func appRemoteDidEstablishConnection(_ appRemote: SPTAppRemote) {
@@ -352,7 +219,6 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
     @objc func appRemote(_ appRemote: SPTAppRemote, didFailConnectionAttemptWithError error: Error?) {
         print("Failed to connect to Spotify App Remote: \(String(describing: error?.localizedDescription))")
         
-        // Attempt to reconnect immediately without retry logic
         if !reconnectAttempted {
             reconnectAttempted = true  // Set the flag to prevent further retries
             reconnectAndExecute {
@@ -401,7 +267,6 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
     func togglePlayPause() {
         guard !isAccessTokenExpired() else {
             Task {
-                await handleTokenRefresh()
                 self.togglePlayPause() // Retry after refresh
             }
             return
@@ -442,7 +307,6 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
     func skipToNext() {
         guard !isAccessTokenExpired() else {
             Task {
-                await handleTokenRefresh()
                 self.skipToNext() // Retry after refresh
             }
             return
@@ -472,7 +336,6 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
     func skipToPrevious() {
         guard !isAccessTokenExpired() else {
             Task {
-                await handleTokenRefresh()
                 self.skipToPrevious() // Retry after refresh
             }
             return
@@ -547,7 +410,10 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
         guard appRemote.isConnected else {
             print("Spotify is not connected. Attempting to reconnect...")
             reconnectAndExecute {
-                self.fetchRecommendations(mood: mood, profile: profile, userGenres: userGenres)
+                // Add 3 second delay before trying fetchRecommendations again
+                DispatchQueue.main.asyncAfter(deadline: .now() + 10.0) {
+                    self.fetchRecommendations(mood: mood, profile: profile, userGenres: userGenres)
+                }
             }
             return
         }
@@ -749,35 +615,17 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
 }
 
 extension SpotifyController {
-    /// Checks connection state and token validity before attempting to connect
     func ensureSpotifyConnection() {
         guard !appRemote.isConnected else {
             print("Spotify already connected with valid token")
             return
         }
         
-        // If we have a token, check if it's expired
-        if let _ = accessToken {
-            if isAccessTokenExpired() {
-                Task {
-                    do {
-                        try await refreshAccessToken()
-                        DispatchQueue.main.async {
-                            self.connect()
-                        }
-                    } catch {
-                        print("Token refresh failed: \(error.localizedDescription)")
-                        DispatchQueue.main.async {
-                            self.disconnect()
-                            self.connect()  // This will trigger new authorization if needed
-                        }
-                    }
-                }
-            } else {
-                connect()
-            }
+        if let token = accessToken, !isAccessTokenExpired() {
+            connect()
         } else {
-            // No token, initiate fresh connection
+            // Need new authorization
+            disconnect()
             connect()
         }
     }
