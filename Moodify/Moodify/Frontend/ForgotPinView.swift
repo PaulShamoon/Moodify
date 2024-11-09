@@ -7,6 +7,9 @@ struct ForgotPinView: View {
     @State private var confirmNewPin: String = ""
     @State private var showError: Bool = false
     @State private var errorMessage: String = ""
+    @State private var isAnswerVisible: Bool = false
+    @State private var isNewPinVisible: Bool = false
+    @State private var isConfirmPinVisible: Bool = false
     @Environment(\.presentationMode) var presentationMode
     @Binding var navigateBackToSelection: Bool
     
@@ -33,36 +36,44 @@ struct ForgotPinView: View {
                     .padding(.top)
                 
                 Spacer()
+                
                 Text("Your Security Question")
                     .font(.title2)
                     .foregroundColor(.white)
+                
+                // Display the security question
                 Text(profile.personalSecurityQuestion ?? "No security question set")
                     .font(.headline)
                     .foregroundColor(.white)
-                SecureField("Enter your answer", text: $enteredAnswer)
-                    .padding()
-                    .background(Color.gray.opacity(0.2))
-                    .cornerRadius(10)
-                    .foregroundColor(.white)
+                
+                // Security answer input with visibility toggle inside the input field
+                TextInputField(
+                    text: $enteredAnswer,
+                    isSecure: !isAnswerVisible,
+                    placeholder: "Enter your answer",
+                    toggleVisibility: { isAnswerVisible.toggle() }
+                )
                 
                 Text("Enter your new 4 digit PIN")
                     .font(.title2)
                     .foregroundColor(.white)
-                SecureField("Enter New 4-digit PIN", text: $newPin)
-                    .keyboardType(.numberPad)
-                    .padding()
-                    .background(Color.gray.opacity(0.2))
-                    .cornerRadius(10)
-                    .foregroundColor(.white)
-                    .frame(width: 200)
-                SecureField("Confirm New PIN", text: $confirmNewPin)
-                    .keyboardType(.numberPad)
-                    .padding()
-                    .background(Color.gray.opacity(0.2))
-                    .cornerRadius(10)
-                    .foregroundColor(.white)
-                    .frame(width: 200)
-
+                
+                // New PIN input with visibility toggle inside the input field
+                PinInputField(
+                    text: $newPin,
+                    isSecure: !isNewPinVisible,
+                    placeholder: "Enter New 4-digit PIN",
+                    toggleVisibility: { isNewPinVisible.toggle() }
+                )
+                
+                // Confirm PIN input with visibility toggle inside the input field
+                PinInputField(
+                    text: $confirmNewPin,
+                    isSecure: !isConfirmPinVisible,
+                    placeholder: "Confirm New PIN",
+                    toggleVisibility: { isConfirmPinVisible.toggle() }
+                )
+                
                 Button(action: resetPin) {
                     Text("Reset PIN")
                         .font(.headline)
@@ -140,5 +151,32 @@ struct ForgotPinView: View {
             errorMessage = "Profile not found. Please try again."
             showError = true
         }
+    }
+}
+
+struct TextInputField: View {
+    @Binding var text: String
+    var isSecure: Bool
+    var placeholder: String
+    var toggleVisibility: () -> Void
+    var body: some View {
+        HStack {
+            Group {
+                if isSecure {
+                    SecureField(placeholder, text: $text)
+                } else {
+                    TextField(placeholder, text: $text)
+                }
+            }
+            .keyboardType(.alphabet)
+            .textContentType(.oneTimeCode)
+            Button(action: toggleVisibility) {
+                Image(systemName: isSecure ? "eye" : "eye.slash")
+                    .foregroundColor(.gray)
+            }
+        }
+        .padding()
+        .background(Color(.systemGray6))
+        .cornerRadius(10)
     }
 }
