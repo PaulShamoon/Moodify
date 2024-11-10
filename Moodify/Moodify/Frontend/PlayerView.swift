@@ -69,17 +69,10 @@ struct PlayerView: View {
                     }
                 }
                 
-                // Resync button with dynamic visibility based on connection status
+                // Display a resync button if necessary
                 if showResyncButton {
                     Button(action: {
-                        // First call to ensureSpotifyConnection
                         spotifyController.ensureSpotifyConnection()
-                        
-                        // Second call to ensureSpotifyConnection after 4 seconds
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
-                            spotifyController.ensureSpotifyConnection()
-                        }
-                        
                     }) {
                         Text("Resync")
                             .font(.headline)
@@ -95,28 +88,27 @@ struct PlayerView: View {
         }
         .padding()
         
-        // Initial check on view appearance
         .onAppear {
-            if !spotifyController.isConnected && hasConnectedSpotify {
-                updateResyncButtonVisibility()
+            NotificationCenter.default.addObserver(
+                forName: UIScene.didActivateNotification,
+                object: nil,
+                queue: .main
+            ) { _ in
+                if hasConnectedSpotify && !spotifyController.isConnected {
+                    spotifyController.ensureSpotifyConnection()
+                }
             }
         }
-        
-        // React to changes in connection status
+        .onDisappear {
+            NotificationCenter.default.removeObserver(self, name: UIScene.didActivateNotification, object: nil)
+        }
         .onChange(of: spotifyController.isConnected) { _ in
             updateResyncButtonVisibility()
-
         }
-        
-        // React to changes in hasConnectedSpotify value
         .onChange(of: hasConnectedSpotify) { _ in
-            updateResyncButtonVisibility()
-        }
-        
-        // When hasConnectedSpotify changes, re-attempt connection
-        .onChange(of: hasConnectedSpotify) { newValue in
-            if newValue {
+            if hasConnectedSpotify {
                 spotifyController.ensureSpotifyConnection()
+                updateResyncButtonVisibility()
             }
         }
     }

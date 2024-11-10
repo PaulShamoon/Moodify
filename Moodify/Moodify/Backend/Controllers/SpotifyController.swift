@@ -45,8 +45,8 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
     // Published properties to hold info about the current track
     @Published var currentTrackName: String = "No track playing"
     @Published var currentTrackURI: String = ""
-    @Published var currentAlbumName: String = ""
-    @Published var currentArtistName: String = ""
+    @Published var currentAlbumName: String = "No album"
+    @Published var currentArtistName: String = "No artist"
     @Published var albumCover: UIImage? = nil
     
     // Access token for API requests
@@ -125,6 +125,7 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
      */
     func connect() {
         if appRemote.isConnected {
+            ensureSpotifyConnection()
             print("Already connected")
             return
         }
@@ -145,11 +146,11 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
     func disconnect() {
         if appRemote.isConnected {
             appRemote.disconnect()
+            updatePlayerState()
         }
         // Reset track and album name and clear access token
         currentTrackName = "No track playing"
-        currentAlbumName = ""
-        accessToken = nil
+        currentAlbumName = "No album"
         UserDefaults.standard.removeObject(forKey: "SpotifyAccessToken")
         UserDefaults.standard.removeObject(forKey: "SpotifyTokenExpiration")
     }
@@ -183,7 +184,6 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
     
     // Delegate method for successful connection
     @objc func appRemoteDidEstablishConnection(_ appRemote: SPTAppRemote) {
-        updatePlayerState()
         reconnectAttempted = false
         print("Spotify App Remote connected successfully.")
         
@@ -238,7 +238,7 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
         DispatchQueue.main.async {
             self.isConnected = false  // Update connection status
             self.currentTrackName = "No track playing"  // Reset track info
-            self.currentAlbumName = ""
+            self.currentAlbumName = "No album"
         }
     }
     
@@ -265,12 +265,6 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
      Updated by Mohammad on 11/03/2024
      */
     func togglePlayPause() {
-        guard !isAccessTokenExpired() else {
-            Task {
-                self.togglePlayPause() // Retry after refresh
-            }
-            return
-        }
         if appRemote.isConnected {
             if isPaused {
                 appRemote.playerAPI?.resume { [weak self] result, error in
@@ -305,12 +299,6 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
      Updated by Mohammad on 11/03/2024
      */
     func skipToNext() {
-        guard !isAccessTokenExpired() else {
-            Task {
-                self.skipToNext() // Retry after refresh
-            }
-            return
-        }
         if appRemote.isConnected {
             appRemote.playerAPI?.skip(toNext: { [weak self] result, error in
                 if let error = error {
@@ -334,12 +322,6 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
      Created by Paul Shamoon on 10/17/2024.
      */
     func skipToPrevious() {
-        guard !isAccessTokenExpired() else {
-            Task {
-                self.skipToPrevious() // Retry after refresh
-            }
-            return
-        }
         if appRemote.isConnected {
             appRemote.playerAPI?.skip(toPrevious: { [weak self] result, error in
                 if let error = error {
@@ -368,9 +350,9 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
                  print("Failed to reconnect to Spotify.")
              }
          }
-        Timer.scheduledTimer(withTimeInterval: 4.0, repeats: false) { _ in
+        /*Timer.scheduledTimer(withTimeInterval: 4.0, repeats: false) { _ in
             self.ensureSpotifyConnection()
-        }
+        }*/
      }
 
      private func handlePlayerAPIError() {
@@ -410,7 +392,6 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
         guard appRemote.isConnected else {
             print("Spotify is not connected. Attempting to reconnect...")
             reconnectAndExecute {
-                // Add 3 second delay before trying fetchRecommendations again
                 DispatchQueue.main.asyncAfter(deadline: .now() + 10.0) {
                     self.fetchRecommendations(mood: mood, profile: profile, userGenres: userGenres)
                 }
@@ -617,17 +598,19 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
 extension SpotifyController {
     func ensureSpotifyConnection() {
         guard !appRemote.isConnected else {
-            print("Spotify already connected with valid token")
+            print("Spotify already connected with a valid token")
             return
         }
         
         if let token = accessToken, !isAccessTokenExpired() {
-            connect()
+            appRemote.connectionParameters.accessToken = token
+            connect() // Attempt direct connection with the current token
         } else {
-            // Need new authorization
+            // No valid token; start authorization process
             disconnect()
-            connect()
+            appRemote.authorizeAndPlayURI("")
         }
     }
+
 }
 

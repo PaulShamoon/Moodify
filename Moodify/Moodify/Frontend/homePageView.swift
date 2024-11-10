@@ -101,7 +101,7 @@ struct homePageView: View {
                         }
                         
                          // Connect to Spotify/Resume Playback button
-                        if !hasConnectedSpotify || spotifyController.accessToken == nil {
+                        if spotifyController.accessToken == nil {
                             Button(action: {
                                 navigateToSpotify = true
                             }) {
@@ -118,7 +118,7 @@ struct homePageView: View {
                                 .shadow(radius: 10)
                             }
                         }
-                        if hasConnectedSpotify && spotifyController.accessToken != nil {
+                        if spotifyController.accessToken != nil {
                             // Player to control Spotify
                             PlayerView(spotifyController: spotifyController)
                             .padding(.horizontal)
@@ -128,9 +128,13 @@ struct homePageView: View {
                         
                         
                         Spacer()
-
                     }
                     .padding(.top, 60)
+                }
+                .onAppear{
+                    if !spotifyController.isConnected {
+                        spotifyController.connect()
+                    }
                 }
                 .alert(isPresented: $showingAlert) {
                     Alert(title: Text("Error"), message: Text(alertMessage), dismissButton: .default(Text("OK")))
@@ -169,11 +173,18 @@ struct homePageView: View {
                         showingAlert = true
                     }
                 }
+        }/*.onAppear {
+            // Only check connection if user has previously connected
+            if hasConnectedSpotify || !spotifyController.isConnected {
+                spotifyController.ensureSpotifyConnection()
+            }
         }
-        .onChange(of: spotifyController.isConnected) {
+        */
+        .onChange(of: spotifyController.isConnected || hasConnectedSpotify) {
             isConnected in
             if isConnected {
                 spotifyController.updatePlayerState()
+                spotifyController.ensureSpotifyConnection()
             }
         }
     }
