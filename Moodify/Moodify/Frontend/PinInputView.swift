@@ -1,9 +1,3 @@
-//
-//  PinInputView.swift
-//  Moodify
-//
-//  Created by Mahdi Sulaiman on 10/23/24.
-//
 import SwiftUI
 
 struct PinInputView: View {
@@ -12,7 +6,7 @@ struct PinInputView: View {
     @State private var enteredPin: String = ""
     @State private var showError: Bool = false
     @State private var showingForgotPin: Bool = false
-    @Environment(\.presentationMode) var presentationMode
+    @Environment(\.presentationMode) var presentationMode 
     @State private var navigateBackToSelection: Bool = false
     var onPinEntered: (String) -> Void
     
@@ -24,6 +18,22 @@ struct PinInputView: View {
         ZStack {
             backgroundColor.edgesIgnoringSafeArea(.all)
             VStack {
+                HStack {
+                    Button(action: {
+                        presentationMode.wrappedValue.dismiss()
+                    }) {
+                        HStack(spacing: 8) {
+                            Image(systemName: "chevron.left")
+                            Text("Back")
+                        }
+                        .foregroundColor(.blue)
+                        .font(.system(size: 16, weight: .medium))
+                    }
+                    Spacer()
+                }
+                .padding(.top, 20)
+                .padding(.leading, 10)
+                
                 if showError {
                     Text("Incorrect PIN. Please try again.")
                         .foregroundColor(.red)

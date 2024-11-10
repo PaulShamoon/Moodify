@@ -179,10 +179,12 @@ struct PinSetupView: View {
     
     private var backButton: some View {
         Button(action: { presentationMode.wrappedValue.dismiss() }) {
-            Image(systemName: "chevron.left")
-                .foregroundColor(.primary)
-                .imageScale(.large)
-                .padding()
+            HStack(spacing: 8) {
+                Image(systemName: "chevron.left")
+                Text("Back")
+            }
+            .foregroundColor(.blue)
+            .font(.system(size: 16, weight: .medium))
         }
     }
     
