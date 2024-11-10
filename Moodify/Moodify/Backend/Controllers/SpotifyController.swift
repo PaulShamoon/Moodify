@@ -245,7 +245,7 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
      */
     @objc func appRemote(_ appRemote: SPTAppRemote, didDisconnectWithError error: Error?) {
         print("Disconnected from Spotify App Remote: \(String(describing: error?.localizedDescription))")
-        
+        isFirstConnectionAttempt = false
         DispatchQueue.main.async {
             self.isConnected = false  // Update connection status
             self.currentTrackName = "No track playing"  // Reset track info
@@ -402,11 +402,8 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
     func fetchRecommendations(mood: String, profile: Profile, userGenres: [String]) {
         guard appRemote.isConnected else {
             print("Spotify is not connected. Attempting to reconnect...")
-            reconnectAndExecute {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 10.0) {
-                    self.fetchRecommendations(mood: mood, profile: profile, userGenres: userGenres)
-                }
-            }
+            resetFirstConnectionAttempt()
+            refreshPlayerState()
             return
         }
         
