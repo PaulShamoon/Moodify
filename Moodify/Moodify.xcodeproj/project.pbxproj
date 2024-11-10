@@ -177,12 +177,8 @@
 		6934A10B2C8FDA840086CC91 /* Moodify */ = {
 			isa = PBXGroup;
 			children = (
-
 				6982AB7F2CDD9BE8005F9750 /* ViewModels */,
-				6934A10C2C8FDA840086CC91 /* MoodifyApp.swift */,
 				6982AB752CDD9646005F9750 /* ColorExtension.swift */,
-				89AD05642CB08439004D8FAD /* ProfileManager.swift */,
-				89AD05622CB083B3004D8FAD /* Profile.swift */,
 				694B6C002C9A4431002F0931 /* Frontend */,
 				6E52B8522CC98F1B0049BF08 /* Backend */,
 				6934A10C2C8FDA840086CC91 /* MoodifyApp.swift */,
@@ -259,8 +255,6 @@
 			isa = PBXGroup;
 			children = (
 				6982AB772CDD9959005F9750 /* MoodModels.swift */,
-				6E728B922CD1B97900017EA4 /* QueueManager.swift */,
-				6E728B902CD1B94F00017EA4 /* Queue.swift */,
 				6EA2E3BB2CDB072900B4E6C8 /* Models */,
 				6EA2E3BA2CDB04C100B4E6C8 /* Controllers */,
 				6E52B8592CC9A9EE0049BF08 /* Constants.swift */,
@@ -271,10 +265,10 @@
 		6EA2E3BA2CDB04C100B4E6C8 /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
-				89AD05642CB08439004D8FAD /* ProfileManager.swift */,
 				6EA2E3B72CDAF29B00B4E6C8 /* PlaylistManager.swift */,
-				6E728B922CD1B97900017EA4 /* QueueManager.swift */,
+				89AD05642CB08439004D8FAD /* ProfileManager.swift */,
 				6E52B8532CC98F370049BF08 /* PlayBackController.swift */,
+				6E728B922CD1B97900017EA4 /* QueueManager.swift */,
 				6EA47A6F2C9E5199006FB5C6 /* SpotifyController.swift */,
 			);
 			path = Controllers;
@@ -283,8 +277,8 @@
 		6EA2E3BB2CDB072900B4E6C8 /* Models */ = {
 			isa = PBXGroup;
 			children = (
-				89AD05622CB083B3004D8FAD /* Profile.swift */,
 				6EA2E3B52CDAF29200B4E6C8 /* Playlist.swift */,
+				89AD05622CB083B3004D8FAD /* Profile.swift */,
 				6E728B902CD1B94F00017EA4 /* Song.swift */,
 			);
 			path = Models;
@@ -426,7 +420,7 @@
 				8966A3A32CC3304F00FA58DE /* PinSetupView.swift in Sources */,
 				89B1EC102CC9C1CC0041F9EE /* ForgotPinView.swift in Sources */,
 				6EA47A702C9E5199006FB5C6 /* SpotifyController.swift in Sources */,
-				6E728B912CD1B95700017EA4 /* Queue.swift in Sources */,
+				6E728B912CD1B95700017EA4 /* Song.swift in Sources */,
 				6982AB7E2CDD9BB1005F9750 /* GetStartedCardView.swift in Sources */,
 				6982AB762CDD964B005F9750 /* ColorExtension.swift in Sources */,
 				6E728B912CD1B95700017EA4 /* Song.swift in Sources */,
