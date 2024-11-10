@@ -16,7 +16,7 @@ struct PlayerView: View {
             RoundedRectangle(cornerRadius: 10)
                 .fill(Color(red: 0.96, green: 0.87, blue: 0.70))
                 .shadow(color: .gray, radius: 5, x: 0, y: 5)
-            
+
             VStack {
                 HStack {
                     VStack(alignment: .leading) {
@@ -31,7 +31,7 @@ struct PlayerView: View {
                             .padding(.leading, 10)
                     }
                     Spacer()
-                    
+
                     Button(action: { spotifyController.skipToPrevious() }) {
                         Image(systemName: "backward.fill")
                             .resizable()
@@ -39,7 +39,7 @@ struct PlayerView: View {
                             .padding()
                             .foregroundColor(.black)
                     }
-                    
+
                     Button(action: { spotifyController.togglePlayPause() }) {
                         Image(systemName: spotifyController.isPaused ? "play.fill" : "pause.fill")
                             .resizable()
@@ -47,7 +47,7 @@ struct PlayerView: View {
                             .padding()
                             .foregroundColor(.black)
                     }
-                    
+
                     Button(action: { spotifyController.skipToNext() }) {
                         Image(systemName: "forward.fill")
                             .resizable()
@@ -72,7 +72,8 @@ struct PlayerView: View {
                 // Display a resync button if necessary
                 if showResyncButton {
                     Button(action: {
-                        spotifyController.ensureSpotifyConnection()
+                        spotifyController.resetFirstConnectionAttempt()
+                        spotifyController.refreshPlayerState()
                     }) {
                         Text("Resync")
                             .font(.headline)
@@ -95,7 +96,7 @@ struct PlayerView: View {
                 queue: .main
             ) { _ in
                 if hasConnectedSpotify && !spotifyController.isConnected {
-                    spotifyController.ensureSpotifyConnection()
+                    spotifyController.initializeSpotifyConnection()
                 }
             }
         }

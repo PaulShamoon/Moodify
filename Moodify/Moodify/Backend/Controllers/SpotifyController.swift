@@ -9,6 +9,8 @@ import SpotifyiOS
 
 class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDelegate, SPTAppRemoteDelegate {
     
+    var isFirstConnectionAttempt = true
+
     // Tracks if reconnect was attempted
     private var reconnectAttempted = false
     
@@ -69,6 +71,15 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
         clientID: spotifyClientID,
         redirectURL: spotifyRedirectURL
     )
+    
+    func refreshPlayerState() {
+        if isFirstConnectionAttempt{
+            // Call ensure connection if needed
+            ensureSpotifyConnection()
+        }
+        // Fetch or update the current player state
+        updatePlayerState()
+        }
     
     // Spotify App Remote instance
     private lazy var appRemote: SPTAppRemote = {
@@ -596,21 +607,54 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
 }
 
 extension SpotifyController {
-    func ensureSpotifyConnection() {
+    func ensureSpotifyConnection(completion: (() -> Void)? = nil) {
         guard !appRemote.isConnected else {
-            print("Spotify already connected with a valid token")
+            print("Spotify already connected.")
+            completion?() // Trigger completion if already connected
+            return
+        }
+        
+        // Silent reconnect if token is valid but connection is lost
+        if let token = accessToken, !isAccessTokenExpired() {
+            print("Attempting silent reconnect with valid token.")
+            appRemote.connectionParameters.accessToken = token
+            appRemote.connect()
+            
+            // Listen for successful connection
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                if self.appRemote.isConnected {
+                    completion?() // Trigger completion once reconnected
+                }
+            }
+        } else {
+            print("Token expired or missing; reconnect deferred.")
+            completion?() // Call completion even if no reconnection occurs
+        }
+    }
+    
+    func initializeSpotifyConnection() {
+        guard isFirstConnectionAttempt else {
+            print("Initial connection attempt already completed.")
+            return
+        }
+        guard !appRemote.isConnected else {
+            print("Spotify already connected with valid token")
             return
         }
         
         if let token = accessToken, !isAccessTokenExpired() {
-            appRemote.connectionParameters.accessToken = token
-            connect() // Attempt direct connection with the current token
+            connect()
         } else {
-            // No valid token; start authorization process
             disconnect()
-            appRemote.authorizeAndPlayURI("")
+            connect()
         }
+        
+        isFirstConnectionAttempt = false // Ensures this only runs once
     }
-
+    
+    func resetFirstConnectionAttempt() {
+        isFirstConnectionAttempt = true
+    }
+    
 }
 
