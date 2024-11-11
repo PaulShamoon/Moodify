@@ -14,9 +14,7 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
     
     // Redirect URL after authorization
     private let spotifyRedirectURL = URL(string: "spotify-ios-quick-start://spotify-login-callback")!
-    
-    @Published var playbackProgress: Double = 0.0
-    
+        
     // Published properties to hold info about the current track
     @Published var currentTrackName: String = "No track playing"
     @Published var currentTrackURI: String = ""
@@ -534,26 +532,5 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
         currentQueue = queueManager.addSongToQueue(song: song)
         
         return song
-    }
-    
-    func reorderQueue(from: Int, to: Int) {
-        // First update the local queue
-        let song = currentQueue.remove(at: from)
-        currentQueue.insert(song, at: to)
-        
-        // Then update Spotify's queue
-        // Note: Since Spotify's SDK doesn't provide direct queue reordering,
-        // we need to recreate the queue in the new order
-        let songsToRequeue = Array(currentQueue[to...])
-        clearCurrentQueue()
-        
-        // Requeue the songs in the new order
-        for song in songsToRequeue {
-            appRemote.playerAPI?.enqueueTrackUri(song.songURI, callback: { (result, error) in
-                if let error = error {
-                    print("Failed to requeue song: \(error.localizedDescription)")
-                }
-            })
-        }
     }
 }

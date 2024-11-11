@@ -42,9 +42,6 @@ struct QueueView: View {
                            endPoint: animateGradient ? .bottomTrailing : .topLeading
             )
             .ignoresSafeArea()
-            .animate(withDuration: 5, autoreverses: true, repeatForever: true) {
-                animateGradient.toggle()
-            }
             
             VStack(spacing: 0) {
                 // Fixed header section
@@ -61,6 +58,7 @@ struct QueueView: View {
                         .font(.caption.bold())
                         .foregroundColor(.white.opacity(0.7))
                         .padding(.horizontal)
+                        .padding(.top, 12)
                         .padding(.bottom, 8)
                     
                     if spotifyController.currentQueue.isEmpty {
@@ -70,26 +68,24 @@ struct QueueView: View {
                             LazyVStack(spacing: 8) {
                                 ForEach(spotifyController.currentQueue) { song in
                                     QueueItemView(song: song, spotifyController: spotifyController)
-                                        .onDrag {
-                                            self.draggedItem = song
-                                            return NSItemProvider(object: song.songURI as NSString)
-                                        }
-                                        .onDrop(of: [.text], delegate: DropViewDelegate(item: song, items: spotifyController.currentQueue, draggedItem: $draggedItem) { from, to in
-                                            withAnimation {
-                                                spotifyController.reorderQueue(from: from, to: to)
-                                            }
-                                        })
                                 }
                             }
                             .padding(.bottom, 16)
                         }
                     }
                 }
+                // Extra padding for the top of the background section
+                .padding(.top, 12)
+                // Extra padding for the bottom of the background section
+                .padding(.bottom, 16)
+                // Setting a maxWidth so it can be the same size as the CustomHeader and EmptyQueueView
+                .frame(maxWidth: 400)
                 .background(
                     RoundedRectangle(cornerRadius: 30)
                         .fill(.ultraThinMaterial)
                         .ignoresSafeArea()
                 )
+                Spacer()
             }
         }
         .navigationBarHidden(true)
@@ -229,15 +225,6 @@ struct NowPlayingCard: View {
                         .foregroundColor(.white.opacity(0.7))
                 }
                 Spacer()
-                
-                // Updated Play/Pause button
-                Button(action: {
-                    spotifyController.togglePlayPause()
-                }) {
-                    Image(systemName: spotifyController.isPaused ? "play.circle.fill" : "pause.circle.fill")
-                        .font(.system(size: 32))
-                        .foregroundColor(.white)
-                }
             }
         }
         .padding(20)
@@ -268,15 +255,6 @@ struct QueueSection: View {
                 LazyVStack(spacing: 8) {
                     ForEach(spotifyController.currentQueue) { song in
                         QueueItemView(song: song, spotifyController: spotifyController)
-                            .onDrag {
-                                self.draggedItem = song
-                                return NSItemProvider(object: song.songURI as NSString)
-                            }
-                            .onDrop(of: [.text], delegate: DropViewDelegate(item: song, items: spotifyController.currentQueue, draggedItem: $draggedItem) { from, to in
-                                withAnimation {
-                                    spotifyController.reorderQueue(from: from, to: to)
-                                }
-                            })
                     }
                 }
             }
@@ -318,10 +296,6 @@ struct QueueItemView: View {
     var body: some View {
         Button(action: { spotifyController.playSongFromQueue(song: song) }) {
             HStack(spacing: 16) {
-                Image(systemName: "line.3.horizontal")
-                    .foregroundColor(.white.opacity(0.6))
-                    .font(.subheadline)
-                
                 VStack(alignment: .leading, spacing: 4) {
                     Text(song.trackName)
                         .font(.system(size: 16, weight: .semibold))
@@ -330,15 +304,7 @@ struct QueueItemView: View {
                         .font(.system(size: 14))
                         .foregroundColor(.white.opacity(0.7))
                 }
-                
                 Spacer()
-                
-                Image(systemName: "play.fill")
-                    .foregroundColor(.white)
-                    .font(.caption)
-                    .frame(width: 32, height: 32)
-                    .background(Circle().fill(.white.opacity(0.2)))
-                    .opacity(isHovered ? 1 : 0.6)
             }
             .padding(.vertical, 12)
             .padding(.horizontal, 16)

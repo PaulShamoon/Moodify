@@ -21,7 +21,7 @@ struct homePageView: View {
     @State private var showMenu = false
     
     // NOTE - this URL is temporary and needs to be updated each time from the backend side to detect mood properly
-    let backendURL = "https://b355-2601-406-4d00-7af0-b905-2ee2-ba90-3017.ngrok-free.app/analyze"
+    let backendURL = "/analyze"
     
     // Add this property to manage background color
     @State private var backgroundColors: [Color] = [
@@ -114,7 +114,7 @@ struct homePageView: View {
                 .padding(.horizontal)
                 
                 // Mood Display
-                VStack{
+                VStack {
                     HStack {
                         Text("Your Current Mood")
                             .font(.system(size: 20, weight: .bold))
@@ -122,30 +122,16 @@ struct homePageView: View {
                         
                         Spacer()
                         
-                        // Updated button with better clarity
                         Button(action: {
                             showMoodSelector = true
                         }) {
-                            HStack(spacing: 4) {
-                                Text("Change Mood")
-                                    .font(.system(size: 14, weight: .medium))
-                                Image(systemName: "pencil.circle.fill")
-                                    .font(.system(size: 20))
-                            }
-                            .foregroundColor(.white)
-                            .padding(.horizontal, 12)
-                            .padding(.vertical, 6)
-                            .background(
-                                Capsule()
-                                    .fill(Color.white.opacity(0.2))
-                                    .overlay(
-                                        Capsule()
-                                            .stroke(Color.white.opacity(0.3), lineWidth: 1)
-                                    )
-                            )
+                            Image(systemName: "pencil.circle.fill")
+                                .font(.system(size: 30))
+                                .foregroundColor(.white)
                         }
                     }
-                    
+                    .padding(.horizontal, 16)
+                 
                     ZStack {
                         // Frosted glass effect background
                         RoundedRectangle(cornerRadius: 30)
