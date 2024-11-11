@@ -19,6 +19,8 @@ struct homePageView: View {
     @StateObject var spotifyController = SpotifyController()
     @Binding var isCreatingProfile: Bool // This will be passed from outside
     @State private var showMenu = false
+    // Variable to check if the camera view has been dismissed
+    @State private var isCameraDismissed = false
     
     // NOTE - this URL is temporary and needs to be updated each time from the backend side to detect mood properly
     let backendURL = "/analyze"
@@ -156,10 +158,15 @@ struct homePageView: View {
             }
         }
         .sheet(isPresented: $showingCamera) {
-            CameraView(image: $capturedImage)
+            CameraView(image: $capturedImage, isCameraDismissed: $isCameraDismissed)
                 .onDisappear {
-                    if let image = capturedImage {
+                    if isCameraDismissed {
+                        // Camera was dismissed reset isCameraDismissed
+                        isCameraDismissed = false
+                    } else if let image = capturedImage {
                         analyzeImage(image: image)
+                        // Reset capturedImage after analyzing
+                        capturedImage = nil
                     } else {
                         alertMessage = "Image capture failed. Please try again."
                         showingAlert = true
@@ -274,6 +281,7 @@ struct homePageView: View {
 
 struct CameraView: UIViewControllerRepresentable {
     @Binding var image: UIImage?
+    @Binding var isCameraDismissed: Bool
     @Environment(\.presentationMode) private var presentationMode
     
     func makeUIViewController(context: Context) -> UIImagePickerController {
@@ -308,6 +316,8 @@ struct CameraView: UIViewControllerRepresentable {
         }
         
         func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+            // Set isCameraDismissed to true if user exited the camera view
+            parent.isCameraDismissed = true
             parent.presentationMode.wrappedValue.dismiss()
         }
         
