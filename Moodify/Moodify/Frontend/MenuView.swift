@@ -4,27 +4,45 @@ struct MenuView: View {
     @Binding var showMenu: Bool
     @EnvironmentObject var profileManager: ProfileManager
     @Binding var navigateToHomePage: Bool
-    @Binding var isCreatingNewProfile: Bool
     @Binding var navigateToMusicPreferences: Bool
+    @Binding var isCreatingNewProfile: Bool
     @State private var showingAccountInformation = false
     @State private var showingMusicPreferences = false
     @State private var showingPlaylists = false
     @State private var showingDeleteAlert = false
     @State private var showingPinSetup = false
-    @State private var showingTOS = false  // New state for TOS navigation
+    @State private var showingPinManagement = false
+    @State private var showingChangePinView = false
+    @State private var showingDeletePinAlert = false
+    @State private var showingTOS = false
     @State private var selectedTab: MenuTab? = nil
+    @State private var isInPinManagement = false
+    @State private var activeAlert: ActiveAlert?
+    @State private var showingAlert = false
     @ObservedObject var spotifyController: SpotifyController
-
+    
     @Namespace private var menuAnimation
+
+    private var hasPin: Bool {
+        profileManager.currentProfile?.userPin != nil
+    }
+    
+    enum ActiveAlert {
+        case deleteProfile
+        case deletePin
+    }
     
     enum MenuTab: String, CaseIterable {
         case account = "Account Information"
         case music = "Music Preferences"
         case playlists = "Playlists"
         case user = "Switch User"
-        case pin = "Set/Change PIN"
+        case addPin = "Add PIN"
+        case managePin = "Manage PIN"
+        case changePin = "Change PIN"
+        case deletePin = "Delete PIN"
+        case tos = "Terms of Service"
         case delete = "Delete Profile"
-        case tos = "Terms of Service"  // New case for TOS
         
         var icon: String {
             switch self {
@@ -32,9 +50,12 @@ struct MenuView: View {
             case .music: return "music.note"
             case .playlists: return "music.note.list"
             case .user: return "arrow.triangle.2.circlepath"
-            case .pin: return "lock.circle"
+            case .addPin: return "lock.circle"
+            case .managePin: return "person.badge.key"
+            case .changePin: return "lock.rotation"
+            case .deletePin: return "lock.slash"
+            case .tos: return "doc.text"
             case .delete: return "trash.circle"
-            case .tos: return "doc.text"  // Icon for TOS
             }
         }
         
@@ -44,9 +65,10 @@ struct MenuView: View {
             case .music: return .purple
             case .playlists: return .yellow
             case .user: return .green
-            case .pin: return .orange
+            case .addPin, .managePin, .changePin: return .orange
+            case .deletePin: return .red
+            case .tos: return .gray
             case .delete: return .red
-            case .tos: return .gray  // Color for TOS
             }
         }
     }
@@ -62,6 +84,7 @@ struct MenuView: View {
                         .onTapGesture {
                             withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
                                 showMenu = false
+                                isInPinManagement = false
                             }
                         }
                     
@@ -69,7 +92,11 @@ struct MenuView: View {
                         Spacer()
                         
                         VStack(spacing: 0) {
-                            MenuHeader(showMenu: $showMenu)
+                            if isInPinManagement {
+                                PinManagementHeader(showMenu: $showMenu, isInPinManagement: $isInPinManagement)
+                            } else {
+                                MenuHeader(showMenu: $showMenu)
+                            }
                             
                             if let profile = profileManager.currentProfile {
                                 ProfileSection(profile: profile)
@@ -77,25 +104,45 @@ struct MenuView: View {
                             
                             ScrollView {
                                 VStack(spacing: 8) {
-                                    ForEach(MenuTab.allCases, id: \.self) { tab in
+                                    if isInPinManagement {
+                                        // PIN Management Options
                                         MenuButton(
-                                            tab: tab,
-                                            isSelected: selectedTab == tab,
-                                            action: {
-                                                handleTabSelection(tab)
-                                            }
+                                            tab: .changePin,
+                                            isSelected: selectedTab == .changePin,
+                                            action: { handleTabSelection(.changePin) }
                                         )
+                                        
+                                        MenuButton(
+                                            tab: .deletePin,
+                                            isSelected: selectedTab == .deletePin,
+                                            action: { handleTabSelection(.deletePin) }
+                                        )
+                                    } else {
+                                        // Regular Menu Options
+                                        ForEach(MenuTab.allCases.filter { tab in
+                                            switch tab {
+                                            case .addPin:
+                                                return !hasPin
+                                            case .managePin:
+                                                return hasPin
+                                            case .changePin, .deletePin:
+                                                return false
+                                            default:
+                                                return true
+                                            }
+                                        }, id: \.self) { tab in
+                                            MenuButton(
+                                                tab: tab,
+                                                isSelected: selectedTab == tab,
+                                                action: {
+                                                    handleTabSelection(tab)
+                                                }
+                                            )
+                                        }
                                     }
                                 }
                                 .padding(.vertical)
                             }
-                            
-                            Spacer()
-                            
-                            Text("Prototype 2.0")
-                                .font(.caption)
-                                .foregroundColor(.gray)
-                                .padding(.bottom)
                         }
                         .frame(width: min(geometry.size.width * 0.85, 320))
                         .background(
@@ -108,25 +155,25 @@ struct MenuView: View {
                     }
                     
                     .navigationDestination(isPresented: $showingAccountInformation) {
-                            AccountInfoView()
-                                .environmentObject(profileManager)
+                        AccountInfoView()
+                            .environmentObject(profileManager)
                     }
-
                     .navigationDestination(isPresented: $showingMusicPreferences) {
                         GeneralMusicPreferencesView(navigateToHomePage: .constant(false))
-                                .environmentObject(profileManager)
+                            .environmentObject(profileManager)
                     }
-                    
                     .navigationDestination(isPresented: $showingPlaylists) {
                         PlaylistsView(spotifyController: spotifyController)
                             .environmentObject(profileManager)
                     }
-                    
                     .navigationDestination(isPresented: $showingPinSetup) {
                         PinSetupView(profile: profileManager.currentProfile)
                             .environmentObject(profileManager)
                     }
-                    
+                    .navigationDestination(isPresented: $showingChangePinView) {
+                        PinSetupView(profile: profileManager.currentProfile)
+                            .environmentObject(profileManager)
+                    }
                     .navigationDestination(isPresented: $showingTOS) {
                         TermsOfServiceView(
                             agreedToTerms: Binding(
@@ -136,15 +183,30 @@ struct MenuView: View {
                         ).environmentObject(profileManager)
                     }
                 }
-                .alert(isPresented: $showingDeleteAlert) {
-                    Alert(
-                        title: Text("Delete Profile"),
-                        message: Text("Are you sure you want to delete the current profile? This action cannot be undone."),
-                        primaryButton: .destructive(Text("Delete")) {
-                            deleteProfile()
-                        },
-                        secondaryButton: .cancel()
-                    )
+                .alert(isPresented: $showingAlert) {
+                    switch activeAlert {
+                    case .deletePin:
+                        return Alert(
+                            title: Text("Delete PIN"),
+                            message: Text("Are you sure you want to delete your PIN? This will remove PIN protection from your profile."),
+                            primaryButton: .destructive(Text("Delete")) {
+                                deletePin()
+                                isInPinManagement = false
+                            },
+                            secondaryButton: .cancel()
+                        )
+                    case .deleteProfile:
+                        return Alert(
+                            title: Text("Delete Profile"),
+                            message: Text("Are you sure you want to delete the current profile? This action cannot be undone."),
+                            primaryButton: .destructive(Text("Delete")) {
+                                deleteProfile()
+                            },
+                            secondaryButton: .cancel()
+                        )
+                    case .none:
+                        return Alert(title: Text("Error"))
+                    }
                 }
             }
             .navigationBarHidden(true)
@@ -165,12 +227,20 @@ struct MenuView: View {
             showingPlaylists = true
         case .user:
             switchUser()
-        case .pin:
+        case .addPin:
             showingPinSetup = true
-        case .delete:
-            showingDeleteAlert = true
+        case .managePin:
+            isInPinManagement = true
+        case .changePin:
+            showingChangePinView = true
+        case .deletePin:
+            activeAlert = .deletePin
+            showingAlert = true
         case .tos:
-            showingTOS = true  // Handle TOS tab selection
+            showingTOS = true
+        case .delete:
+            activeAlert = .deleteProfile
+            showingAlert = true
         }
     }
     
@@ -181,6 +251,24 @@ struct MenuView: View {
             navigateToHomePage = false
             navigateToMusicPreferences = false
             showMenu = false
+        }
+    }
+    
+    private func deletePin() {
+        if let currentProfile = profileManager.currentProfile {
+            withAnimation {
+                profileManager.deletePin(profile: currentProfile)
+                profileManager.updateProfile(
+                    profile: currentProfile,
+                    name: currentProfile.name,
+                    dateOfBirth: currentProfile.dateOfBirth,
+                    favoriteGenres: currentProfile.favoriteGenres,
+                    hasAgreedToTerms: currentProfile.hasAgreedToTerms,
+                    userPin: nil,
+                    personalSecurityQuestion: currentProfile.personalSecurityQuestion,
+                    securityQuestionAnswer: currentProfile.securityQuestionAnswer
+                )
+            }
         }
     }
     
@@ -195,6 +283,42 @@ struct MenuView: View {
                 showMenu = false
             }
         }
+    }
+}
+
+struct PinManagementHeader: View {
+    @Binding var showMenu: Bool
+    @Binding var isInPinManagement: Bool
+    
+    var body: some View {
+        HStack {
+            Button {
+                withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
+                    isInPinManagement = false
+                }
+            } label: {
+                Image(systemName: "chevron.left")
+                    .font(.title2)
+                    .foregroundColor(.gray)
+            }
+            
+            Text("Pin Management")
+                .font(.title.bold())
+            
+            Spacer()
+            
+            Button {
+                withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
+                    showMenu = false
+                    isInPinManagement = false
+                }
+            } label: {
+                Image(systemName: "xmark.circle.fill")
+                    .font(.title2)
+                    .foregroundColor(.gray)
+            }
+        }
+        .padding()
     }
 }
 
