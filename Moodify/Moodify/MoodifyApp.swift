@@ -1,6 +1,6 @@
 /*
-    This is the main entry point for the Moodify app.
-*/
+ This is the main entry point for the Moodify app.
+ */
 
 import SwiftUI
 
@@ -14,14 +14,14 @@ struct MoodifyApp: App {
     @State private var showSplash = true
     @State private var isCreatingNewProfile = false
     @State private var isCreatingProfile = false
-
+    
     var body: some Scene {
         WindowGroup {
             NavigationStack {
                 if showSplash {
                     SplashPageView(showSplash: $showSplash)
                     /* this is where the splash page is displayed and then the onboarding view is displayed
-                    */
+                     */
                 } else if !hasCompletedOnboarding {
                     OnboardingView {
                         hasCompletedOnboarding = true

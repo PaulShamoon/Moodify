@@ -15,7 +15,7 @@ import SwiftUI
 struct PlayerView: View {
     @ObservedObject var spotifyController: SpotifyController
     @State private var navigateToQueue = false
-
+    
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 20)
@@ -42,29 +42,29 @@ struct PlayerView: View {
                             )
                     }
                     
-                    // Track and Artist info with nude background
+                    // Track and Artist info
                     VStack(alignment: .leading) {
                         Text(spotifyController.currentTrackName)
                             .font(.headline)
-                            .foregroundColor(.black)
-                            .padding(.leading, 10)
+                            .foregroundColor(.white)  // Adjusted for better contrast
                             .lineLimit(1)
                         
                         Text(spotifyController.currentArtistName)
                             .font(.subheadline)
-                            .foregroundColor(.black)
-                            .padding(.leading, 10)
+                            .foregroundColor(.white)  // Adjusted for better contrast
                             .lineLimit(1)
                     }
                     .padding(.vertical, 5)
+                    .padding(.horizontal, 10) // Ensure padding inside the background
                     .background(
                         RoundedRectangle(cornerRadius: 8)
-                            .fill(Color(red: 0.93, green: 0.87, blue: 0.83))  // Nude color
+                            .fill(Color(red: 0.15, green: 0.25, blue: 0.20).opacity(0.7))  // Darker background for contrast
                             .shadow(color: .black.opacity(0.1), radius: 2, x: 0, y: 1)
                     )
                     
                     Spacer()
                     
+                    // Playback Controls
                     Button(action: { spotifyController.skipToPrevious() }) {
                         Image(systemName: "backward.fill")
                             .resizable()
@@ -89,6 +89,7 @@ struct PlayerView: View {
                             .foregroundColor(.white)
                     }
                     
+                    // Queue Button
                     Button(action: {
                         navigateToQueue = true
                     }) {
@@ -106,7 +107,6 @@ struct PlayerView: View {
         .padding()
     }
 }
-
 
 struct PlayerView_Previews: PreviewProvider {
     static var previews: some View {

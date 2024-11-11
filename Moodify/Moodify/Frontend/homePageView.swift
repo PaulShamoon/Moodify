@@ -21,7 +21,7 @@ struct homePageView: View {
     @State private var showMenu = false
     
     // NOTE - this URL is temporary and needs to be updated each time from the backend side to detect mood properly
-    let backendURL = "https://25f7-2601-406-4d00-7af0-b905-2ee2-ba90-3017.ngrok-free.app/analyze"
+    let backendURL = "https://b355-2601-406-4d00-7af0-b905-2ee2-ba90-3017.ngrok-free.app/analyze"
     
     // Add this property to manage background color
     @State private var backgroundColors: [Color] = [
@@ -66,6 +66,14 @@ struct homePageView: View {
             }
         }
     }
+    
+    // Add these new state variables
+    @State private var showMoodPreferenceSheet = false
+    @State private var detectedMood = ""
+    
+    // Add these state variables to homePageView
+    @State private var showMoodSelector = false
+    @State private var selectedManualMood = "neutral"
     
     var body: some View {
         ZStack {
@@ -231,6 +239,24 @@ struct homePageView: View {
                     }
                 }
         }
+        .sheet(isPresented: $showMoodPreferenceSheet) {
+            MoodPreferenceView(
+                spotifyController: spotifyController,
+                profile: profile,
+                detectedMood: detectedMood,
+                isPresented: $showMoodPreferenceSheet
+            )
+        }
+        .sheet(isPresented: $showMoodSelector) {
+            ManualMoodSelector(
+                isPresented: $showMoodSelector,
+                spotifyController: spotifyController,
+                profile: profile,
+                currentMood: $currentMood,
+                currentMoodText: $currentMoodText,
+                updateBackgroundColors: updateBackgroundColors
+            )
+        }
     }
     
     // Check camera permissions
@@ -306,7 +332,15 @@ struct homePageView: View {
                     currentMood = moodEmoji(for: emotion)
                     currentMoodText = "You seem to be \(emotion.capitalized)."
                     updateBackgroundColors(for: emotion)
-                    spotifyController.fetchRecommendations(mood: emotion, profile: profile, userGenres: profile.favoriteGenres)
+                    
+                    // Check if mood is sad and show preference sheet
+                    if emotion.lowercased() == "sad" {
+                        detectedMood = emotion
+                        showMoodPreferenceSheet = true
+                    } else {
+                        // For non-sad moods, proceed as normal
+                        spotifyController.fetchRecommendations(mood: emotion, profile: profile, userGenres: profile.favoriteGenres)
+                    }
                 }
             } else {
                 DispatchQueue.main.async {
@@ -337,59 +371,91 @@ struct homePageView: View {
     }
 }
 
-struct CameraView: UIViewControllerRepresentable {
-    @Binding var image: UIImage?
-    @Environment(\.presentationMode) private var presentationMode
+struct MoodPreferenceView: View {
+    let spotifyController: SpotifyController
+    let profile: Profile
+    let detectedMood: String
+    @Binding var isPresented: Bool
     
-    func makeUIViewController(context: Context) -> UIImagePickerController {
-        let picker = UIImagePickerController()
-        picker.sourceType = .camera
-        picker.cameraDevice = .front
-        picker.delegate = context.coordinator
-        return picker
-    }
-    
-    func updateUIViewController(_ uiViewController: UIImagePickerController, context: Context) {}
-    
-    func makeCoordinator() -> Coordinator {
-        Coordinator(self)
-    }
-    
-    class Coordinator: NSObject, UINavigationControllerDelegate, UIImagePickerControllerDelegate {
-        let parent: CameraView
-        
-        init(_ parent: CameraView) {
-            self.parent = parent
-        }
-        
-        func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
-            if let image = info[.originalImage] as? UIImage {
-                let fixedImage = fixOrientation(image: image, cameraDevice: picker.cameraDevice)
-                parent.image = fixedImage  // Save the corrected image!!!
-            } else {
-                print("Failed to capture image.")
+    var body: some View {
+        VStack(spacing: 30) {
+            // Emoji and Title
+            VStack(spacing: 15) {
+                Text("😢")
+                    .font(.system(size: 60))
+                
+                Text("We noticed you're feeling down")
+                    .font(.title2)
+                    .fontWeight(.bold)
+                    .multilineTextAlignment(.center)
             }
-            parent.presentationMode.wrappedValue.dismiss()
+            .padding(.top, 40)
+            
+            Text("How would you like to feel better?")
+                .font(.body)
+                .foregroundColor(.secondary)
+                .padding(.bottom, 10)
+            
+            // Buttons Stack
+            VStack(spacing: 16) {
+                Button(action: {
+                    spotifyController.fetchRecommendations(mood: detectedMood, profile: profile, userGenres: profile.favoriteGenres)
+                    isPresented = false
+                }) {
+                    HStack {
+                        Image(systemName: "cloud.rain")
+                            .font(.title3)
+                        Text("Embrace the moment\nwith calming music")
+                            .multilineTextAlignment(.center)
+                            .lineLimit(2)
+                    }
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 70)
+                    .background(
+                        RoundedRectangle(cornerRadius: 15)
+                            .fill(Color.blue.opacity(0.15))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 15)
+                                    .stroke(Color.blue.opacity(0.3), lineWidth: 1)
+                            )
+                    )
+                }
+                .foregroundColor(.primary)
+                
+                Button(action: {
+                    spotifyController.fetchRecommendations(mood: "happy", profile: profile, userGenres: profile.favoriteGenres)
+                    isPresented = false
+                }) {
+                    HStack {
+                        Image(systemName: "sun.max.fill")
+                            .font(.title3)
+                        Text("Lift my spirits\nwith upbeat tunes")
+                            .multilineTextAlignment(.center)
+                            .lineLimit(2)
+                    }
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 70)
+                    .background(
+                        RoundedRectangle(cornerRadius: 15)
+                            .fill(Color.green.opacity(0.15))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 15)
+                                    .stroke(Color.green.opacity(0.3), lineWidth: 1)
+                            )
+                    )
+                }
+                .foregroundColor(.primary)
+            }
+            .padding(.horizontal)
         }
-        
-        func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
-            parent.presentationMode.wrappedValue.dismiss()
-        }
-        
-        //I decided to add this to not have the image be captured inverted
-        private func fixOrientation(image: UIImage, cameraDevice: UIImagePickerController.CameraDevice) -> UIImage {
-            guard cameraDevice == .front else { return image }
-            // Apply horizontal flip to the image
-            UIGraphicsBeginImageContextWithOptions(image.size, false, image.scale)
-            let context = UIGraphicsGetCurrentContext()!
-            context.translateBy(x: image.size.width / 2, y: image.size.height / 2)
-            context.scaleBy(x: -1.0, y: 1.0)  // Flip horizontally
-            context.translateBy(x: -image.size.width / 2, y: -image.size.height / 2)
-            image.draw(in: CGRect(origin: .zero, size: image.size))
-            let flippedImage = UIGraphicsGetImageFromCurrentImageContext()
-            UIGraphicsEndImageContext()
-            return flippedImage ?? image
-        }
+        .padding(.horizontal, 20)
+        .padding(.bottom, 40)
+        .frame(maxWidth: 340)
+        .background(
+            RoundedRectangle(cornerRadius: 25)
+                .fill(Color(UIColor.systemBackground))
+                .shadow(color: Color.black.opacity(0.1), radius: 15, x: 0, y: 5)
+        )
     }
 }
 
@@ -401,5 +467,142 @@ struct ContentView_Previews: PreviewProvider {
             isCreatingNewProfile: .constant(false),
             navigateToMusicPreferences: .constant(false), isCreatingProfile: .constant(false)
         )
+    }
+}
+
+struct ManualMoodSelector: View {
+    @Binding var isPresented: Bool
+    let spotifyController: SpotifyController
+    let profile: Profile
+    @Binding var currentMood: String
+    @Binding var currentMoodText: String
+    let updateBackgroundColors: (String) -> Void
+    
+    private let moods: [(name: String, emoji: String, color: Color, icon: String)] = [
+        ("Happy", "😄", .yellow, "sun.max.fill"),
+        ("Sad", "😢", .blue, "cloud.rain"),
+        ("Energetic", "⚡️", .orange, "bolt.fill"),
+        ("Calm", "😌", .mint, "leaf.fill"),
+        ("Focused", "🎯", .indigo, "target"),
+        ("Romantic", "💝", .pink, "heart.fill"),
+        ("Party", "🎉", .purple, "star.fill"),
+        ("Sleepy", "😴", .gray, "moon.stars.fill")
+    ]
+    
+    @State private var selectedMood: String = ""
+    @Environment(\.colorScheme) var colorScheme
+    
+    var body: some View {
+        NavigationView {
+            ScrollView {
+                VStack(spacing: 25) {
+                    // Header Text
+                    Text("How are you feeling?")
+                        .font(.title2)
+                        .fontWeight(.bold)
+                        .padding(.top)
+                    
+                    // Mood Grid
+                    LazyVGrid(columns: [
+                        GridItem(.flexible()),
+                        GridItem(.flexible())
+                    ], spacing: 15) {
+                        ForEach(moods, id: \.name) { mood in
+                            MoodCard(
+                                mood: mood,
+                                isSelected: selectedMood == mood.name,
+                                action: {
+                                    selectedMood = mood.name
+                                    updateMood(mood: mood.name.lowercased())
+                                }
+                            )
+                        }
+                    }
+                    .padding(.horizontal)
+                }
+                .padding(.vertical)
+            }
+            .background(colorScheme == .dark ? Color.black : Color.white)
+            .navigationBarItems(
+                trailing: Button("Done") {
+                    isPresented = false
+                }
+            )
+        }
+    }
+    
+    private func updateMood(mood: String) {
+        // Update UI
+        currentMood = moods.first(where: { $0.name.lowercased() == mood.lowercased() })?.emoji ?? "😶"
+        currentMoodText = "You're feeling \(mood.capitalized)"
+        updateBackgroundColors(mood)
+        
+        // Map mood names to recommendation moods if needed
+        let recommendationMood = mapMoodToRecommendation(mood)
+        
+        // Fetch recommendations
+        spotifyController.fetchRecommendations(
+            mood: recommendationMood,
+            profile: profile,
+            userGenres: profile.favoriteGenres
+        )
+    }
+    
+    private func mapMoodToRecommendation(_ mood: String) -> String {
+        switch mood.lowercased() {
+        case "energetic": return "happy"
+        case "calm": return "neutral"
+        case "focused": return "neutral"
+        case "romantic": return "happy"
+        case "party": return "happy"
+        case "sleepy": return "sad"
+        default: return mood
+        }
+    }
+}
+
+struct MoodCard: View {
+    let mood: (name: String, emoji: String, color: Color, icon: String)
+    let isSelected: Bool
+    let action: () -> Void
+    
+    var body: some View {
+        Button(action: action) {
+            VStack(spacing: 12) {
+                ZStack {
+                    Circle()
+                        .fill(mood.color.opacity(0.15))
+                        .frame(width: 60, height: 60)
+                    
+                    VStack(spacing: 4) {
+                        Text(mood.emoji)
+                            .font(.system(size: 30))
+                        
+                        Image(systemName: mood.icon)
+                            .font(.system(size: 12))
+                            .foregroundColor(mood.color)
+                            .opacity(0.8)
+                    }
+                }
+                
+                Text(mood.name)
+                    .font(.system(size: 16, weight: .medium))
+                    .foregroundColor(.primary)
+            }
+            .frame(maxWidth: .infinity)
+            .frame(height: 120)
+            .background(
+                RoundedRectangle(cornerRadius: 20)
+                    .fill(Color(UIColor.systemBackground))
+                    .shadow(color: isSelected ? mood.color.opacity(0.3) : Color.black.opacity(0.1),
+                           radius: isSelected ? 10 : 5)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 20)
+                            .stroke(isSelected ? mood.color : Color.clear, lineWidth: 2)
+                    )
+            )
+        }
+        .scaleEffect(isSelected ? 1.05 : 1.0)
+        .animation(.spring(response: 0.3), value: isSelected)
     }
 }

@@ -32,13 +32,13 @@ struct QueueView: View {
             return [Color(red: 0.1, green: 0.3, blue: 0.4), Color(red: 0.2, green: 0.4, blue: 0.3)]
         }
     }
-
+    
     var body: some View {
         ZStack {
             // Animated gradient background
             LinearGradient(colors: backgroundColors,
-                startPoint: animateGradient ? .topLeading : .bottomTrailing,
-                endPoint: animateGradient ? .bottomTrailing : .topLeading
+                           startPoint: animateGradient ? .topLeading : .bottomTrailing,
+                           endPoint: animateGradient ? .bottomTrailing : .topLeading
             )
             .ignoresSafeArea()
             .animate(withDuration: 5, autoreverses: true, repeatForever: true) {
