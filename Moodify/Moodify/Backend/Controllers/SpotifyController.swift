@@ -352,19 +352,32 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
     }
 
     
-    private func reconnectAndExecute(_ action: @escaping () -> Void) {
-         appRemote.authorizeAndPlayURI("") // Opens Spotify to establish a connection
-         DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-             if self.appRemote.isConnected {
-                 action() // Execute the action once reconnected
-             } else {
-                 print("Failed to reconnect to Spotify.")
-             }
-         }
-        /*Timer.scheduledTimer(withTimeInterval: 4.0, repeats: false) { _ in
-            self.ensureSpotifyConnection()
-        }*/
-     }
+    func reconnectAndExecute(_ action: @escaping () -> Void, delay: TimeInterval = 2.0) {
+        // Check if already connected; if so, execute the action immediately
+        guard !appRemote.isConnected else {
+            print("Spotify is already connected.")
+            action() // Execute the action immediately since we're already connected
+            return
+        }
+        
+        // If not connected, attempt to reconnect
+        print("Spotify is not connected. Attempting to reconnect...")
+        resetFirstConnectionAttempt()
+        
+        // Attempt to establish the connection and authorize
+        appRemote.authorizeAndPlayURI("") // Opens Spotify to establish a connection
+        
+        // Delay to allow connection and then check if connected
+        DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+            if self.appRemote.isConnected {
+                // Refresh the player state to ensure everything is up-to-date
+                self.refreshPlayerState()
+                action() // Execute the provided action after refreshing player state
+            } else {
+                print("Failed to reconnect to Spotify.")
+            }
+        }
+    }
 
      private func handlePlayerAPIError() {
          // Add error handleing
@@ -402,8 +415,9 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
     func fetchRecommendations(mood: String, profile: Profile, userGenres: [String]) {
         guard appRemote.isConnected else {
             print("Spotify is not connected. Attempting to reconnect...")
-            resetFirstConnectionAttempt()
-            refreshPlayerState()
+            reconnectAndExecute({
+                self.fetchRecommendations(mood: mood, profile: profile, userGenres: userGenres)
+            }, delay: 10.0)
             return
         }
         

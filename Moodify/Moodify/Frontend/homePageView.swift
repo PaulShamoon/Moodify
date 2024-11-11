@@ -133,7 +133,7 @@ struct homePageView: View {
                 }
                 .onAppear{
                     if !spotifyController.isConnected {
-                        spotifyController.connect()
+                        spotifyController.initializeSpotifyConnection()
                     }
                 }
                 .alert(isPresented: $showingAlert) {

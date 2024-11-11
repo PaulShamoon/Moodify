@@ -81,33 +81,35 @@ class PlaylistManager: ObservableObject {
      Created By: Paul Shamoon
      */
     func playPlaylist(playlist: Playlist) {
-        // Clear currentQueue before queueing the playlist's songs
-        spotifyController.clearCurrentQueue()
-                
-        for (index, track) in playlist.songs.enumerated() {
-            // Extract the URI from each "Song" object in the playlist
-            let uri = track.songURI
+        spotifyController.reconnectAndExecute({
+            // Clear currentQueue before queueing the playlist's songs
+            self.spotifyController.clearCurrentQueue()
             
-            // Add a small delay between requests to prevent rate limiting
-            DispatchQueue.main.asyncAfter(deadline: .now() + Double(index) * 0.5) {
-                // If it's the first song, play it immediately to prevent Spotify from playing a random song
-                if index == 0 {
-                    self.appRemote?.playerAPI?.play(uri)
-                } else {
-                    // Add the song to the queue
-                    self.appRemote?.playerAPI?.enqueueTrackUri(uri, callback: { (result, error) in
-                        if let error = error {
-                            print("Failed to enqueue song URI \(uri): \(error.localizedDescription)")
-                        } else {
-                            print("Enqueued song URI: \(uri)")
-                        }
-                        // Update the currentQueue with the songs from the playlist that we enqueue
-                        self.spotifyController.currentQueue = self.queueManager.addSongToQueue(song: track)
-                    })
+            for (index, track) in playlist.songs.enumerated() {
+                let uri = track.songURI
+                
+                // Add a small delay between requests to prevent rate limiting
+                DispatchQueue.main.asyncAfter(deadline: .now() + Double(index) * 0.5) {
+                    // If it's the first song, play it immediately to prevent Spotify from playing a random song
+                    if index == 0 {
+                        self.appRemote?.playerAPI?.play(uri)
+                    } else {
+                        // Add the song to the queue
+                        self.appRemote?.playerAPI?.enqueueTrackUri(uri, callback: { (result, error) in
+                            if let error = error {
+                                print("Failed to enqueue song URI \(uri): \(error.localizedDescription)")
+                            } else {
+                                print("Enqueued song URI: \(uri)")
+                            }
+                            // Update the currentQueue with the songs from the playlist that we enqueue
+                            self.spotifyController.currentQueue = self.queueManager.addSongToQueue(song: track)
+                        })
+                    }
                 }
             }
-        }
+        })  // Using a 10-second delay for reconnect if needed
     }
+
     
     
     /*
