@@ -21,7 +21,7 @@ struct ConnectToSpotifyView: View {
             
             Button(action: {
                 print("button pressed")
-                spotifyController.connect()
+                spotifyController.initializeSpotifyConnection()
             }) {
                 HStack(spacing: 0) {
                     Text("Connect with")

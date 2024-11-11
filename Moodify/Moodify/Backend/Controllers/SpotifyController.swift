@@ -47,8 +47,8 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
     // Published properties to hold info about the current track
     @Published var currentTrackName: String = "No track playing"
     @Published var currentTrackURI: String = ""
-    @Published var currentAlbumName: String = "No album"
-    @Published var currentArtistName: String = "No artist"
+    @Published var currentAlbumName: String = ""
+    @Published var currentArtistName: String = ""
     @Published var albumCover: UIImage? = nil
     
     // Access token for API requests
@@ -190,9 +190,6 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
         }
     }
     
-    // ... [Rest of the code remains exactly the same, including all delegate methods,
-    //     player control methods, queue management, etc.]
-    
     // Delegate method for successful connection
     @objc func appRemoteDidEstablishConnection(_ appRemote: SPTAppRemote) {
         reconnectAttempted = false
@@ -201,7 +198,7 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
         DispatchQueue.main.async {
             self.isConnected = true  // Update connection status
         }
-        
+        isPaused = false
         retryCount = 0 // Reset the retry counter on a successful connection
         
         // Set up the player API and subscribe to player state
@@ -250,6 +247,8 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
             self.isConnected = false  // Update connection status
             self.currentTrackName = "No track playing"  // Reset track info
             self.currentAlbumName = "No album"
+            self.currentArtistName = ""
+            self.isPaused = true
         }
     }
     

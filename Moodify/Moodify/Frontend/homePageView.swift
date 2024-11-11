@@ -100,8 +100,8 @@ struct homePageView: View {
                             .shadow(radius: 10)
                         }
                         
-                         // Connect to Spotify/Resume Playback button
-                        if spotifyController.accessToken == nil {
+                         // Connect to Spotify
+                        if spotifyController.accessToken == nil && spotifyController.isAccessTokenExpired(){
                             Button(action: {
                                 navigateToSpotify = true
                             }) {
@@ -132,7 +132,7 @@ struct homePageView: View {
                     .padding(.top, 60)
                 }
                 .onAppear{
-                    if !spotifyController.isConnected {
+                    if !spotifyController.isConnected && spotifyController.accessToken != nil && !spotifyController.isAccessTokenExpired() {
                         spotifyController.initializeSpotifyConnection()
                     }
                 }
