@@ -133,9 +133,14 @@ struct homePageView: View {
                     }
                     .padding(.top, 60)
                 }
-                .onAppear{
-                    if !spotifyController.isConnected && spotifyController.accessToken != nil && !spotifyController.isAccessTokenExpired() {
-                        spotifyController.initializeSpotifyConnection()
+                .onAppear {
+                    // Check if the access token is available and not expired
+                    if let token = spotifyController.accessToken, !spotifyController.isAccessTokenExpired() {
+                        if !spotifyController.isConnected {
+                            spotifyController.initializeSpotifyConnection()
+                        }
+                    } else {
+                        print("Access token is expired or missing. Please reconnect to Spotify.")
                     }
                 }
                 .alert(isPresented: $showingAlert) {
