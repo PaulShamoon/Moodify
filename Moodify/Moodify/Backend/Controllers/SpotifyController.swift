@@ -15,6 +15,8 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
     // Redirect URL after authorization
     private let spotifyRedirectURL = URL(string: "spotify-ios-quick-start://spotify-login-callback")!
     
+    @Published var playbackProgress: Double = 0.0
+    
     // Published properties to hold info about the current track
     @Published var currentTrackName: String = "No track playing"
     @Published var currentTrackURI: String = ""
@@ -22,7 +24,7 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
     @Published var currentArtistName: String = ""
     @Published var albumCover: UIImage? = nil
     @Published var accessToken: String? = nil
-
+    
     // Array of "Song" objects to hold the state of the queue
     @Published var currentQueue: [Song] = []
     
@@ -213,14 +215,14 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
     
     
     /*
-    Method to clear the current queue
+     Method to clear the current queue
      
-    NOTE: The Spotify Web API nor the Spotify iOS SDK provide an API endpoint to clear the current queue.
+     NOTE: The Spotify Web API nor the Spotify iOS SDK provide an API endpoint to clear the current queue.
      Because of this, our only option is to skip through every song in the currentQueue to "clear" the queue.
      These "skip" requests happen almost instantanous and are barley noticable to the user, making it a effective loophole.
-    
+     
      Created By: Paul Shamoon
-    */
+     */
     func clearCurrentQueue() {
         // Check if currentQueue is empty
         guard !currentQueue.isEmpty else {
@@ -317,7 +319,7 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
             "min_danceability": minDanceability,
             "max_danceability": maxDanceability
         ]
-
+        
         // Iterate over optional parameters and append if non-nil
         for (key, value) in optionalParameters {
             if let value = value {
@@ -388,23 +390,23 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
     private func enqueueTracks(mood: String, profile: Profile, tracks: [[String: Any]]) {
         // Clear the currentQueue before queueing new songs
         clearCurrentQueue()
-
+        
         // This will store all song objects created after enqueuing the track
         var songs: [Song] = []
-
+        
         // Create a DispatchGroup to track asynchronous tasks
         let dispatchGroup = DispatchGroup()
-
+        
         for (index, track) in tracks.enumerated() {
             // Extract the URI from each track dictionary
             guard let uri = track["uri"] as? String else {
                 print("Failed to find URI in track at index \(index)")
                 continue
             }
-
+            
             // Notify the group that a task is starting
             dispatchGroup.enter()
-
+            
             // Add a small delay between requests to prevent rate limiting
             DispatchQueue.main.asyncAfter(deadline: .now() + Double(index) * 0.5) {
                 // If it's the first song, play it immediately
@@ -430,7 +432,7 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
                 }
             }
         }
-
+        
         // This will run after all tracks have been enqueued
         dispatchGroup.notify(queue: .main) {
             // Now all tracks have been enqueued, and songs array is populated
@@ -481,7 +483,7 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
      @param song: "Song" object from the queue to play
      
      Created By: Paul Shamoon
-    */
+     */
     func playSongFromQueue(song: Song) {
         // Get the song to play's index in the currentQueue
         if let index = currentQueue.firstIndex(where: { $0.songURI == song.songURI }) {
@@ -533,7 +535,7 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
         
         return song
     }
-
+    
     func reorderQueue(from: Int, to: Int) {
         // First update the local queue
         let song = currentQueue.remove(at: from)

@@ -246,7 +246,6 @@ struct MenuView: View {
     
     private func switchUser() {
         withAnimation {
-            profileManager.currentProfile = nil
             isCreatingNewProfile = false
             navigateToHomePage = false
             navigateToMusicPreferences = false
@@ -276,11 +275,7 @@ struct MenuView: View {
         if let currentProfile = profileManager.currentProfile {
             withAnimation {
                 profileManager.deleteProfile(profile: currentProfile)
-                profileManager.currentProfile = nil
-                isCreatingNewProfile = false
-                navigateToHomePage = false
-                navigateToMusicPreferences = false
-                showMenu = false
+                switchUser()
             }
         }
     }

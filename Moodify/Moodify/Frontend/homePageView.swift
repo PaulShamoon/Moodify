@@ -25,8 +25,8 @@ struct homePageView: View {
     
     // Add this property to manage background color
     @State private var backgroundColors: [Color] = [
-        Color(red: 0.15, green: 0.25, blue: 0.20).opacity(0.3),  // Initial faint dark green
-        Color(red: 0.15, green: 0.25, blue: 0.20).opacity(0.1)   // Lighter shade for gradient
+        Color(red: 0.075, green: 0.075, blue: 0.075),  // Very dark gray, almost black
+        Color(red: 0.1, green: 0.1, blue: 0.1)         // Slightly lighter dark gray
     ]
     
     // Add this method to determine background colors based on mood
@@ -35,33 +35,33 @@ struct homePageView: View {
             switch emotion.lowercased() {
             case "happy":
                 backgroundColors = [
-                    Color.yellow.opacity(0.3),
-                    Color.orange.opacity(0.2)
+                    Color(red: 0.1, green: 0.1, blue: 0.1),
+                    Color(red: 0.2, green: 0.15, blue: 0.05)  // Subtle warm dark
                 ]
             case "sad":
                 backgroundColors = [
-                    Color.blue.opacity(0.3),
-                    Color.purple.opacity(0.2)
+                    Color(red: 0.1, green: 0.1, blue: 0.1),
+                    Color(red: 0.05, green: 0.1, blue: 0.2)   // Subtle cool dark
                 ]
             case "angry":
                 backgroundColors = [
-                    Color.red.opacity(0.3),
-                    Color.orange.opacity(0.2)
+                    Color(red: 0.1, green: 0.1, blue: 0.1),
+                    Color(red: 0.2, green: 0.05, blue: 0.05)  // Subtle red dark
                 ]
             case "surprise":
                 backgroundColors = [
-                    Color.purple.opacity(0.3),
-                    Color.pink.opacity(0.2)
+                    Color(red: 0.1, green: 0.1, blue: 0.1),
+                    Color(red: 0.15, green: 0.05, blue: 0.2)  // Subtle purple dark
                 ]
             case "chill":
                 backgroundColors = [
-                    Color(red: 0.3, green: 0.6, blue: 0.5).opacity(0.3),
-                    Color(red: 0.2, green: 0.5, blue: 0.6).opacity(0.2)
+                    Color(red: 0.1, green: 0.1, blue: 0.1),
+                    Color(red: 0.05, green: 0.15, blue: 0.15) // Subtle teal dark
                 ]
             default:
                 backgroundColors = [
-                    Color(red: 0.15, green: 0.25, blue: 0.20).opacity(0.3),
-                    Color(red: 0.15, green: 0.25, blue: 0.20).opacity(0.1)
+                    Color(red: 0.075, green: 0.075, blue: 0.075),
+                    Color(red: 0.1, green: 0.1, blue: 0.1)
                 ]
             }
         }
@@ -87,12 +87,16 @@ struct homePageView: View {
             VStack {
                 // Header with profile and settings
                 HStack {
-                    Text("Welcome, \(profile.name)")
-                        .font(.title)
-                        .fontWeight(.bold)
-                        .foregroundColor(.white)
-                        .shadow(radius: 5)
-                        .padding(.leading, 35)
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Welcome")
+                            .font(.system(size: 28, weight: .light))
+                            .foregroundColor(.white.opacity(0.9))
+                        Text(profile.name)
+                            .font(.system(size: 34, weight: .bold))
+                            .foregroundColor(.white)
+                    }
+                    .shadow(color: .black.opacity(0.2), radius: 3, x: 0, y: 2)
+                    .padding(.leading, 35)
                     
                     Spacer()
                     
@@ -111,9 +115,36 @@ struct homePageView: View {
                 
                 // Mood Display
                 VStack{
-                    Text("Your Current Mood")
-                        .font(.system(size: 20, weight: .bold))
-                        .foregroundColor(.white.opacity(0.9))
+                    HStack {
+                        Text("Your Current Mood")
+                            .font(.system(size: 20, weight: .bold))
+                            .foregroundColor(.white.opacity(0.9))
+                        
+                        Spacer()
+                        
+                        // Updated button with better clarity
+                        Button(action: {
+                            showMoodSelector = true
+                        }) {
+                            HStack(spacing: 4) {
+                                Text("Change Mood")
+                                    .font(.system(size: 14, weight: .medium))
+                                Image(systemName: "pencil.circle.fill")
+                                    .font(.system(size: 20))
+                            }
+                            .foregroundColor(.white)
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 6)
+                            .background(
+                                Capsule()
+                                    .fill(Color.white.opacity(0.2))
+                                    .overlay(
+                                        Capsule()
+                                            .stroke(Color.white.opacity(0.3), lineWidth: 1)
+                                    )
+                            )
+                        }
+                    }
                     
                     ZStack {
                         // Frosted glass effect background
@@ -139,13 +170,27 @@ struct homePageView: View {
                 .padding(.vertical, 20)
                 .background(
                     RoundedRectangle(cornerRadius: 20)
-                        .fill(.ultraThinMaterial)
+                        .fill(Color(red: 0.2, green: 0.4, blue: 0.3))
                         .overlay(
                             RoundedRectangle(cornerRadius: 20)
-                                .stroke(.white.opacity(0.1), lineWidth: 0.5)
+                                .stroke(Color(red: 0.4, green: 0.3, blue: 0.2), lineWidth: 3.0)
                         )
                 )
                 .padding(.horizontal)
+                .padding(.bottom, 20)
+                
+                // Player View
+                PlayerView(spotifyController: spotifyController)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .background(
+                        RoundedRectangle(cornerRadius: 20)
+                            .fill(Color(red: 0.2, green: 0.4, blue: 0.3))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 20)
+                                    .stroke(Color(red: 0.4, green: 0.3, blue: 0.2), lineWidth: 3.0)
+                            )
+                    )
+                    .padding(.horizontal)
                 
                 // Action Buttons
                 HStack(spacing: 20) {
@@ -163,10 +208,10 @@ struct homePageView: View {
                         .padding(.vertical, 12)
                         .background(
                             Capsule()
-                                .fill(.ultraThinMaterial)
+                                .fill(Color(red: 0.4, green: 0.3, blue: 0.2).opacity(0.3))
                                 .overlay(
                                     Capsule()
-                                        .stroke(.white.opacity(0.2), lineWidth: 0.5)
+                                        .stroke(Color(red: 0.2, green: 0.4, blue: 0.3), lineWidth: 1.5)
                                 )
                         )
                     }
@@ -189,10 +234,10 @@ struct homePageView: View {
                         .padding(.vertical, 12)
                         .background(
                             Capsule()
-                                .fill(.ultraThinMaterial)
+                                .fill(Color(red: 0.4, green: 0.3, blue: 0.2).opacity(0.3))
                                 .overlay(
                                     Capsule()
-                                        .stroke(.white.opacity(0.2), lineWidth: 0.5)
+                                        .stroke(Color(red: 0.2, green: 0.4, blue: 0.3), lineWidth: 1.5)
                                 )
                         )
                     }
@@ -200,10 +245,6 @@ struct homePageView: View {
                 .padding(.top, 20)
                 
                 Spacer()
-                
-                // Player View
-                PlayerView(spotifyController: spotifyController)
-                    .padding(.horizontal)
             }
             .padding(.top, 60)
             
@@ -217,8 +258,8 @@ struct homePageView: View {
                 MenuView(
                     showMenu: $showMenu,
                     navigateToHomePage: $navigateToHomePage,
-                    isCreatingNewProfile: $isCreatingProfile,
                     navigateToMusicPreferences: $navigateToMusicPreferences,
+                    isCreatingNewProfile: $isCreatingProfile,
                     spotifyController: spotifyController
                 )
                 .transition(.move(edge: .trailing))
@@ -352,8 +393,8 @@ struct homePageView: View {
     }
     
     /*
-      Method to call the connect() method within the SpotifyController to reconnect to Spotify
-    */
+     Method to call the connect() method within the SpotifyController to reconnect to Spotify
+     */
     private func reConnectToSpotify() {
         spotifyController.connect()
     }
@@ -459,17 +500,6 @@ struct MoodPreferenceView: View {
     }
 }
 
-struct ContentView_Previews: PreviewProvider {
-    static var previews: some View {
-        homePageView(
-            profile: Profile(name: "Test User", dateOfBirth: Date(), favoriteGenres: ["Pop", "Rock"], hasAgreedToTerms: true),
-            navigateToHomePage: .constant(false),
-            isCreatingNewProfile: .constant(false),
-            navigateToMusicPreferences: .constant(false), isCreatingProfile: .constant(false)
-        )
-    }
-}
-
 struct ManualMoodSelector: View {
     @Binding var isPresented: Bool
     let spotifyController: SpotifyController
@@ -481,12 +511,9 @@ struct ManualMoodSelector: View {
     private let moods: [(name: String, emoji: String, color: Color, icon: String)] = [
         ("Happy", "😄", .yellow, "sun.max.fill"),
         ("Sad", "😢", .blue, "cloud.rain"),
-        ("Energetic", "⚡️", .orange, "bolt.fill"),
-        ("Chill", "😌", .mint, "leaf.fill"),
-        ("Focused", "🎯", .indigo, "target"),
-        ("Romantic", "💝", .pink, "heart.fill"),
-        ("Party", "🎉", .purple, "star.fill"),
-        ("Sleepy", "😴", .gray, "moon.stars.fill")
+        ("Angry", "😡", .red, "flame.fill"),
+        ("Anxious", "😰", .purple, "tornado"),
+        ("Chill", "😌", .mint, "leaf.fill")
     ]
     
     @State private var selectedMood: String = ""
@@ -496,27 +523,51 @@ struct ManualMoodSelector: View {
         NavigationView {
             ScrollView {
                 VStack(spacing: 25) {
-                    // Header Text
                     Text("How are you feeling?")
                         .font(.title2)
                         .fontWeight(.bold)
                         .padding(.top)
                     
-                    // Mood Grid
-                    LazyVGrid(columns: [
-                        GridItem(.flexible()),
-                        GridItem(.flexible())
-                    ], spacing: 15) {
-                        ForEach(moods, id: \.name) { mood in
-                            MoodCard(
-                                mood: mood,
-                                isSelected: selectedMood == mood.name,
-                                action: {
-                                    selectedMood = mood.name
-                                    updateMood(mood: mood.name.lowercased())
-                                }
-                            )
-                        }
+                    // First row - 2 items
+                    HStack(spacing: 15) {
+                        MoodCard(
+                            mood: moods[0], // Happy
+                            isSelected: selectedMood == moods[0].name,
+                            action: { selectedMood = moods[0].name; updateMood(mood: moods[0].name.lowercased()) }
+                        )
+                        MoodCard(
+                            mood: moods[1], // Sad
+                            isSelected: selectedMood == moods[1].name,
+                            action: { selectedMood = moods[1].name; updateMood(mood: moods[1].name.lowercased()) }
+                        )
+                    }
+                    .padding(.horizontal)
+                    
+                    // Second row - 2 items
+                    HStack(spacing: 15) {
+                        MoodCard(
+                            mood: moods[2], // Angry
+                            isSelected: selectedMood == moods[2].name,
+                            action: { selectedMood = moods[2].name; updateMood(mood: moods[2].name.lowercased()) }
+                        )
+                        MoodCard(
+                            mood: moods[3], // Anxious
+                            isSelected: selectedMood == moods[3].name,
+                            action: { selectedMood = moods[3].name; updateMood(mood: moods[3].name.lowercased()) }
+                        )
+                    }
+                    .padding(.horizontal)
+                    
+                    // Third row - centered single item
+                    HStack {
+                        Spacer()
+                        MoodCard(
+                            mood: moods[4], // Chill
+                            isSelected: selectedMood == moods[4].name,
+                            action: { selectedMood = moods[4].name; updateMood(mood: moods[4].name.lowercased()) }
+                        )
+                        .frame(maxWidth: UIScreen.main.bounds.width / 2.3) // Match the width of cards in the rows above
+                        Spacer()
                     }
                     .padding(.horizontal)
                 }
@@ -546,16 +597,14 @@ struct ManualMoodSelector: View {
             profile: profile,
             userGenres: profile.favoriteGenres
         )
+        
+        // Dismiss the sheet
+        isPresented = false
     }
     
     private func mapMoodToRecommendation(_ mood: String) -> String {
         switch mood.lowercased() {
-        case "energetic": return "happy"
-        case "chill": return "chill"
-        case "focused": return "chill"
-        case "romantic": return "happy"
-        case "party": return "happy"
-        case "sleepy": return "sad"
+        case "anxious": return "chill" // Map anxious to chill music
         default: return mood
         }
     }
@@ -595,7 +644,7 @@ struct MoodCard: View {
                 RoundedRectangle(cornerRadius: 20)
                     .fill(Color(UIColor.systemBackground))
                     .shadow(color: isSelected ? mood.color.opacity(0.3) : Color.black.opacity(0.1),
-                           radius: isSelected ? 10 : 5)
+                            radius: isSelected ? 10 : 5)
                     .overlay(
                         RoundedRectangle(cornerRadius: 20)
                             .stroke(isSelected ? mood.color : Color.clear, lineWidth: 2)
@@ -604,5 +653,16 @@ struct MoodCard: View {
         }
         .scaleEffect(isSelected ? 1.05 : 1.0)
         .animation(.spring(response: 0.3), value: isSelected)
+    }
+}
+
+struct ContentView_Previews: PreviewProvider {
+    static var previews: some View {
+        homePageView(
+            profile: Profile(name: "Naz", dateOfBirth: Date(), favoriteGenres: ["Pop", "Rock"], hasAgreedToTerms: true),
+            navigateToHomePage: .constant(false),
+            isCreatingNewProfile: .constant(false),
+            navigateToMusicPreferences: .constant(false), isCreatingProfile: .constant(false)
+        )
     }
 }

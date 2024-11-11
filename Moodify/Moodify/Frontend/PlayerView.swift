@@ -18,23 +18,24 @@ struct PlayerView: View {
     
     var body: some View {
         ZStack {
+            // Background
             RoundedRectangle(cornerRadius: 20)
-                .fill(Color(red: 0.15, green: 0.25, blue: 0.20))
+                .fill(.ultraThinMaterial)
                 .shadow(color: .black.opacity(0.2), radius: 10, x: 0, y: 5)
             
-            VStack {
-                HStack(spacing: 15) {
+            VStack(spacing: 16) {
+                HStack(spacing: 16) {
                     // Album Cover
                     if let image = spotifyController.albumCover {
                         Image(uiImage: image)
                             .resizable()
                             .aspectRatio(contentMode: .fill)
-                            .frame(width: 70, height: 70)
+                            .frame(width: 80, height: 80)
                             .cornerRadius(12)
                     } else {
                         RoundedRectangle(cornerRadius: 12)
                             .fill(Color.gray.opacity(0.3))
-                            .frame(width: 70, height: 70)
+                            .frame(width: 80, height: 80)
                             .overlay(
                                 Image(systemName: "music.note")
                                     .foregroundColor(.white.opacity(0.5))
@@ -43,68 +44,65 @@ struct PlayerView: View {
                     }
                     
                     // Track and Artist info
-                    VStack(alignment: .leading) {
+                    VStack(alignment: .leading, spacing: 4) {
                         Text(spotifyController.currentTrackName)
-                            .font(.headline)
-                            .foregroundColor(.white)  // Adjusted for better contrast
+                            .font(.title3.bold())
+                            .foregroundColor(.white)
                             .lineLimit(1)
                         
                         Text(spotifyController.currentArtistName)
                             .font(.subheadline)
-                            .foregroundColor(.white)  // Adjusted for better contrast
+                            .foregroundColor(.white.opacity(0.7))
+                            .lineLimit(1)
+                        
+                        Text(spotifyController.currentAlbumName)
+                            .font(.caption)
+                            .foregroundColor(.white.opacity(0.5))
                             .lineLimit(1)
                     }
-                    .padding(.vertical, 5)
-                    .padding(.horizontal, 10) // Ensure padding inside the background
-                    .background(
-                        RoundedRectangle(cornerRadius: 8)
-                            .fill(Color(red: 0.15, green: 0.25, blue: 0.20).opacity(0.7))  // Darker background for contrast
-                            .shadow(color: .black.opacity(0.1), radius: 2, x: 0, y: 1)
-                    )
                     
                     Spacer()
-                    
-                    // Playback Controls
+                }
+                
+                // Playback Controls
+                HStack(spacing: 32) {
                     Button(action: { spotifyController.skipToPrevious() }) {
                         Image(systemName: "backward.fill")
-                            .resizable()
-                            .frame(width: 25, height: 25)
-                            .padding()
+                            .font(.title2)
                             .foregroundColor(.white)
                     }
                     
                     Button(action: { spotifyController.togglePlayPause() }) {
-                        Image(systemName: spotifyController.isPaused ? "play.fill" : "pause.fill")
-                            .resizable()
-                            .frame(width: 25, height: 25)
-                            .padding()
+                        Image(systemName: spotifyController.isPaused ? "play.circle.fill" : "pause.circle.fill")
+                            .font(.system(size: 44))
                             .foregroundColor(.white)
                     }
                     
                     Button(action: { spotifyController.skipToNext() }) {
                         Image(systemName: "forward.fill")
-                            .resizable()
-                            .frame(width: 25, height: 25)
-                            .padding()
+                            .font(.title2)
                             .foregroundColor(.white)
                     }
                     
-                    // Queue Button
-                    Button(action: {
-                        navigateToQueue = true
-                    }) {
+                    Spacer()
+                    
+                    Button(action: { navigateToQueue = true }) {
                         Image(systemName: "music.note.list")
+                            .font(.title2)
                             .foregroundColor(.white)
                     }
-                    .navigationDestination(isPresented: $navigateToQueue) {
-                        QueueView(spotifyController: spotifyController)
-                            .transition(.blurReplace)
-                    }
                 }
+                .padding(.top, 8)
             }
-            .padding()
+            .padding(20)
         }
-        .padding()
+        .frame(height: 160)
+        .padding(.horizontal)
+        .padding(.bottom, 8)
+        .navigationDestination(isPresented: $navigateToQueue) {
+            QueueView(spotifyController: spotifyController)
+                .transition(.blurReplace)
+        }
     }
 }
 
