@@ -614,9 +614,8 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
             }
         }
     }
-}
 
-extension SpotifyController {
+
     func ensureSpotifyConnection(completion: (() -> Void)? = nil) {
         guard !appRemote.isConnected else {
             print("Spotify already connected.")
