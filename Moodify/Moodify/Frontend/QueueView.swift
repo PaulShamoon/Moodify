@@ -16,6 +16,7 @@ struct QueueView: View {
     @ObservedObject var spotifyController: SpotifyController
     @Environment(\.dismiss) var dismiss
     @State private var animateGradient = false
+    @State private var draggedItem: Song?
     
     // Dynamic gradient colors based on mood
     private var backgroundColors: [Color] {
@@ -26,7 +27,7 @@ struct QueueView: View {
             return [Color.blue.opacity(0.3), Color.purple.opacity(0.3)]
         case "angry":
             return [Color.red.opacity(0.3), Color.orange.opacity(0.3)]
-        case "neutral":
+        case "chill":
             return [Color.green.opacity(0.3), Color.blue.opacity(0.3)]
         default:
             return [Color(red: 0.1, green: 0.3, blue: 0.4), Color(red: 0.2, green: 0.4, blue: 0.3)]
@@ -46,22 +47,49 @@ struct QueueView: View {
             }
             
             VStack(spacing: 0) {
-                // Header
-                CustomHeader(dismiss: dismiss, spotifyController: spotifyController)
-                
-                ScrollView(showsIndicators: false) {
-                    VStack(spacing: 24) {
-                        // Current Mood Section
-                        MoodSection(currentMood: spotifyController.currentMood)
-                        
-                        // Now Playing Card
-                        NowPlayingCard(spotifyController: spotifyController)
-                        
-                        // Queue Section
-                        QueueSection(spotifyController: spotifyController)
-                    }
-                    .padding(.vertical)
+                // Fixed header section
+                VStack(spacing: 16) {
+                    CustomHeader(dismiss: dismiss, spotifyController: spotifyController)
+                    MoodSection(currentMood: spotifyController.currentMood)
+                    NowPlayingCard(spotifyController: spotifyController)
                 }
+                .padding(.bottom)
+                
+                // Scrollable queue section
+                VStack(alignment: .leading) {
+                    Text("COMING UP NEXT")
+                        .font(.caption.bold())
+                        .foregroundColor(.white.opacity(0.7))
+                        .padding(.horizontal)
+                        .padding(.bottom, 8)
+                    
+                    if spotifyController.currentQueue.isEmpty {
+                        EmptyQueueView()
+                    } else {
+                        ScrollView {
+                            LazyVStack(spacing: 8) {
+                                ForEach(spotifyController.currentQueue) { song in
+                                    QueueItemView(song: song, spotifyController: spotifyController)
+                                        .onDrag {
+                                            self.draggedItem = song
+                                            return NSItemProvider(object: song.songURI as NSString)
+                                        }
+                                        .onDrop(of: [.text], delegate: DropViewDelegate(item: song, items: spotifyController.currentQueue, draggedItem: $draggedItem) { from, to in
+                                            withAnimation {
+                                                spotifyController.reorderQueue(from: from, to: to)
+                                            }
+                                        })
+                                }
+                            }
+                            .padding(.bottom, 16)
+                        }
+                    }
+                }
+                .background(
+                    RoundedRectangle(cornerRadius: 30)
+                        .fill(.ultraThinMaterial)
+                        .ignoresSafeArea()
+                )
             }
         }
         .navigationBarHidden(true)
@@ -119,8 +147,8 @@ struct MoodSection: View {
             return "cloud.rain"
         case "angry":
             return "bolt.fill"
-        case "neutral":
-            return "face.smiling"
+        case "chill":
+            return "leaf.fill"
         default:
             return "music.note"
         }
@@ -168,7 +196,6 @@ struct CustomHeader: View {
 // Now Playing Card
 struct NowPlayingCard: View {
     let spotifyController: SpotifyController
-    @State private var isPlaying: Bool = false
     
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -203,12 +230,11 @@ struct NowPlayingCard: View {
                 }
                 Spacer()
                 
-                // Play/Pause button
+                // Updated Play/Pause button
                 Button(action: {
                     spotifyController.togglePlayPause()
-                    isPlaying.toggle()
                 }) {
-                    Image(systemName: !spotifyController.isPaused ? "pause.circle.fill" : "play.circle.fill")
+                    Image(systemName: spotifyController.isPaused ? "play.circle.fill" : "pause.circle.fill")
                         .font(.system(size: 32))
                         .foregroundColor(.white)
                 }
@@ -221,9 +247,6 @@ struct NowPlayingCard: View {
                 .shadow(color: .black.opacity(0.2), radius: 10, x: 0, y: 5)
         )
         .padding(.horizontal)
-        .onAppear {
-            isPlaying = !spotifyController.isPaused
-        }
     }
 }
 
@@ -295,42 +318,35 @@ struct QueueItemView: View {
     var body: some View {
         Button(action: { spotifyController.playSongFromQueue(song: song) }) {
             HStack(spacing: 16) {
-                // Drag handle
                 Image(systemName: "line.3.horizontal")
                     .foregroundColor(.white.opacity(0.6))
                     .font(.subheadline)
                 
                 VStack(alignment: .leading, spacing: 4) {
                     Text(song.trackName)
-                        .font(.headline)
+                        .font(.system(size: 16, weight: .semibold))
                         .foregroundColor(.white)
                     Text(song.artistName)
-                        .font(.subheadline)
+                        .font(.system(size: 14))
                         .foregroundColor(.white.opacity(0.7))
                 }
                 
                 Spacer()
                 
                 Image(systemName: "play.fill")
-                    .foregroundColor(.white.opacity(0.8))
+                    .foregroundColor(.white)
                     .font(.caption)
-                    .padding(8)
+                    .frame(width: 32, height: 32)
                     .background(Circle().fill(.white.opacity(0.2)))
-                    .opacity(isHovered ? 1 : 0)
+                    .opacity(isHovered ? 1 : 0.6)
             }
             .padding(.vertical, 12)
             .padding(.horizontal, 16)
             .background(
-                RoundedRectangle(cornerRadius: 16)
-                    .fill(.ultraThinMaterial)
-                    .opacity(isHovered ? 0.8 : 0.5)
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(.white.opacity(isHovered ? 0.15 : 0.1))
             )
             .padding(.horizontal)
-            .onHover { hovering in
-                withAnimation(.easeInOut(duration: 0.2)) {
-                    isHovered = hovering
-                }
-            }
         }
     }
 }

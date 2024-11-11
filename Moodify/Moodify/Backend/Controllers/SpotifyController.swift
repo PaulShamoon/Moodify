@@ -32,7 +32,7 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
     // Variable to store the last known player state
     var isPaused: Bool = false
     
-    @Published var currentMood: String = "Neutral" // Default mood
+    @Published var currentMood: String = "Chill" // Default mood
     
     private lazy var configuration = SPTConfiguration(
         clientID: spotifyClientID,
@@ -172,6 +172,7 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
             self.currentArtistName = playerState.track.artist.name
             self.currentTrackURI = playerState.track.uri
             self.currentAlbumName = playerState.track.album.name
+            self.isPaused = playerState.isPaused
             self.fetchAlbumCover()
         }
     }
@@ -277,13 +278,13 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
             maxEnergy = 1.0
             minLoudness = -5.0 // Louder tracks for intensity
             
-        case "neutral":
+        case "chill":
             minValence = 0.4
             maxValence = 0.6
             minEnergy = 0.4
             maxEnergy = 0.6
             minAcousticness = 0.3
-            maxAcousticness = 0.6 // Balanced range for neutrality
+            maxAcousticness = 0.6 // Balanced range for chill mood
             
         default:
             break

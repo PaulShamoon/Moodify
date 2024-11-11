@@ -53,10 +53,10 @@ struct homePageView: View {
                     Color.purple.opacity(0.3),
                     Color.pink.opacity(0.2)
                 ]
-            case "neutral":
+            case "chill":
                 backgroundColors = [
-                    Color(red: 0.5, green: 0.5, blue: 0.5).opacity(0.3),
-                    Color(red: 0.6, green: 0.6, blue: 0.6).opacity(0.2)
+                    Color(red: 0.3, green: 0.6, blue: 0.5).opacity(0.3),
+                    Color(red: 0.2, green: 0.5, blue: 0.6).opacity(0.2)
                 ]
             default:
                 backgroundColors = [
@@ -73,7 +73,7 @@ struct homePageView: View {
     
     // Add these state variables to homePageView
     @State private var showMoodSelector = false
-    @State private var selectedManualMood = "neutral"
+    @State private var selectedManualMood = "chill"
     
     var body: some View {
         ZStack {
@@ -99,7 +99,7 @@ struct homePageView: View {
                     Button(action: {
                         withAnimation { showMenu.toggle() }
                     }) {
-                        Image(systemName: "gearshape.fill")
+                        Image(systemName: "line.3.horizontal")
                             .font(.title)
                             .foregroundColor(.white)
                             .padding()
@@ -365,7 +365,7 @@ struct homePageView: View {
         case "sad": return "😢"
         case "angry": return "😡"
         case "surprise": return "😲"
-        case "neutral": return "😐"
+        case "chill": return "😌"
         default: return "😶"
         }
     }
@@ -482,7 +482,7 @@ struct ManualMoodSelector: View {
         ("Happy", "😄", .yellow, "sun.max.fill"),
         ("Sad", "😢", .blue, "cloud.rain"),
         ("Energetic", "⚡️", .orange, "bolt.fill"),
-        ("Calm", "😌", .mint, "leaf.fill"),
+        ("Chill", "😌", .mint, "leaf.fill"),
         ("Focused", "🎯", .indigo, "target"),
         ("Romantic", "💝", .pink, "heart.fill"),
         ("Party", "🎉", .purple, "star.fill"),
@@ -551,8 +551,8 @@ struct ManualMoodSelector: View {
     private func mapMoodToRecommendation(_ mood: String) -> String {
         switch mood.lowercased() {
         case "energetic": return "happy"
-        case "calm": return "neutral"
-        case "focused": return "neutral"
+        case "chill": return "chill"
+        case "focused": return "chill"
         case "romantic": return "happy"
         case "party": return "happy"
         case "sleepy": return "sad"
