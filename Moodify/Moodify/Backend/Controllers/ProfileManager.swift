@@ -75,6 +75,18 @@ class ProfileManager: ObservableObject {
         }
     }
     
+    func deletePin(profile: Profile) {
+        guard let index = profiles.firstIndex(where: { $0.id == profile.id }) else {
+            print("Profile not found. No deletion performed.")
+            return
+        }
+        
+        profiles[index].userPin = ""
+        saveProfiles()
+        loadProfiles() // Refresh profiles after deletion
+        print("Profile pin deleted successfully.")
+    }
+    
     func verifyPin(for profile: Profile, enteredPin: String) -> Bool {
         return profile.userPin == enteredPin
     }
