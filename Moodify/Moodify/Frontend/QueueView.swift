@@ -14,113 +14,358 @@ import SwiftUI
  */
 struct QueueView: View {
     @ObservedObject var spotifyController: SpotifyController
-
-    // Environment property to handle view dismissal
     @Environment(\.dismiss) var dismiss
+    @State private var animateGradient = false
+    
+    // Dynamic gradient colors based on mood
+    private var backgroundColors: [Color] {
+        switch spotifyController.currentMood.lowercased() {
+        case "happy", "surprise":
+            return [Color.yellow.opacity(0.3), Color.orange.opacity(0.3)]
+        case "sad", "disgust", "fear":
+            return [Color.blue.opacity(0.3), Color.purple.opacity(0.3)]
+        case "angry":
+            return [Color.red.opacity(0.3), Color.orange.opacity(0.3)]
+        case "neutral":
+            return [Color.green.opacity(0.3), Color.blue.opacity(0.3)]
+        default:
+            return [Color(red: 0.1, green: 0.3, blue: 0.4), Color(red: 0.2, green: 0.4, blue: 0.3)]
+        }
+    }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 20) {
-            HStack {
-                Button(action: {
-                    // Dismiss the view to return back to the home page
-                    dismiss()
-                }) {
-                    Image(systemName: "chevron.down")
-                        .font(.title2)
-                        .foregroundColor(.white)
-                        .padding(.leading)
-                }
-                
-                // Pushes the text and remaining space to the center
-                Spacer()
-                
-                Text("Queue")
-                    .font(.title3)
-                    .fontWeight(.bold)
-                    .foregroundColor(.white)
-                    .padding(.horizontal)
-                
-                Spacer()
+        ZStack {
+            // Animated gradient background
+            LinearGradient(colors: backgroundColors,
+                startPoint: animateGradient ? .topLeading : .bottomTrailing,
+                endPoint: animateGradient ? .bottomTrailing : .topLeading
+            )
+            .ignoresSafeArea()
+            .animate(withDuration: 5, autoreverses: true, repeatForever: true) {
+                animateGradient.toggle()
             }
-            Divider()
-                .background(Color.gray)
+            
+            VStack(spacing: 0) {
+                // Header
+                CustomHeader(dismiss: dismiss, spotifyController: spotifyController)
+                
+                ScrollView(showsIndicators: false) {
+                    VStack(spacing: 24) {
+                        // Current Mood Section
+                        MoodSection(currentMood: spotifyController.currentMood)
+                        
+                        // Now Playing Card
+                        NowPlayingCard(spotifyController: spotifyController)
+                        
+                        // Queue Section
+                        QueueSection(spotifyController: spotifyController)
+                    }
+                    .padding(.vertical)
+                }
+            }
+        }
+        .navigationBarHidden(true)
+    }
+}
 
-            Text("Now Playing:")
-                .font(.title2)
-                .fontWeight(.bold)
+// Current Mood Section
+struct MoodSection: View {
+    let currentMood: String
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("CURRENT MOOD")
+                .font(.caption.bold())
+                .foregroundColor(.white.opacity(0.7))
+            
+            HStack {
+                Image(systemName: getMoodIcon())
+                    .font(.title)
+                    .foregroundColor(.white)
+                
+                Text(currentMood)
+                    .font(.title2.bold())
+                    .foregroundColor(.white)
+                
+                Spacer()
+                
+                // Mood indicator pill
+                Text("Playing \(currentMood.lowercased()) music")
+                    .font(.caption)
+                    .foregroundColor(.white)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 6)
+                    .background(
+                        Capsule()
+                            .fill(.ultraThinMaterial)
+                    )
+            }
+        }
+        .padding(20)
+        .background(
+            RoundedRectangle(cornerRadius: 20)
+                .fill(.ultraThinMaterial)
+                .shadow(color: .black.opacity(0.2), radius: 10, x: 0, y: 5)
+        )
+        .padding(.horizontal)
+    }
+    
+    // Helper function to get mood icon
+    private func getMoodIcon() -> String {
+        switch currentMood.lowercased() {
+        case "happy", "surprise":
+            return "face.smiling"
+        case "sad", "disgust", "fear":
+            return "cloud.rain"
+        case "angry":
+            return "bolt.fill"
+        case "neutral":
+            return "face.smiling"
+        default:
+            return "music.note"
+        }
+    }
+}
+
+// Custom Header
+struct CustomHeader: View {
+    let dismiss: DismissAction
+    let spotifyController: SpotifyController
+    
+    var body: some View {
+        HStack {
+            Button(action: { dismiss() }) {
+                Image(systemName: "chevron.down")
+                    .font(.title2)
+                    .foregroundColor(.white)
+                    .padding(12)
+                    .background(.ultraThinMaterial)
+                    .clipShape(Circle())
+            }
+            
+            Spacer()
+            
+            Text("Mood Queue")
+                .font(.title3.bold())
                 .foregroundColor(.white)
             
-            HStack {                
-                VStack(alignment: .leading) {
-                    Text(spotifyController.currentTrackName)
-                        .font(.headline)
-                        .foregroundColor(.white)
-                        .padding(.leading, 10)
-                    Text(spotifyController.currentAlbumName)
-                        .font(.subheadline)
-                        .foregroundColor(.white)
-                        .padding(.leading, 10)
-
-                }
-                .padding(.leading, 10)
-            }
-            
-            Divider()
-                .background(Color.gray)
-            
-            HStack {
-                Text("Next in Queue:")
-                    .font(.title2)
-                    .fontWeight(.bold)
-                    .foregroundColor(.white)
-                
-                // Spacer to push the "Clear Queue" button to the right
-                Spacer()
-                
-                Button(action: {
-                    spotifyController.clearCurrentQueue()
-                }) {
-                    Text("Clear queue")
-                        .font(.title3)
-                        .fontWeight(.semibold)
-                        .foregroundColor(.gray)
-                }
-            }
-
-            // Check if currentQueue is empty
-            if spotifyController.currentQueue.isEmpty {
-                Text("No songs queued")
-                    .font(.headline)
-                    .foregroundColor(.gray)
-                    .padding()
-            } else {
-                List(spotifyController.currentQueue) { song in
-                    VStack(alignment: .leading, spacing: 2) {
-                        Button(action: {
-                            spotifyController.playSongFromQueue(song: song)
-                        }) {
-                            Text(song.trackName)
-                                .font(.headline)
-                                .foregroundColor(.white)
-                                .frame(maxWidth: .infinity, alignment: .leading)
-
-                            Text(song.artistName)
-                                .font(.subheadline)
-                                .foregroundColor(.gray)
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                        }
-                        .padding(.vertical, 5)
-                    }
-                }
-                .listStyle(PlainListStyle())
-            }
             Spacer()
+            
+            Button(action: { spotifyController.clearCurrentQueue() }) {
+                Image(systemName: "trash")
+                    .font(.title2)
+                    .foregroundColor(.white)
+                    .padding(12)
+                    .background(.ultraThinMaterial)
+                    .clipShape(Circle())
+            }
         }
         .padding()
-        .background(Color.black.edgesIgnoringSafeArea(.all))
+        .background(.ultraThinMaterial)
+    }
+}
+
+// Now Playing Card
+struct NowPlayingCard: View {
+    let spotifyController: SpotifyController
+    @State private var isPlaying: Bool = false
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("NOW PLAYING")
+                .font(.caption.bold())
+                .foregroundColor(.white.opacity(0.7))
+            
+            HStack(spacing: 16) {
+                // Album art
+                if let albumCover = spotifyController.albumCover {
+                    Image(uiImage: albumCover)
+                        .resizable()
+                        .frame(width: 60, height: 60)
+                        .cornerRadius(12)
+                } else {
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(.ultraThinMaterial)
+                        .frame(width: 60, height: 60)
+                        .overlay(
+                            Image(systemName: "music.note")
+                                .foregroundColor(.white)
+                        )
+                }
+                
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(spotifyController.currentTrackName)
+                        .font(.title3.bold())
+                        .foregroundColor(.white)
+                    Text(spotifyController.currentAlbumName)
+                        .font(.subheadline)
+                        .foregroundColor(.white.opacity(0.7))
+                }
+                Spacer()
+                
+                // Play/Pause button
+                Button(action: {
+                    spotifyController.togglePlayPause()
+                    isPlaying.toggle()
+                }) {
+                    Image(systemName: !spotifyController.isPaused ? "pause.circle.fill" : "play.circle.fill")
+                        .font(.system(size: 32))
+                        .foregroundColor(.white)
+                }
+            }
+        }
+        .padding(20)
+        .background(
+            RoundedRectangle(cornerRadius: 20)
+                .fill(.ultraThinMaterial)
+                .shadow(color: .black.opacity(0.2), radius: 10, x: 0, y: 5)
+        )
+        .padding(.horizontal)
+        .onAppear {
+            isPlaying = !spotifyController.isPaused
+        }
+    }
+}
+
+// Queue Section
+struct QueueSection: View {
+    let spotifyController: SpotifyController
+    @State private var draggedItem: Song?
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("COMING UP NEXT")
+                .font(.caption.bold())
+                .foregroundColor(.white.opacity(0.7))
+                .padding(.horizontal)
+            
+            if spotifyController.currentQueue.isEmpty {
+                EmptyQueueView()
+            } else {
+                LazyVStack(spacing: 8) {
+                    ForEach(spotifyController.currentQueue) { song in
+                        QueueItemView(song: song, spotifyController: spotifyController)
+                            .onDrag {
+                                self.draggedItem = song
+                                return NSItemProvider(object: song.songURI as NSString)
+                            }
+                            .onDrop(of: [.text], delegate: DropViewDelegate(item: song, items: spotifyController.currentQueue, draggedItem: $draggedItem) { from, to in
+                                withAnimation {
+                                    spotifyController.reorderQueue(from: from, to: to)
+                                }
+                            })
+                    }
+                }
+            }
+        }
+        .padding(.vertical)
+    }
+}
+
+// Empty Queue View
+struct EmptyQueueView: View {
+    var body: some View {
+        VStack(spacing: 12) {
+            Image(systemName: "music.note.list")
+                .font(.system(size: 40))
+                .foregroundColor(.white.opacity(0.6))
+            Text("Your queue is empty")
+                .font(.headline)
+                .foregroundColor(.white.opacity(0.8))
+            Text("Add some songs to get the party started!")
+                .font(.subheadline)
+                .foregroundColor(.white.opacity(0.6))
+        }
+        .frame(maxWidth: .infinity)
+        .padding(30)
+        .background(
+            RoundedRectangle(cornerRadius: 20)
+                .fill(.ultraThinMaterial)
+        )
+        .padding(.horizontal)
+    }
+}
+
+// Queue Item View
+struct QueueItemView: View {
+    let song: Song
+    let spotifyController: SpotifyController
+    @State private var isHovered = false
+    
+    var body: some View {
+        Button(action: { spotifyController.playSongFromQueue(song: song) }) {
+            HStack(spacing: 16) {
+                // Drag handle
+                Image(systemName: "line.3.horizontal")
+                    .foregroundColor(.white.opacity(0.6))
+                    .font(.subheadline)
+                
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(song.trackName)
+                        .font(.headline)
+                        .foregroundColor(.white)
+                    Text(song.artistName)
+                        .font(.subheadline)
+                        .foregroundColor(.white.opacity(0.7))
+                }
+                
+                Spacer()
+                
+                Image(systemName: "play.fill")
+                    .foregroundColor(.white.opacity(0.8))
+                    .font(.caption)
+                    .padding(8)
+                    .background(Circle().fill(.white.opacity(0.2)))
+                    .opacity(isHovered ? 1 : 0)
+            }
+            .padding(.vertical, 12)
+            .padding(.horizontal, 16)
+            .background(
+                RoundedRectangle(cornerRadius: 16)
+                    .fill(.ultraThinMaterial)
+                    .opacity(isHovered ? 0.8 : 0.5)
+            )
+            .padding(.horizontal)
+            .onHover { hovering in
+                withAnimation(.easeInOut(duration: 0.2)) {
+                    isHovered = hovering
+                }
+            }
+        }
+    }
+}
+
+// Drop Delegate
+struct DropViewDelegate: DropDelegate {
+    let item: Song
+    let items: [Song]
+    @Binding var draggedItem: Song?
+    let reorderAction: (Int, Int) -> Void
+    
+    func performDrop(info: DropInfo) -> Bool {
+        return true
+    }
+    
+    func dropEntered(info: DropInfo) {
+        guard let draggedItem = self.draggedItem else { return }
         
-        // Hides the default back button
-        .navigationBarBackButtonHidden(true)
+        if draggedItem != item {
+            let from = items.firstIndex(of: draggedItem)!
+            let to = items.firstIndex(of: item)!
+            reorderAction(from, to)
+        }
+    }
+}
+
+// Animation modifier
+extension View {
+    func animate(withDuration duration: Double, autoreverses: Bool = false, repeatForever: Bool = false, completion: (() -> Void)? = nil) -> some View {
+        return self.onAppear {
+            withAnimation(Animation.easeInOut(duration: duration)
+                .repeatForever(autoreverses: autoreverses)) {
+                    completion?()
+                }
+        }
     }
 }
 

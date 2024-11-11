@@ -32,6 +32,8 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
     // Variable to store the last known player state
     var isPaused: Bool = false
     
+    @Published var currentMood: String = "Neutral" // Default mood
+    
     private lazy var configuration = SPTConfiguration(
         clientID: spotifyClientID,
         redirectURL: spotifyRedirectURL
@@ -332,6 +334,7 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
      Created by: Mohammad Sulaiman
      */
     func fetchRecommendations(mood: String, profile: Profile, userGenres: [String]) {
+        self.currentMood = mood
         // Get feature parameters based on mood
         let (minValence, maxValence, minEnergy, maxEnergy, minLoudness, maxLoudness, minAcousticness, maxAcousticness, minDanceability, maxDanceability) = getMoodParameters(for: mood)
         
@@ -528,5 +531,26 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
         currentQueue = queueManager.addSongToQueue(song: song)
         
         return song
+    }
+
+    func reorderQueue(from: Int, to: Int) {
+        // First update the local queue
+        let song = currentQueue.remove(at: from)
+        currentQueue.insert(song, at: to)
+        
+        // Then update Spotify's queue
+        // Note: Since Spotify's SDK doesn't provide direct queue reordering,
+        // we need to recreate the queue in the new order
+        let songsToRequeue = Array(currentQueue[to...])
+        clearCurrentQueue()
+        
+        // Requeue the songs in the new order
+        for song in songsToRequeue {
+            appRemote.playerAPI?.enqueueTrackUri(song.songURI, callback: { (result, error) in
+                if let error = error {
+                    print("Failed to requeue song: \(error.localizedDescription)")
+                }
+            })
+        }
     }
 }

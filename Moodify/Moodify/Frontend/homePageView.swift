@@ -20,127 +20,188 @@ struct homePageView: View {
     @Binding var isCreatingProfile: Bool // This will be passed from outside
     @State private var showMenu = false
     
-    /// NOTE - this URL is temporary and needs to be updated each time from the backend side to detect mood properly
-    let backendURL = "/analyze"
+    // NOTE - this URL is temporary and needs to be updated each time from the backend side to detect mood properly
+    let backendURL = "https://25f7-2601-406-4d00-7af0-b905-2ee2-ba90-3017.ngrok-free.app/analyze"
+    
+    // Add this property to manage background color
+    @State private var backgroundColors: [Color] = [
+        Color(red: 0.15, green: 0.25, blue: 0.20).opacity(0.3),  // Initial faint dark green
+        Color(red: 0.15, green: 0.25, blue: 0.20).opacity(0.1)   // Lighter shade for gradient
+    ]
+    
+    // Add this method to determine background colors based on mood
+    private func updateBackgroundColors(for emotion: String) {
+        withAnimation(.easeInOut(duration: 1.0)) {
+            switch emotion.lowercased() {
+            case "happy":
+                backgroundColors = [
+                    Color.yellow.opacity(0.3),
+                    Color.orange.opacity(0.2)
+                ]
+            case "sad":
+                backgroundColors = [
+                    Color.blue.opacity(0.3),
+                    Color.purple.opacity(0.2)
+                ]
+            case "angry":
+                backgroundColors = [
+                    Color.red.opacity(0.3),
+                    Color.orange.opacity(0.2)
+                ]
+            case "surprise":
+                backgroundColors = [
+                    Color.purple.opacity(0.3),
+                    Color.pink.opacity(0.2)
+                ]
+            case "neutral":
+                backgroundColors = [
+                    Color(red: 0.5, green: 0.5, blue: 0.5).opacity(0.3),
+                    Color(red: 0.6, green: 0.6, blue: 0.6).opacity(0.2)
+                ]
+            default:
+                backgroundColors = [
+                    Color(red: 0.15, green: 0.25, blue: 0.20).opacity(0.3),
+                    Color(red: 0.15, green: 0.25, blue: 0.20).opacity(0.1)
+                ]
+            }
+        }
+    }
     
     var body: some View {
         ZStack {
-            NavigationView {
-                ScrollView {
-                    VStack(spacing: 30) {
-                        // Header with menu button
-                        HStack {
-                            Spacer()
-                            Button(action: {
-                                withAnimation { showMenu.toggle() }
-                            }) {
-                                Image(systemName: "line.horizontal.3")
-                                    .font(.title)
-                                    .foregroundColor(.white)
-                            }
+            LinearGradient(
+                gradient: Gradient(colors: backgroundColors),
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+            .edgesIgnoringSafeArea(.all)
+            
+            VStack {
+                // Header with profile and settings
+                HStack {
+                    Text("Welcome, \(profile.name)")
+                        .font(.title)
+                        .fontWeight(.bold)
+                        .foregroundColor(.white)
+                        .shadow(radius: 5)
+                        .padding(.leading, 35)
+                    
+                    Spacer()
+                    
+                    Button(action: {
+                        withAnimation { showMenu.toggle() }
+                    }) {
+                        Image(systemName: "gearshape.fill")
+                            .font(.title)
+                            .foregroundColor(.white)
                             .padding()
-                        }
-                        
-                        // Welcome and mood display
-                        VStack(spacing: 30) {
-                            Text("Welcome, \(profile.name)")
-                                .font(.title)
-                                .foregroundColor(.white)
-                            
-                            Text("Your Current Mood")
-                                .font(.headline)
-                                .foregroundColor(.white)
-                            
-                            Text(currentMood)
-                                .font(.system(size: 60))
-                                .foregroundColor(.white)
-                                .padding()
-                                .background(Circle().fill(Color.gray.opacity(0.4)))
-                                .shadow(radius: 10)
-                            
-                            Text(currentMoodText)
-                                .font(.body)
-                                .foregroundColor(.white)
-                            
-                            // Probabilities display
-                            if !probabilities.isEmpty {
-                                VStack(alignment: .leading, spacing: 10) {
-                                    Text("Probabilities")
-                                        .font(.headline)
-                                        .foregroundColor(.white)
-                                    
-                                    ForEach(probabilities, id: \.emotion) { prob in
-                                        HStack {
-                                            Text("\(prob.emotion.capitalized):")
-                                                .foregroundColor(.white)
-                                            Spacer()
-                                            Text("\(String(format: "%.2f", prob.probability * 100))%")
-                                                .foregroundColor(.green)
-                                        }
-                                        .padding(.vertical, 5)
-                                        .background(RoundedRectangle(cornerRadius: 10).fill(Color.black.opacity(0.3)))
-                                    }
-                                }
-                                .padding()
-                                .background(RoundedRectangle(cornerRadius: 12).fill(Color.white.opacity(0.1)))
-                                .padding(.horizontal, 20)
-                            }
-                        }
-                        
-                        // Detect Mood button
-                        Button(action: {
-                            checkCameraPermission()
-                        }) {
-                            HStack {
-                                Image(systemName: "camera")
-                                Text(isDetectingMood ? "Detecting..." : "Detect Mood")
-                            }
-                            .padding()
-                            .background(Capsule().fill(Color.green))
+                            .background(Circle().fill(Color.black.opacity(0.3)))
                             .shadow(radius: 10)
-                        }
-                        
-                         // Connect to Spotify/Resume Playback button
-                         Button(action: {
-                             // If no access token is stored then the user never intially connected to Spotify and authorized Moodify
-                             if spotifyController.accessToken == nil {
-                                 navigateToSpotify = true
-                             } else {
-                                 // If access token is stored then we just want to reconnect to spotify
-                                 spotifyController.connect()
-                             }
-                         }) {
-                             HStack {
-                                 Image(systemName: "music.note")
-                                     .font(.title2)
-                                     .foregroundColor(.black)
-                                 Text(spotifyController.accessToken == nil ? "Connect to Spotify" : "Resume Playback")
-                                     .font(.system(size: 20, weight: .bold, design: .rounded))
-                                     .foregroundColor(.black)
-                             }
-                             .padding()
-                             .background(Capsule().fill(Color.green))
-                             .shadow(radius: 10)
-                         }
-                        
-                        // View to display the player
-                        PlayerView(spotifyController: spotifyController)
-                        
-                        // Padding on the outside for better spacing
-                        .padding(.horizontal)
-                        
-                        Spacer()
-                        
-                        .navigationDestination(isPresented: $navigateToSpotify) {
-                            ConnectToSpotifyView(spotifyController: spotifyController)
-                        }
-
                     }
-                    .padding(.top, 60)
                 }
-                .alert(isPresented: $showingAlert) {
-                    Alert(title: Text("Error"), message: Text(alertMessage), dismissButton: .default(Text("OK")))
+                .padding(.horizontal)
+                
+                // Mood Display
+                VStack{
+                    Text("Your Current Mood")
+                        .font(.system(size: 20, weight: .bold))
+                        .foregroundColor(.white.opacity(0.9))
+                    
+                    ZStack {
+                        // Frosted glass effect background
+                        RoundedRectangle(cornerRadius: 30)
+                            .fill(.ultraThinMaterial)
+                            .frame(width: 150, height: 150)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 30)
+                                    .stroke(.white.opacity(0.2), lineWidth: 1)
+                            )
+                        
+                        Text(currentMood)
+                            .font(.system(size: 70))
+                    }
+                    .padding(.vertical, 8)
+                    
+                    Text(currentMoodText)
+                        .font(.system(size: 16, weight: .regular))
+                        .foregroundColor(.white.opacity(0.8))
+                        .multilineTextAlignment(.center)
                 }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 20)
+                .background(
+                    RoundedRectangle(cornerRadius: 20)
+                        .fill(.ultraThinMaterial)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 20)
+                                .stroke(.white.opacity(0.1), lineWidth: 0.5)
+                        )
+                )
+                .padding(.horizontal)
+                
+                // Action Buttons
+                HStack(spacing: 20) {
+                    Button(action: {
+                        checkCameraPermission()
+                    }) {
+                        HStack {
+                            Image(systemName: "camera")
+                                .font(.system(size: 16))
+                            Text(isDetectingMood ? "Detecting..." : "Detect Mood")
+                                .font(.system(size: 16, weight: .medium))
+                        }
+                        .foregroundColor(.white)
+                        .padding(.horizontal, 20)
+                        .padding(.vertical, 12)
+                        .background(
+                            Capsule()
+                                .fill(.ultraThinMaterial)
+                                .overlay(
+                                    Capsule()
+                                        .stroke(.white.opacity(0.2), lineWidth: 0.5)
+                                )
+                        )
+                    }
+                    
+                    Button(action: {
+                        if spotifyController.accessToken == nil {
+                            navigateToSpotify = true
+                        } else {
+                            reConnectToSpotify()
+                        }
+                    }) {
+                        HStack {
+                            Image(systemName: "music.note")
+                                .font(.system(size: 16))
+                            Text(spotifyController.accessToken == nil ? "Connect to Spotify" : "Resume Playback")
+                                .font(.system(size: 16, weight: .medium))
+                        }
+                        .foregroundColor(.white)
+                        .padding(.horizontal, 20)
+                        .padding(.vertical, 12)
+                        .background(
+                            Capsule()
+                                .fill(.ultraThinMaterial)
+                                .overlay(
+                                    Capsule()
+                                        .stroke(.white.opacity(0.2), lineWidth: 0.5)
+                                )
+                        )
+                    }
+                }
+                .padding(.top, 20)
+                
+                Spacer()
+                
+                // Player View
+                PlayerView(spotifyController: spotifyController)
+                    .padding(.horizontal)
+            }
+            .padding(.top, 60)
+            
+            // Add navigation handling
+            .navigationDestination(isPresented: $navigateToSpotify) {
+                ConnectToSpotifyView(spotifyController: spotifyController)
             }
             
             // Slide-in menu
@@ -152,9 +213,12 @@ struct homePageView: View {
                     navigateToMusicPreferences: $navigateToMusicPreferences,
                     spotifyController: spotifyController
                 )
-                    .transition(.move(edge: .trailing)) // Slide in from the right
-                    .zIndex(1) // Ensure the menu is above the main content
+                .transition(.move(edge: .trailing))
+                .zIndex(1)
             }
+        }
+        .alert(isPresented: $showingAlert) {
+            Alert(title: Text("Error"), message: Text(alertMessage), dismissButton: .default(Text("OK")))
         }
         .sheet(isPresented: $showingCamera) {
             CameraView(image: $capturedImage)
@@ -241,8 +305,8 @@ struct homePageView: View {
                     probabilities = sortedProbabilities.map { ($0.key, $0.value) }
                     currentMood = moodEmoji(for: emotion)
                     currentMoodText = "You seem to be \(emotion.capitalized)."
+                    updateBackgroundColors(for: emotion)
                     spotifyController.fetchRecommendations(mood: emotion, profile: profile, userGenres: profile.favoriteGenres)
-
                 }
             } else {
                 DispatchQueue.main.async {
@@ -257,8 +321,8 @@ struct homePageView: View {
       Method to call the connect() method within the SpotifyController to reconnect to Spotify
     */
     private func reConnectToSpotify() {
-         spotifyController.connect()
-     }
+        spotifyController.connect()
+    }
     
     // Convert emotion string to emoji
     private func moodEmoji(for emotion: String) -> String {
