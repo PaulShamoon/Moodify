@@ -246,6 +246,7 @@ struct MenuView: View {
     
     private func switchUser() {
         withAnimation {
+            profileManager.currentProfile = nil
             isCreatingNewProfile = false
             navigateToHomePage = false
             navigateToMusicPreferences = false
