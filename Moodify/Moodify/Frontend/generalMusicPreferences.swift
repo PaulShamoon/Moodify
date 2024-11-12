@@ -1,4 +1,4 @@
-// Add text to inform user to select in order of preference
+import SwiftUICore
 import SwiftUI
 
 struct PreferenceInfoRow: View {
@@ -37,6 +37,8 @@ struct GeneralMusicPreferencesView: View {
     @State private var selectedGenres: Set<String> = []
     @Binding var navigateToHomePage: Bool
     @State private var isPlaying = false
+    @State private var isFirstTimeUser: Bool = true
+    @State private var showAllGenres: Bool = false
     
     @Environment(\.presentationMode) var presentationMode
     
@@ -47,6 +49,53 @@ struct GeneralMusicPreferencesView: View {
         "Funk", "Garage", "Grunge", "Synth-Pop", "Opera", "Bluegrass", "Film Scores", "World Music",
         "Samba", "Tango"
     ]
+    
+    func genreIcon(for genre: String) -> String {
+        switch genre {
+        case "Pop": return "star.fill"
+        case "Hip-Hop": return "headphones"
+        case "Rock": return "guitars"
+        case "Indie": return "music.microphone"
+        case "Electronic": return "airplayaudio"
+        case "Jazz": return "music.quarternote.3"
+        case "Dance": return "music.note"
+        case "R&B": return "music.mic"
+        case "House": return "music.note.house"
+        case "Classical": return "music.note.list"
+        case "Reggae": return "music.quarternote.3"
+        case "Soul": return "music.note.tv"
+        case "Country": return "guitars.fill"
+        case "Metal": return "guitar.fill"
+        case "Techno": return "music.note.tv"
+        case "Latin": return "music.mic"
+        case "Punk": return "guitars.fill"
+        case "Blues": return "music.quarternote.3"
+        case "Ambient": return "cloud.fill"
+        case "Acoustic": return "music.note"
+        case "Folk": return "guitars.fill"
+        case "Alternative": return "music.note.list"
+        case "K-Pop": return "music.note.house"
+        case "Chill": return "music.note"
+        case "Lo-Fi": return "cloud.fill"
+        case "EDM": return "airplayaudio"
+        case "Disco": return "music.note"
+        case "Trance": return "music.note.house"
+        case "Ska": return "music.note"
+        case "Gospel": return "music.mic"
+        case "Funk": return "music.mic"
+        case "Garage": return "guitars.fill"
+        case "Grunge": return "music.note"
+        case "Synth-Pop": return "music.note"
+        case "Opera": return "music.note"
+        case "Bluegrass": return "guitars.fill"
+        case "Film Scores": return "film.fill"
+        case "World Music": return "globe"
+        case "Samba": return "music.note"
+        case "Tango": return "music.note"
+        default: return "music.note"
+        }
+    }
+    
     var body: some View {
         ZStack {
             LinearGradient(gradient: Gradient(colors: [Color.black, Color(white: 0.1)]),
@@ -64,7 +113,7 @@ struct GeneralMusicPreferencesView: View {
                     .padding(.top, 20)
                     
                     LazyVGrid(columns: [GridItem(.adaptive(minimum: 100), spacing: 12)], spacing: 12) {
-                        ForEach(genres, id: \.self) { genre in
+                        ForEach(Array(genres.prefix(showAllGenres ? genres.count : 12)), id: \.self) { genre in
                             Button(action: {
                                 withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
                                     toggleGenreSelection(genre: genre)
@@ -99,6 +148,19 @@ struct GeneralMusicPreferencesView: View {
                         }
                     }
                     .padding(.horizontal)
+                    
+                    if !showAllGenres && genres.count > 12 {
+                        Button(action: {
+                            withAnimation {
+                                showAllGenres.toggle()
+                            }
+                        }) {
+                            Text("Show more...")
+                                .font(.system(size: 16, weight: .semibold, design: .rounded))
+                                .foregroundColor(.blue)
+                                .padding(.vertical, 12)
+                        }
+                    }
                     
                     VStack(spacing: 16) {
                         PreferenceInfoRow(
@@ -180,23 +242,6 @@ struct GeneralMusicPreferencesView: View {
             selectedGenres.remove(genre)
         } else {
             selectedGenres.insert(genre)
-        }
-    }
-    
-    private func genreIcon(for genre: String) -> String {
-        switch genre {
-        case "Pop":
-            return "star.fill"
-        case "Classical":
-            return "music.note.list"
-        case "Hip-Hop":
-            return "beats.headphones"
-        case "Country":
-            return "guitars.fill"
-        case "Dance":
-            return "music.note"
-        default:
-            return "music.note"
         }
     }
 }
