@@ -17,7 +17,7 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
     @Published private(set) var isConnected: Bool = false
     
     // Stores token expiration
-    private var tokenExpirationDate: Date? {
+    var tokenExpirationDate: Date? {
         get {
             if let timestamp = UserDefaults.standard.object(forKey: "SpotifyTokenExpiration") as? TimeInterval {
                 return Date(timeIntervalSince1970: timestamp)

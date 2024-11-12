@@ -21,7 +21,8 @@ struct homePageView: View {
     @State private var showMenu = false
     // Variable to check if the camera view has been dismissed
     @State private var isCameraDismissed = false
-    
+    @State private var showConnectToSpotifyButton = false // New state variable
+
     // NOTE - this URL is temporary and needs to be updated each time from the backend side to detect mood properly
     let backendURL = "/analyze"
     
@@ -102,8 +103,7 @@ struct homePageView: View {
                             .shadow(radius: 10)
                         }
                         
-                         // Connect to Spotify
-                        if spotifyController.accessToken == nil && spotifyController.isAccessTokenExpired(){
+                        if showConnectToSpotifyButton {
                             Button(action: {
                                 navigateToSpotify = true
                             }) {
@@ -120,27 +120,24 @@ struct homePageView: View {
                                 .shadow(radius: 10)
                             }
                         }
-                        if spotifyController.accessToken != nil {
-                            // Player to control Spotify
+                        if spotifyController.accessToken != nil, !spotifyController.isAccessTokenExpired() {
                             PlayerView(spotifyController: spotifyController)
                             .padding(.horizontal)
                         }
-                            // Padding on the outside for better spacing
-                        
-                        
-                        
                         Spacer()
                     }
                     .padding(.top, 60)
                 }
                 .onAppear {
                     // Check if the access token is available and not expired
-                    if let token = spotifyController.accessToken, !spotifyController.isAccessTokenExpired() {
+                    if spotifyController.accessToken != nil, !spotifyController.isAccessTokenExpired() {
                         if !spotifyController.isConnected {
                             spotifyController.initializeSpotifyConnection()
                         }
+                        showConnectToSpotifyButton = false // Hide the button if connected
                     } else {
                         print("Access token is expired or missing. Please reconnect to Spotify.")
+                        showConnectToSpotifyButton = true // Show the button if not connected
                     }
                 }
                 .alert(isPresented: $showingAlert) {
