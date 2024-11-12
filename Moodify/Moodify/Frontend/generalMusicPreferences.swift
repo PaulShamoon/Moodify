@@ -42,48 +42,59 @@ struct GeneralMusicPreferencesView: View {
     
     @Environment(\.presentationMode) var presentationMode
     
-    let allGenres = [
-        "Pop": "star.fill",
-        "Hip-Hop": "headphones",
-        "Rock": "guitars",
-        "Indie": "music.microphone",
-        "Electronic": "airplayaudio",
-        "Jazz": "music.quarternote.3",
-        "Dance": "music.note",
-        "R&B": "music.mic",
-        "House": "music.note.house",
-        "Classical": "music.note.list",
-        "Reggae": "music.quarternote.3",
-        "Soul": "music.note.tv",
-        "Country": "guitars.fill",
-        "Metal": "guitar.fill",
-        "Techno": "music.note.tv",
-        "Latin": "music.mic",
-        "Punk": "guitars.fill",
-        "Blues": "music.quarternote.3",
-        "Ambient": "cloud.fill",
-        "Acoustic": "music.note",
-        "Folk": "guitars.fill",
-        "Alternative": "music.note.list",
-        "K-Pop": "music.note.house",
-        "Chill": "music.note",
-        "Lo-Fi": "cloud.fill",
-        "EDM": "airplayaudio",
-        "Disco": "music.note",
-        "Trance": "music.note.house",
-        "Ska": "music.note",
-        "Gospel": "music.mic",
-        "Funk": "music.mic",
-        "Garage": "guitars.fill",
-        "Grunge": "music.note",
-        "Synth-Pop": "music.note",
-        "Opera": "music.note",
-        "Bluegrass": "guitars.fill",
-        "Film Scores": "film.fill",
-        "World Music": "globe",
-        "Samba": "music.note",
-        "Tango": "music.note"
+    let genres = [
+        "Pop", "Hip-Hop", "Rock", "Indie", "Electronic", "Jazz", "Dance", "R&B", "House", "Classical",
+        "Reggae", "Soul", "Country", "Metal", "Techno", "Latin", "Punk", "Blues", "Ambient", "Acoustic",
+        "Folk", "Alternative", "K-Pop", "Chill", "Lo-Fi", "EDM", "Disco", "Trance", "Ska", "Gospel",
+        "Funk", "Garage", "Grunge", "Synth-Pop", "Opera", "Bluegrass", "Film Scores", "World Music",
+        "Samba", "Tango"
     ]
+    
+    func genreIcon(for genre: String) -> String {
+        switch genre {
+        case "Pop": return "star.fill"
+        case "Hip-Hop": return "headphones"
+        case "Rock": return "guitars"
+        case "Indie": return "music.microphone"
+        case "Electronic": return "airplayaudio"
+        case "Jazz": return "music.quarternote.3"
+        case "Dance": return "music.note"
+        case "R&B": return "music.mic"
+        case "House": return "music.note.house"
+        case "Classical": return "music.note.list"
+        case "Reggae": return "music.quarternote.3"
+        case "Soul": return "music.note.tv"
+        case "Country": return "guitars.fill"
+        case "Metal": return "guitar.fill"
+        case "Techno": return "music.note.tv"
+        case "Latin": return "music.mic"
+        case "Punk": return "guitars.fill"
+        case "Blues": return "music.quarternote.3"
+        case "Ambient": return "cloud.fill"
+        case "Acoustic": return "music.note"
+        case "Folk": return "guitars.fill"
+        case "Alternative": return "music.note.list"
+        case "K-Pop": return "music.note.house"
+        case "Chill": return "music.note"
+        case "Lo-Fi": return "cloud.fill"
+        case "EDM": return "airplayaudio"
+        case "Disco": return "music.note"
+        case "Trance": return "music.note.house"
+        case "Ska": return "music.note"
+        case "Gospel": return "music.mic"
+        case "Funk": return "music.mic"
+        case "Garage": return "guitars.fill"
+        case "Grunge": return "music.note"
+        case "Synth-Pop": return "music.note"
+        case "Opera": return "music.note"
+        case "Bluegrass": return "guitars.fill"
+        case "Film Scores": return "film.fill"
+        case "World Music": return "globe"
+        case "Samba": return "music.note"
+        case "Tango": return "music.note"
+        default: return "music.note"
+        }
+    }
     
     var body: some View {
         ZStack {
@@ -102,7 +113,7 @@ struct GeneralMusicPreferencesView: View {
                     .padding(.top, 20)
                     
                     LazyVGrid(columns: [GridItem(.adaptive(minimum: 100), spacing: 12)], spacing: 12) {
-                        ForEach(Array(allGenres.keys.prefix(showAllGenres ? allGenres.count : 12)), id: \.self) { genre in
+                        ForEach(Array(genres.prefix(showAllGenres ? genres.count : 12)), id: \.self) { genre in
                             Button(action: {
                                 withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
                                     toggleGenreSelection(genre: genre)
@@ -119,7 +130,7 @@ struct GeneralMusicPreferencesView: View {
                                         .shadow(color: selectedGenres.contains(genre) ? Color.green.opacity(0.3) : Color.black.opacity(0.2), radius: 6, x: 0, y: 3)
                                     
                                     VStack(spacing: 8) {
-                                        Image(systemName: allGenres[genre] ?? "music.note")
+                                        Image(systemName: genreIcon(for: genre))
                                             .font(.system(size: 22))
                                             .foregroundColor(selectedGenres.contains(genre) ? .white : .gray)
                                         
@@ -141,7 +152,7 @@ struct GeneralMusicPreferencesView: View {
                     }
                     .padding(.horizontal)
                     
-                    if !showAllGenres && allGenres.count > 12 {
+                    if !showAllGenres && genres.count > 12 {
                         Button(action: {
                             withAnimation {
                                 showAllGenres.toggle()
@@ -165,7 +176,7 @@ struct GeneralMusicPreferencesView: View {
                         PreferenceInfoRow(
                             icon: "number.circle.fill",
                             title: "Total Selected",
-                            value: "\(selectedGenres.count) of \(allGenres.count) genres",
+                            value: "\(selectedGenres.count) of \(genres.count) genres",
                             iconColor: .blue
                         )
                     }
