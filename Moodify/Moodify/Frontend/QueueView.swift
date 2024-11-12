@@ -21,9 +21,9 @@ struct QueueView: View {
     // Dynamic gradient colors based on mood
     private var backgroundColors: [Color] {
         switch spotifyController.currentMood.lowercased() {
-        case "happy", "surprise":
+        case "happy":
             return [Color.yellow.opacity(0.3), Color.orange.opacity(0.3)]
-        case "sad", "disgust", "fear":
+        case "sad":
             return [Color.blue.opacity(0.3), Color.purple.opacity(0.3)]
         case "angry":
             return [Color.red.opacity(0.3), Color.orange.opacity(0.3)]
@@ -140,9 +140,9 @@ struct MoodSection: View {
     // Helper function to get mood icon
     private func getMoodIcon() -> String {
         switch spotifyController.currentMood.lowercased() {
-        case "happy", "surprise":
+        case "happy":
             return "face.smiling"
-        case "sad", "disgust", "fear":
+        case "sad":
             return "cloud.rain"
         case "angry":
             return "bolt.fill"
