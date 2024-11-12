@@ -14,7 +14,7 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
     
     // Redirect URL after authorization
     private let spotifyRedirectURL = URL(string: "spotify-ios-quick-start://spotify-login-callback")!
-        
+    
     // Published properties to hold info about the current track
     @Published var currentTrackName: String = "No track playing"
     @Published var currentTrackURI: String = ""

@@ -115,17 +115,17 @@ struct MoodSection: View {
                 // Mood indicator pill
                 Text(
                     spotifyController.currentPlaylist == nil
-                        ? "Playing \(spotifyController.currentMood.lowercased()) music"
-                        : "Playing \(spotifyController.currentPlaylist!.mood) playlist"
+                    ? "Playing \(spotifyController.currentMood.lowercased()) music"
+                    : "Playing \(spotifyController.currentPlaylist!.mood) playlist"
                 )
                 .font(.caption)
-                    .foregroundColor(.white)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 6)
-                    .background(
-                        Capsule()
-                            .fill(.ultraThinMaterial)
-                    )
+                .foregroundColor(.white)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 6)
+                .background(
+                    Capsule()
+                        .fill(.ultraThinMaterial)
+                )
             }
         }
         .padding(20)

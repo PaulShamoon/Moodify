@@ -6,7 +6,7 @@ struct PinInputView: View {
     @State private var enteredPin: String = ""
     @State private var showError: Bool = false
     @State private var showingForgotPin: Bool = false
-    @Environment(\.presentationMode) var presentationMode 
+    @Environment(\.presentationMode) var presentationMode
     @State private var navigateBackToSelection: Bool = false
     var onPinEntered: (String) -> Void
     

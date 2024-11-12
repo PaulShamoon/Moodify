@@ -503,6 +503,9 @@ struct ManualMoodSelector: View {
     @State private var selectedMood: String = ""
     @Environment(\.colorScheme) var colorScheme
     
+    @State private var showMoodPreferenceSheet = false
+    @State private var detectedMood = ""
+    
     var body: some View {
         NavigationView {
             ScrollView {
@@ -564,31 +567,59 @@ struct ManualMoodSelector: View {
                 }
             )
         }
+        .sheet(isPresented: $showMoodPreferenceSheet) {
+            MoodPreferenceView(
+                spotifyController: spotifyController,
+                profile: profile,
+                detectedMood: detectedMood,
+                isPresented: $showMoodPreferenceSheet
+            )
+            /**
+             Closes manual selector after preference selection
+             Created by: Nazanin Mahmoudi
+             */
+            .onDisappear {
+                isPresented = false
+            }
+        }
     }
     
+    /**
+     Updates UI and handles music recommendations based on selected mood.
+     Displays preference options if user selects 'sad'.
+     
+     @param mood: String representing the selected mood
+     Created by: Nazanin Mahmoudi
+     */
     private func updateMood(mood: String) {
         // Update UI
         currentMood = moods.first(where: { $0.name.lowercased() == mood.lowercased() })?.emoji ?? "😶"
         currentMoodText = "You're feeling \(mood.capitalized)"
         updateBackgroundColors(mood)
         
-        // Map mood names to recommendation moods if needed
-        let recommendationMood = mapMoodToRecommendation(mood)
-        
-        // Fetch recommendations
-        spotifyController.fetchRecommendations(
-            mood: recommendationMood,
-            profile: profile,
-            userGenres: profile.favoriteGenres
-        )
-        
-        // Dismiss the sheet
-        isPresented = false
+        if mood.lowercased() == "sad" {
+            /** Show preference options for sad mood */
+            detectedMood = mood
+            showMoodPreferenceSheet = true
+        } else {
+            /** Direct music recommendations for other moods */
+            let recommendationMood = mapMoodToRecommendation(mood)
+            spotifyController.fetchRecommendations(
+                mood: recommendationMood,
+                profile: profile,
+                userGenres: profile.favoriteGenres
+            )
+            isPresented = false
+        }
     }
     
+    /**
+     Maps mood selections to appropriate music categories
+     Created by: Nazanin Mahmoudi
+     */
     private func mapMoodToRecommendation(_ mood: String) -> String {
         switch mood.lowercased() {
-        case "anxious": return "chill" // Map anxious to chill music
+        case "anxious": return "chill"
         default: return mood
         }
     }
