@@ -25,7 +25,7 @@ struct MoodifyApp: App {
                 } else if !hasCompletedOnboarding {
                     OnboardingView {
                         hasCompletedOnboarding = true
-                        isCreatingNewProfile = true /* User gets taken to the account set up page */
+                        hasCompletedQuestionnaire = false /* User gets taken to the account set up page */
                     }
                 } else {
                     if isCreatingNewProfile || !hasCompletedQuestionnaire {

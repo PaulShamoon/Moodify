@@ -22,7 +22,7 @@ struct QuestionnaireView: View {
     
     var body: some View {
         ScrollView {
-            VStack(spacing: 25) {
+            VStack(spacing: 15) {
                 Spacer()
                 
                 headerSection
