@@ -9,6 +9,7 @@ import AVFoundation
 
 struct CameraView: UIViewControllerRepresentable {
     @Binding var image: UIImage?
+    @Binding var isCameraDismissed: Bool
     @Environment(\.presentationMode) private var presentationMode
     
     func makeUIViewController(context: Context) -> UIImagePickerController {
@@ -43,6 +44,8 @@ struct CameraView: UIViewControllerRepresentable {
         }
         
         func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+            // Set isCameraDismissed to true if user exited the camera view
+            parent.isCameraDismissed = true
             parent.presentationMode.wrappedValue.dismiss()
         }
         
