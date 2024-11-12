@@ -223,18 +223,13 @@
 		694B6C002C9A4431002F0931 /* Frontend */ = {
 			isa = PBXGroup;
 			children = (
-				6982AB7D2CDD9BA6005F9750 /* GetStartedCardView.swift */,
-				6982AB7B2CDD9B84005F9750 /* MoodCardOnboardingView.swift */,
+				6EE6C3302CE3B6330026D489 /* OnBoardingStuff */,
+				6EE6C32F2CE3B55C0026D489 /* PinStuff */,
 				69EA65912CE1BBB500723081 /* CameraView.swift */,
-				6982AB792CDD9B3E005F9750 /* OnboardingMood.swift */,
-				6982AB732CDD95A3005F9750 /* OnBoarding.swift */,
 				6EA2E3BC2CDC8DDC00B4E6C8 /*  PlaylistsView.swift */,
 				89C558392CDC11CB00F67E99 /* TermsOfServiceView.swift */,
 				6E9DDAFA2CD2B57900C17DCB /* QueueView.swift */,
 				6E728B942CD1CD9800017EA4 /* PlayerView.swift */,
-				89B1EC0F2CC9C1BF0041F9EE /* ForgotPinView.swift */,
-				89B1EC0D2CC9BDB10041F9EE /* PinInputView.swift */,
-				8966A3A22CC3304500FA58DE /* PinSetupView.swift */,
 				8917A3DA2CA4D86100253254 /* AccountInfoView.swift */,
 				89AD05662CB08474004D8FAD /* ProfileSelectionView.swift */,
 				8917A3D82CA4D10F00253254 /* MenuView.swift */,
@@ -259,7 +254,6 @@
 		6E52B8522CC98F1B0049BF08 /* Backend */ = {
 			isa = PBXGroup;
 			children = (
-				6982AB772CDD9959005F9750 /* MoodModels.swift */,
 				6EA2E3BB2CDB072900B4E6C8 /* Models */,
 				6EA2E3BA2CDB04C100B4E6C8 /* Controllers */,
 				6E52B8592CC9A9EE0049BF08 /* Constants.swift */,
@@ -283,11 +277,33 @@
 		6EA2E3BB2CDB072900B4E6C8 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				6982AB772CDD9959005F9750 /* MoodModels.swift */,
 				6EA2E3B52CDAF29200B4E6C8 /* Playlist.swift */,
 				89AD05622CB083B3004D8FAD /* Profile.swift */,
 				6E728B902CD1B94F00017EA4 /* Song.swift */,
 			);
 			path = Models;
+			sourceTree = "<group>";
+		};
+		6EE6C32F2CE3B55C0026D489 /* PinStuff */ = {
+			isa = PBXGroup;
+			children = (
+				89B1EC0F2CC9C1BF0041F9EE /* ForgotPinView.swift */,
+				89B1EC0D2CC9BDB10041F9EE /* PinInputView.swift */,
+				8966A3A22CC3304500FA58DE /* PinSetupView.swift */,
+			);
+			path = PinStuff;
+			sourceTree = "<group>";
+		};
+		6EE6C3302CE3B6330026D489 /* OnBoardingStuff */ = {
+			isa = PBXGroup;
+			children = (
+				6982AB792CDD9B3E005F9750 /* OnboardingMood.swift */,
+				6982AB7B2CDD9B84005F9750 /* MoodCardOnboardingView.swift */,
+				6982AB7D2CDD9BA6005F9750 /* GetStartedCardView.swift */,
+				6982AB732CDD95A3005F9750 /* OnBoarding.swift */,
+			);
+			path = OnBoardingStuff;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -624,7 +640,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Moodify/Preview Content\"";
-				DEVELOPMENT_TEAM = 9RU82Q2W86;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Moodify/Info.plist;
@@ -642,7 +658,6 @@
 				);
 				MARKETING_VERSION = 1.0;
 				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_BUNDLE_IDENTIFIER = MoodifyCapstone123;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -663,7 +678,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Moodify/Preview Content\"";
-				DEVELOPMENT_TEAM = 9RU82Q2W86;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Moodify/Info.plist;
@@ -681,7 +696,6 @@
 				);
 				MARKETING_VERSION = 1.0;
 				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_BUNDLE_IDENTIFIER = MoodifyCapstone123;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;

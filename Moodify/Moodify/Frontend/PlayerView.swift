@@ -85,9 +85,9 @@ struct PlayerView: View {
                             .font(.title2)
                             .foregroundColor(.white)
                     }
-                    .navigationDestination(isPresented: $navigateToQueue) {
+                    .sheet(isPresented: $navigateToQueue) {
                         QueueView(spotifyController: spotifyController)
-                            .transition(.blurReplace)
+                            .presentationDetents([.large]) // Optional: Allows you to control sheet sizes
                     }
                 }
                 
