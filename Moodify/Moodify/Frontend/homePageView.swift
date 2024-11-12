@@ -132,7 +132,6 @@ struct homePageView: View {
                     .padding(.horizontal, 16)
                     
                     ZStack {
-                        // Frosted glass effect background
                         RoundedRectangle(cornerRadius: 30)
                             .fill(.ultraThinMaterial)
                             .frame(width: 150, height: 150)
@@ -141,8 +140,21 @@ struct homePageView: View {
                                     .stroke(.white.opacity(0.2), lineWidth: 1)
                             )
                         
-                        Text(currentMood)
-                            .font(.system(size: 70))
+                        if isDetectingMood {
+                            /* Loading Animation for when the user's mood is being generated */
+                            VStack(spacing: 15) {
+                                ProgressView()
+                                    .scaleEffect(1.5)
+                                    .tint(.white)
+                                
+                                Text("Detecting Mood...")
+                                    .font(.system(size: 16))
+                                    .foregroundColor(.white)
+                            }
+                        } else {
+                            Text(currentMood)
+                                .font(.system(size: 70))
+                        }
                     }
                     .padding(.vertical, 8)
                     
@@ -398,9 +410,16 @@ struct homePageView: View {
     
     // Analyze the captured image using the backend
     private func analyzeImage(image: UIImage) {
+        // Set loading state to true when starting analysis
+        DispatchQueue.main.async {
+            isDetectingMood = true
+            currentMoodText = ""  // Clear current mood text while detecting
+        }
+        
         guard let imageData = image.jpegData(compressionQuality: 0.8) else {
             alertMessage = "Failed to convert image to JPEG."
             showingAlert = true
+            isDetectingMood = false  // Reset loading state on error
             return
         }
         
@@ -420,6 +439,11 @@ struct homePageView: View {
         request.httpBody = body
         
         URLSession.shared.dataTask(with: request) { data, response, error in
+            // Set loading state to false when analysis completes
+            DispatchQueue.main.async {
+                isDetectingMood = false
+            }
+            
             if let error = error {
                 DispatchQueue.main.async {
                     alertMessage = "Failed to analyze image: \(error.localizedDescription)"
