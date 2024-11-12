@@ -110,7 +110,7 @@ struct ProfileSelectionView: View {
         }
         .sheet(isPresented: $showingPinPrompt) {
             PinInputView(
-                profile: selectedProfile ?? Profile(name: "", dateOfBirth: Date(), favoriteGenres: [], hasAgreedToTerms: false),
+                profile: selectedProfile ?? Profile(name: "", dateOfBirth: Date(), favoriteGenres: [], hasAgreedToTerms: false, completedMusicPreferences: false),
                 onPinEntered: { enteredPin in
                     if let profile = selectedProfile {
                         verifyPin(for: profile, enteredPin: enteredPin)
@@ -268,7 +268,8 @@ extension Color {
             name: "John Doe",
             dateOfBirth: Date(),
             favoriteGenres: [],
-            hasAgreedToTerms: true
+            hasAgreedToTerms: true,
+            completedMusicPreferences: true
         ),
         defaultProfileImage: URL(string: "https://cdn.pixabay.com/photo/2016/11/08/15/21/user-1808597_1280.png")!,
         action: {}

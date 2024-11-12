@@ -4,6 +4,7 @@ import PDFKit
 struct QuestionnaireView: View {
     @EnvironmentObject var profileManager: ProfileManager
     @State private var agreedToTerms: Bool = false
+    @State private var completedMusicPreferences: Bool = false
     @Binding var navigateToMusicPreferences: Bool
     @Binding var isCreatingNewProfile: Bool
     
@@ -169,6 +170,7 @@ struct QuestionnaireView: View {
                     dateOfBirth: dateOfBirth,
                     favoriteGenres: profile.favoriteGenres,
                     hasAgreedToTerms: agreedToTerms,
+                    completedMusicPreferences: profile.completedMusicPreferences,
                     userPin: profile.userPin,
                     personalSecurityQuestion: profile.personalSecurityQuestion,
                     securityQuestionAnswer: profile.personalSecurityQuestion
@@ -178,7 +180,8 @@ struct QuestionnaireView: View {
                     name: name,
                     dateOfBirth: dateOfBirth,
                     favoriteGenres: [],
-                    hasAgreedToTerms: agreedToTerms
+                    hasAgreedToTerms: agreedToTerms,
+                    completedMusicPreferences: completedMusicPreferences
                 )
             }
             navigateToMusicPreferences = true
@@ -191,6 +194,7 @@ struct QuestionnaireView: View {
             name = profile.name
             dateOfBirth = profile.dateOfBirth
             agreedToTerms = profile.hasAgreedToTerms
+            completedMusicPreferences = profile.completedMusicPreferences
         }
     }
     

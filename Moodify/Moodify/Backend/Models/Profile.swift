@@ -6,6 +6,7 @@ struct Profile: Identifiable, Codable {
     var dateOfBirth: Date
     var favoriteGenres: [String]
     var hasAgreedToTerms: Bool
+    var completedMusicPreferences: Bool
     var userPin: String?
     var personalSecurityQuestion: String?
     var securityQuestionAnswer: String?

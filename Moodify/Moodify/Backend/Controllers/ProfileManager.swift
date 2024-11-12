@@ -11,20 +11,21 @@ class ProfileManager: ObservableObject {
     }
     
     // Create a new profile
-    func createProfile(name: String, dateOfBirth: Date, favoriteGenres: [String], hasAgreedToTerms: Bool) {
-        let newProfile = Profile(name: name, dateOfBirth: dateOfBirth, favoriteGenres: favoriteGenres, hasAgreedToTerms: hasAgreedToTerms)
+    func createProfile(name: String, dateOfBirth: Date, favoriteGenres: [String], hasAgreedToTerms: Bool, completedMusicPreferences: Bool) {
+        let newProfile = Profile(name: name, dateOfBirth: dateOfBirth, favoriteGenres: favoriteGenres, hasAgreedToTerms: hasAgreedToTerms, completedMusicPreferences: completedMusicPreferences)
         profiles.append(newProfile)
         saveProfiles()
         selectProfile(newProfile)
     }
     
     // Update an existing profile
-    func updateProfile(profile: Profile, name: String, dateOfBirth: Date, favoriteGenres: [String], hasAgreedToTerms: Bool, userPin: String?, personalSecurityQuestion: String?, securityQuestionAnswer: String?) {
+    func updateProfile(profile: Profile, name: String, dateOfBirth: Date, favoriteGenres: [String], hasAgreedToTerms: Bool, completedMusicPreferences: Bool, userPin: String?, personalSecurityQuestion: String?, securityQuestionAnswer: String?) {
         if let index = profiles.firstIndex(where: { $0.id == profile.id }) {
             profiles[index].name = name
             profiles[index].dateOfBirth = dateOfBirth
             profiles[index].favoriteGenres = favoriteGenres
             profiles[index].hasAgreedToTerms = hasAgreedToTerms
+            profiles[index].completedMusicPreferences = completedMusicPreferences
             profiles[index].userPin = userPin
             profiles[index].personalSecurityQuestion = personalSecurityQuestion
             profiles[index].securityQuestionAnswer = securityQuestionAnswer
@@ -82,6 +83,16 @@ class ProfileManager: ObservableObject {
         }
     }
     
+    func setCompletedMusicPreferences(profile: Profile, completedMusicPreferences: Bool) {
+        if let index = profiles.firstIndex(where: { $0.id == profile.id }) {
+            profiles[index].completedMusicPreferences = completedMusicPreferences
+        }
+    }
+    
+    func verifyCompletedMusicPreferences(profile: Profile) -> Bool {
+        return profile.completedMusicPreferences
+    }
+    
     func deletePin(profile: Profile) {
         guard let index = profiles.firstIndex(where: { $0.id == profile.id }) else {
             print("Profile not found. No deletion performed.")
@@ -92,9 +103,5 @@ class ProfileManager: ObservableObject {
         saveProfiles()
         loadProfiles() // Refresh profiles after deletion
         print("Profile pin deleted successfully.")
-    }
-    
-    func verifyPin(for profile: Profile, enteredPin: String) -> Bool {
-        return profile.userPin == enteredPin
     }
 }

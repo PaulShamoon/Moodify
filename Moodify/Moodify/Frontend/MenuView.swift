@@ -264,6 +264,7 @@ struct MenuView: View {
                     dateOfBirth: currentProfile.dateOfBirth,
                     favoriteGenres: currentProfile.favoriteGenres,
                     hasAgreedToTerms: currentProfile.hasAgreedToTerms,
+                    completedMusicPreferences: currentProfile.completedMusicPreferences,
                     userPin: nil,
                     personalSecurityQuestion: currentProfile.personalSecurityQuestion,
                     securityQuestionAnswer: currentProfile.securityQuestionAnswer
