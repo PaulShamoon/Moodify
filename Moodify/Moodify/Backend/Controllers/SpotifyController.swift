@@ -22,7 +22,8 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
     @Published var currentArtistName: String = ""
     @Published var albumCover: UIImage? = nil
     @Published var accessToken: String? = nil
-
+    // Currently playing playlist
+    @Published var currentPlaylist: Playlist? = nil
     // Array of "Song" objects to hold the state of the queue
     @Published var currentQueue: [Song] = []
     
@@ -31,6 +32,8 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
     
     // Variable to store the last known player state
     var isPaused: Bool = false
+    
+    @Published var currentMood: String = "Chill" // Default mood
     
     private lazy var configuration = SPTConfiguration(
         clientID: spotifyClientID,
@@ -170,6 +173,7 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
             self.currentArtistName = playerState.track.artist.name
             self.currentTrackURI = playerState.track.uri
             self.currentAlbumName = playerState.track.album.name
+            self.isPaused = playerState.isPaused
             self.fetchAlbumCover()
         }
     }
@@ -210,14 +214,14 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
     
     
     /*
-    Method to clear the current queue
+     Method to clear the current queue
      
-    NOTE: The Spotify Web API nor the Spotify iOS SDK provide an API endpoint to clear the current queue.
+     NOTE: The Spotify Web API nor the Spotify iOS SDK provide an API endpoint to clear the current queue.
      Because of this, our only option is to skip through every song in the currentQueue to "clear" the queue.
      These "skip" requests happen almost instantanous and are barley noticable to the user, making it a effective loophole.
-    
+     
      Created By: Paul Shamoon
-    */
+     */
     func clearCurrentQueue() {
         // Check if currentQueue is empty
         guard !currentQueue.isEmpty else {
@@ -249,7 +253,7 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
         var maxDanceability: Double? = nil
         
         switch mood.lowercased() {
-        case "happy", "surprise":
+        case "happy":
             minValence = 0.7
             maxValence = 1.0
             minEnergy = 0.6
@@ -260,7 +264,7 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
              */
             
             
-        case "sad", "disgust", "fear":
+        case "sad":
             minValence = 0.0
             maxValence = 0.3
             minEnergy = 0.3
@@ -275,13 +279,13 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
             maxEnergy = 1.0
             minLoudness = -5.0 // Louder tracks for intensity
             
-        case "neutral":
+        case "chill":
             minValence = 0.4
             maxValence = 0.6
             minEnergy = 0.4
             maxEnergy = 0.6
             minAcousticness = 0.3
-            maxAcousticness = 0.6 // Balanced range for neutrality
+            maxAcousticness = 0.6 // Balanced range for chill mood
             
         default:
             break
@@ -314,7 +318,7 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
             "min_danceability": minDanceability,
             "max_danceability": maxDanceability
         ]
-
+        
         // Iterate over optional parameters and append if non-nil
         for (key, value) in optionalParameters {
             if let value = value {
@@ -332,6 +336,10 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
      Created by: Mohammad Sulaiman
      */
     func fetchRecommendations(mood: String, profile: Profile, userGenres: [String]) {
+        // Reset currentPlaylist to nil when queueing songs based off mood
+        self.currentPlaylist = nil
+        self.currentMood = mood
+        
         // Get feature parameters based on mood
         let (minValence, maxValence, minEnergy, maxEnergy, minLoudness, maxLoudness, minAcousticness, maxAcousticness, minDanceability, maxDanceability) = getMoodParameters(for: mood)
         
@@ -384,23 +392,23 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
     private func enqueueTracks(mood: String, profile: Profile, tracks: [[String: Any]]) {
         // Clear the currentQueue before queueing new songs
         clearCurrentQueue()
-
+        
         // This will store all song objects created after enqueuing the track
         var songs: [Song] = []
-
+        
         // Create a DispatchGroup to track asynchronous tasks
         let dispatchGroup = DispatchGroup()
-
+        
         for (index, track) in tracks.enumerated() {
             // Extract the URI from each track dictionary
             guard let uri = track["uri"] as? String else {
                 print("Failed to find URI in track at index \(index)")
                 continue
             }
-
+            
             // Notify the group that a task is starting
             dispatchGroup.enter()
-
+            
             // Add a small delay between requests to prevent rate limiting
             DispatchQueue.main.asyncAfter(deadline: .now() + Double(index) * 0.5) {
                 // If it's the first song, play it immediately
@@ -426,7 +434,7 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
                 }
             }
         }
-
+        
         // This will run after all tracks have been enqueued
         dispatchGroup.notify(queue: .main) {
             // Now all tracks have been enqueued, and songs array is populated
@@ -477,7 +485,7 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
      @param song: "Song" object from the queue to play
      
      Created By: Paul Shamoon
-    */
+     */
     func playSongFromQueue(song: Song) {
         // Get the song to play's index in the currentQueue
         if let index = currentQueue.firstIndex(where: { $0.songURI == song.songURI }) {

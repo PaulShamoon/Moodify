@@ -80,7 +80,7 @@ let angry_songs = [
     "6HZILIRieu8S0iqY8kIKhj"
 ]
 
-let neutral_songs = [
+let chill_songs = [
     // Sweet Life
     "6MEDfjHxnVNcYmHe3mM6L2",
     // Cool Cat

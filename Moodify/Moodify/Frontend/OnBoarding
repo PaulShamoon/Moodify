@@ -1,0 +1,171 @@
+/*
+    This is the onboarding view for the Moodify app.
+    Created by: Nazanin Mahmoudi
+*/
+
+import SwiftUI
+
+struct OnboardingView: View {
+    @State private var currentPage = 0
+    private let totalPages = 3
+    var onCompletion: () -> Void
+    @State private var isCreatingNewProfile = true
+
+    var body: some View {
+        ZStack {
+            AnimatedDarkBackground()
+                .ignoresSafeArea()
+            
+            VStack {
+                Spacer()
+
+                HStack {
+                    Spacer()
+                    Button(action: {
+                        onCompletion()
+                        isCreatingNewProfile = true
+                    }) {
+                        Text("Skip")
+                            .foregroundColor(.white)
+                            .padding()
+                    }
+                }
+
+                TabView(selection: $currentPage) {
+                    OnboardingPageView(
+                        title: "Welcome to Moodify",
+                        description: "Discover music that perfectly matches your mood.",
+                        imageName: "music.note"
+                    ).tag(0)
+                    
+                    OnboardingPageView(
+                        title: "Capture Your Mood",
+                        description: "Use your camera to detect your mood effortlessly.",
+                        imageName: "camera.fill"
+                    ).tag(1)
+                    
+                    OnboardingPageView(
+                        title: "Personalized Playlists",
+                        description: "Get Spotify playlists curated just for your current vibe.",
+                        imageName: "headphones"
+                    ).tag(2)
+                }
+                .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
+                
+                Spacer()
+
+                HStack(spacing: 8) {
+                    ForEach(0..<totalPages) { index in
+                        Circle()
+                            .fill(index == currentPage ? Color.green : Color.white.opacity(0.3))
+                            .frame(width: 10, height: 10)
+                            .scaleEffect(index == currentPage ? 1.2 : 1.0)
+                            .animation(.spring(response: 0.3, dampingFraction: 0.7), value: currentPage)
+                    }
+                }
+                .padding(.bottom, 40)
+                
+                Button(action: {
+                    if currentPage < totalPages - 1 {
+                        withAnimation { currentPage += 1 }
+                    } else {
+                        onCompletion()
+                        isCreatingNewProfile = true
+                    }
+                }) {
+                    Text(currentPage < totalPages - 1 ? "Next" : "Get Started")
+                        .font(.headline)
+                        .foregroundColor(.white)
+                        .padding()
+                        .frame(width: 180)
+                        .background(Color.green)
+                        .cornerRadius(12)
+                        .shadow(color: Color.green.opacity(0.5), radius: 10, x: 0, y: 10)
+                }
+                .padding(.bottom, 50)
+            }
+        }
+    }
+}
+
+struct OnboardingPageView: View {
+    let title: String
+    let description: String
+    let imageName: String
+    
+    var body: some View {
+        VStack(spacing: 20) {
+            Spacer()
+            
+            Image(systemName: imageName)
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+                .frame(width: 120, height: 120)
+                .foregroundColor(.white)
+                .shadow(radius: 10)
+                .padding(.bottom, 20)
+            
+            Text(title)
+                .font(.system(size: 28, weight: .bold, design: .rounded))
+                .foregroundColor(.white)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 30)
+            
+            Text(description)
+                .font(.system(size: 16, weight: .medium, design: .rounded))
+                .foregroundColor(.white.opacity(0.8))
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 30)
+            
+            Spacer()
+        }
+        .padding()
+    }
+}
+
+struct AnimatedDarkBackground: View {
+    @State private var animate = false
+    
+    var body: some View {
+        ZStack {
+            LinearGradient(gradient: Gradient(colors: [Color(hex: "#1A1A2E"), Color(hex: "#16213E"), Color(hex: "#0F3460")]),
+                           startPoint: .topLeading,
+                           endPoint: .bottomTrailing)
+            
+            ForEach(0..<15) { _ in
+                Circle()
+                    .fill(Color.white.opacity(0.05))
+                    .frame(width: CGFloat.random(in: 50...120), height: CGFloat.random(in: 50...120))
+                    .position(x: CGFloat.random(in: 0...UIScreen.main.bounds.width),
+                              y: CGFloat.random(in: 0...UIScreen.main.bounds.height))
+                    .offset(y: animate ? -50 : 50)
+                    .animation(Animation.easeInOut(duration: Double.random(in: 4...8)).repeatForever(autoreverses: true))
+            }
+        }
+        .onAppear {
+            animate = true
+        }
+    }
+}
+
+extension Color {
+    init(hex: String) {
+        let scanner = Scanner(string: hex)
+        _ = scanner.scanString("#")
+        
+        var rgb: UInt64 = 0
+        scanner.scanHexInt64(&rgb)
+        
+        let r = Double((rgb >> 16) & 0xFF) / 255.0
+        let g = Double((rgb >> 8) & 0xFF) / 255.0
+        let b = Double(rgb & 0xFF) / 255.0
+        
+        self.init(red: r, green: g, blue: b)
+    }
+}
+
+struct OnboardingView_Previews: PreviewProvider {
+    static var previews: some View {
+        OnboardingView(onCompletion: { })
+    }
+}
