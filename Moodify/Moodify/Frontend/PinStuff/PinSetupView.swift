@@ -58,8 +58,6 @@ struct PinSetupView: View {
                 .padding()
             }
         }
-        .navigationBarBackButtonHidden(true)
-        .navigationBarItems(leading: backButton)
     }
     
     private var headerView: some View {
@@ -168,9 +166,10 @@ struct PinSetupView: View {
             Button(action: handleNextStep) {
                 Text(getButtonTitle())
                     .frame(maxWidth: .infinity)
+                    .font(.title2)
                     .padding()
                     .background(Color.green)
-                    .foregroundColor(.white)
+                    .foregroundColor(.black)
                     .cornerRadius(12)
             }
         }

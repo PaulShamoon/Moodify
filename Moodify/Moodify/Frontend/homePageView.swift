@@ -7,7 +7,7 @@ struct homePageView: View {
     @Binding var isCreatingNewProfile: Bool
     @Binding var navigateToMusicPreferences: Bool
     @State private var navigateToSpotify = false // State for navigation
-    
+    @AppStorage("hasConnectedSpotify") private var hasConnectedSpotify = false
     @State private var showingCamera = false
     @State private var showingAlert = false
     @State private var alertMessage = ""
@@ -20,9 +20,12 @@ struct homePageView: View {
     @Binding var isCreatingProfile: Bool // This will be passed from outside
     @State private var showMenu = false
     @State private var isCameraDismissed = false
-    
+    @State private var showConnectToSpotifyButton = false // New state variable
+    @State private var showResyncSpotifyButton = false // New state variable
+
+
     // NOTE - this URL is temporary and needs to be updated each time from the backend side to detect mood properly
-    let backendURL = "/analyze"
+    let backendURL = "https://5c39-50-4-216-192.ngrok-free.app/analyze"
     
     // Add this property to manage background color
     @State private var backgroundColors: [Color] = [
@@ -198,30 +201,56 @@ struct homePageView: View {
                         )
                     }
                     
-                    Button(action: {
-                        if spotifyController.accessToken == nil {
+                    // Connect to Spotify Button
+                    if showConnectToSpotifyButton {
+                        Button(action: {
                             navigateToSpotify = true
-                        } else {
-                            reConnectToSpotify()
+                        }) {
+                            HStack {
+                                Image(systemName: "music.note")
+                                    .font(.system(size: 16))
+                                Text("Connect to Spotify")
+                                    .font(.system(size: 16, weight: .medium))
+                            }
+                            .foregroundColor(.white)
+                            .padding(.horizontal, 20)
+                            .padding(.vertical, 12)
+                            .background(
+                                Capsule()
+                                    .fill(Color(red: 0.4, green: 0.3, blue: 0.2).opacity(0.3))
+                                    .overlay(
+                                        Capsule()
+                                            .stroke(Color(red: 0.2, green: 0.4, blue: 0.3), lineWidth: 1.5)
+                                    )
+                            )
                         }
-                    }) {
-                        HStack {
-                            Image(systemName: "music.note")
-                                .font(.system(size: 16))
-                            Text(spotifyController.accessToken == nil ? "Connect to Spotify" : "Resume Playback")
-                                .font(.system(size: 16, weight: .medium))
+                    }
+
+                    // Resync Spotify Button
+                    if showResyncSpotifyButton {
+                        Button(action: {
+                            spotifyController.resetFirstConnectionAttempt()
+                            spotifyController.refreshPlayerState()
+                            showResyncSpotifyButton = false // Hide the button after resync
+                        }) {
+                            HStack {
+                                Image(systemName: "music.note")
+                                    .font(.system(size: 16))
+                                Text("Resync Spotify")
+                                    .font(.system(size: 16, weight: .medium))
+                            }
+                            .foregroundColor(.white)
+                            .padding(.horizontal, 20)
+                            .padding(.vertical, 12)
+                            .background(
+                                Capsule()
+                                    .fill(Color(red: 0.4, green: 0.3, blue: 0.2).opacity(0.3))
+                                    .overlay(
+                                        Capsule()
+                                            .stroke(Color(red: 0.2, green: 0.4, blue: 0.3), lineWidth: 1.5)
+                                    )
+                            )
                         }
-                        .foregroundColor(.white)
-                        .padding(.horizontal, 20)
-                        .padding(.vertical, 12)
-                        .background(
-                            Capsule()
-                                .fill(Color(red: 0.4, green: 0.3, blue: 0.2).opacity(0.3))
-                                .overlay(
-                                    Capsule()
-                                        .stroke(Color(red: 0.2, green: 0.4, blue: 0.3), lineWidth: 1.5)
-                                )
-                        )
                     }
                 }
                 .padding(.top, 20)
@@ -229,10 +258,69 @@ struct homePageView: View {
                 Spacer()
             }
             .padding(.top, 60)
+            /*
+            .onAppear {
+                // Check if the access token is available and not expired
+                if spotifyController.accessToken != nil, !spotifyController.isAccessTokenExpired() {
+                    if !spotifyController.isConnected {
+                        spotifyController.initializeSpotifyConnection()
+                        showResyncSpotifyButton = true // Show resync button if disconnected
+                    } else {
+                        showResyncSpotifyButton = false // Hide resync if already connected
+                    }
+                    showConnectToSpotifyButton = false
+                } else {
+                    print("Access token is expired or missing. Please reconnect to Spotify.")
+                    showConnectToSpotifyButton = true // Show connect button if not connected
+                }
+            }*/
+            .onAppear {
+                // Check if the access token is available and not expired
+                if spotifyController.accessToken != nil, !spotifyController.isAccessTokenExpired() {
+                    if !spotifyController.isConnected {
+                        spotifyController.initializeSpotifyConnection()
+                    }
+                    showConnectToSpotifyButton = false // Hide connect button if token is valid
+                } else {
+                    print("Access token is expired or missing. Please reconnect to Spotify.")
+                    showConnectToSpotifyButton = true // Show connect button if not connected
+                }
+                updateResyncButtonVisibility() // Update resync button visibility on view load
+            }
+
+            // Observe spotifyController.isConnected changes to update resync button visibility
+            .onChange(of: spotifyController.isConnected) { _ in
+                updateResyncButtonVisibility()
+                spotifyController.updatePlayerState() // Update player state if reconnected
+            }
+
+            
+            .alert(isPresented: $showingAlert) {
+                Alert(title: Text("Error"), message: Text(alertMessage), dismissButton: .default(Text("OK")))
+            }
             
             // Add navigation handling
             .navigationDestination(isPresented: $navigateToSpotify) {
                 ConnectToSpotifyView(spotifyController: spotifyController)
+                    .onDisappear {
+                        // Set flag when user completes Spotify connection
+                        if spotifyController.accessToken != nil {
+                            hasConnectedSpotify = true
+                        }
+                    }
+                    .navigationBarBackButtonHidden(true)
+                    .toolbar {
+                        ToolbarItem(placement: .navigationBarLeading) {
+                            Button(action: {
+                                navigateToSpotify = false
+                            }) {
+                                Image(systemName: "chevron.backward")
+                                    .foregroundColor(.white)
+                                Text("Back")
+                                    .foregroundColor(.white)
+                            }
+                        }
+                    }
             }
             
             // Slide-in menu
@@ -277,6 +365,12 @@ struct homePageView: View {
                 updateBackgroundColors: updateBackgroundColors
             )
         }
+    }
+    
+    // Function to update resync button visibility
+    private func updateResyncButtonVisibility() {
+        // Show Resync button only if Spotify was connected before (hasConnectedSpotify) but is now disconnected
+        showResyncSpotifyButton = hasConnectedSpotify && !spotifyController.isConnected && !showConnectToSpotifyButton
     }
     
     // Check camera permissions

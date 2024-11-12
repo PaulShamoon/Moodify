@@ -9,11 +9,40 @@ import SpotifyiOS
 
 class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDelegate, SPTAppRemoteDelegate {
     
+    var isFirstConnectionAttempt = true
+
+    // Tracks if reconnect was attempted
+    private var reconnectAttempted = false
+    
+    @Published private(set) var isConnected: Bool = false
+    
+    // Stores token expiration
+    var tokenExpirationDate: Date? {
+        get {
+            if let timestamp = UserDefaults.standard.object(forKey: "SpotifyTokenExpiration") as? TimeInterval {
+                return Date(timeIntervalSince1970: timestamp)
+            }
+            return nil
+        }
+        set {
+            UserDefaults.standard.set(newValue?.timeIntervalSince1970, forKey: "SpotifyTokenExpiration")
+        }
+    }
+    
+    // Reset retry counter
+    var retryCount = 0
+    
     // Unique Spotify client ID
     private let spotifyClientID = "3dfaae404a2f4847a2ff7d707f7154f4"
     
     // Redirect URL after authorization
     private let spotifyRedirectURL = URL(string: "spotify-ios-quick-start://spotify-login-callback")!
+    
+    // Initialize the MoodHandler
+    private let moodQueueHandler = MoodQueueHandler()
+    
+    // Scopes for Spotify access
+    private let spotifyScopes = "user-read-private user-read-email playlist-modify-public playlist-modify-private"
     
     // Published properties to hold info about the current track
     @Published var currentTrackName: String = "No track playing"
@@ -21,9 +50,16 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
     @Published var currentAlbumName: String = ""
     @Published var currentArtistName: String = ""
     @Published var albumCover: UIImage? = nil
-    @Published var accessToken: String? = nil
-    // Currently playing playlist
+    
+    // Access token for API requests
+    @Published var accessToken: String? {
+        didSet {
+            appRemote.connectionParameters.accessToken = accessToken
+        }
+    }
+    
     @Published var currentPlaylist: Playlist? = nil
+    
     // Array of "Song" objects to hold the state of the queue
     @Published var currentQueue: [Song] = []
     
@@ -40,6 +76,15 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
         redirectURL: spotifyRedirectURL
     )
     
+    func refreshPlayerState() {
+        if isFirstConnectionAttempt{
+            // Call ensure connection if needed
+            ensureSpotifyConnection()
+        }
+        // Fetch or update the current player state
+        updatePlayerState()
+        }
+    
     // Spotify App Remote instance
     private lazy var appRemote: SPTAppRemote = {
         let appRemote = SPTAppRemote(configuration: configuration, logLevel: .debug)
@@ -48,13 +93,11 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
         return appRemote
     }()
     
-    
-    // Initialization of the playbackController
+    // Lazy initialization of the playbackController
     private lazy var playbackController: PlaybackController = {
         return PlaybackController(appRemote: appRemote)
     }()
     
-    // Initialization of the queueManager
     private lazy var queueManager: QueueManager = {
         return QueueManager()
     }()
@@ -76,23 +119,39 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
     
     // Function to retrieve the access token from UserDefaults
     private func retrieveAccessToken() {
-        if let storedAccessToken = UserDefaults.standard.string(forKey: "SpotifyAccessToken") {
+        if let storedAccessToken = UserDefaults.standard.string(forKey: "SpotifyAccessToken"),
+           let expirationTimestamp = UserDefaults.standard.object(forKey: "SpotifyTokenExpiration") as? TimeInterval {
             self.accessToken = storedAccessToken
+            self.tokenExpirationDate = Date(timeIntervalSince1970: expirationTimestamp)
             appRemote.connectionParameters.accessToken = storedAccessToken
         } else {
             print("No access token found in UserDefaults")
         }
     }
     
+    func isAccessTokenExpired() -> Bool {
+        guard let expirationDate = tokenExpirationDate else { return true }
+        // Add 60-second buffer to prevent edge cases
+        return Date().addingTimeInterval(60) >= expirationDate
+    }
+    
     /*
      Method connects the application to Spotify and or authorizes Moodify
      */
     func connect() {
-        if accessToken == nil {
-            // Authorizes user and plays passed in URI
-            appRemote.authorizeAndPlayURI("")
-        } else {
+        if appRemote.isConnected {
+            ensureSpotifyConnection()
+            print("Already connected")
+            return
+        }
+        
+        if let token = accessToken, !isAccessTokenExpired() {
+            appRemote.connectionParameters.accessToken = token
             appRemote.connect()
+        } else {
+            // No valid token - need new authorization
+            disconnect()
+            appRemote.authorizeAndPlayURI("")
         }
     }
     
@@ -102,34 +161,54 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
     func disconnect() {
         if appRemote.isConnected {
             appRemote.disconnect()
-            // Reset track and album name
-            currentTrackName = "No track playing"
-            currentAlbumName = ""
-            accessToken = nil
-        } else {
-            print("AppRemote is not connected, no need to disconnect")
+            updatePlayerState()
         }
+        // Reset track and album name and clear access token
+        currentTrackName = "No track playing"
+        currentAlbumName = "No album"
+        albumCover = nil
+        UserDefaults.standard.removeObject(forKey: "SpotifyAccessToken")
+        UserDefaults.standard.removeObject(forKey: "SpotifyTokenExpiration")
     }
     
     // Handle incoming URL after authorization
     func setAccessToken(from url: URL) {
         let parameters = appRemote.authorizationParameters(from: url)
         
-        if let accessToken = parameters?[SPTAppRemoteAccessTokenKey] {
+        if let accessToken = parameters?[SPTAppRemoteAccessTokenKey],
+           let expiresIn = parameters?["expires_in"] as? String,
+           let expirationInterval = TimeInterval(expiresIn) {
             self.accessToken = accessToken
+            self.tokenExpirationDate = Date().addingTimeInterval(expirationInterval)
+            
             appRemote.connectionParameters.accessToken = accessToken
             UserDefaults.standard.set(accessToken, forKey: "SpotifyAccessToken")
-            // Connect after setting access token
+            UserDefaults.standard.set(self.tokenExpirationDate?.timeIntervalSince1970, forKey: "SpotifyTokenExpiration")
+            
+            // Connect and initialize player state
             appRemote.connect()
-        } else if let errorDescription = parameters?[SPTAppRemoteErrorDescriptionKey] {
-            print("Error setting access token: \(errorDescription)")
+            
+            // Add a slight delay to ensure connection is established before getting player state
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
+                self?.updatePlayerState()
+            }
         }
     }
     
     // Delegate method for successful connection
     @objc func appRemoteDidEstablishConnection(_ appRemote: SPTAppRemote) {
-        self.appRemote.playerAPI?.delegate = self
-        self.appRemote.playerAPI?.subscribe(toPlayerState: { (result, error) in
+        reconnectAttempted = false
+        print("Spotify App Remote connected successfully.")
+        
+        DispatchQueue.main.async {
+            self.isConnected = true  // Update connection status
+        }
+        isPaused = false
+        retryCount = 0 // Reset the retry counter on a successful connection
+        
+        // Set up the player API and subscribe to player state
+        appRemote.playerAPI?.delegate = self
+        appRemote.playerAPI?.subscribe(toPlayerState: { (result, error) in
             if let error = error {
                 print("Error subscribing to player state: \(error.localizedDescription)")
             } else {
@@ -138,7 +217,7 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
         })
         
         // Fetch the current player state
-        self.appRemote.playerAPI?.getPlayerState { (result, error) in
+        appRemote.playerAPI?.getPlayerState { (result, error) in
             if let playerState = result as? SPTAppRemotePlayerState {
                 self.playerStateDidChange(playerState)
             } else if let error = error {
@@ -152,6 +231,15 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
      */
     @objc func appRemote(_ appRemote: SPTAppRemote, didFailConnectionAttemptWithError error: Error?) {
         print("Failed to connect to Spotify App Remote: \(String(describing: error?.localizedDescription))")
+        
+        if !reconnectAttempted {
+            reconnectAttempted = true  // Set the flag to prevent further retries
+            reconnectAndExecute {
+                print("Reattempted connection after failure.")
+            }
+        } else {
+            print("Reconnect attempt already made, will not retry.")
+        }
     }
     
     /*
@@ -159,6 +247,15 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
      */
     @objc func appRemote(_ appRemote: SPTAppRemote, didDisconnectWithError error: Error?) {
         print("Disconnected from Spotify App Remote: \(String(describing: error?.localizedDescription))")
+        isFirstConnectionAttempt = false
+        DispatchQueue.main.async {
+            self.isConnected = false  // Update connection status
+            self.currentTrackName = "No track playing"  // Reset track info
+            self.currentAlbumName = "No album"
+            self.currentArtistName = ""
+            self.albumCover = nil
+            self.isPaused = true
+        }
     }
     
     /*
@@ -182,16 +279,33 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
     /*
      Method plays or pauses the player depending on its current status
      Created by Paul Shamoon on 10/17/2024.
+     Updated by Mohammad on 11/03/2024
      */
     func togglePlayPause() {
-        if isPaused {
-            // If isPaused is true, then resume player
-            appRemote.playerAPI?.resume()
-            isPaused = false
+        if appRemote.isConnected {
+            if isPaused {
+                appRemote.playerAPI?.resume { [weak self] result, error in
+                    if let error = error {
+                        print("Error resuming playback: \(error.localizedDescription)")
+                    } else {
+                        self?.isPaused = false
+                        print("Music resumed.")
+                    }
+                }
+            } else {
+                appRemote.playerAPI?.pause { [weak self] result, error in
+                    if let error = error {
+                        print("Error pausing playback: \(error.localizedDescription)")
+                    } else {
+                        self?.isPaused = true
+                        print("Music paused.")
+                    }
+                }
+            }
         } else {
-            // If isPaused is false, then pause player
-            appRemote.playerAPI?.pause()
-            isPaused = true
+            reconnectAndExecute {
+                self.togglePlayPause()
+            }
         }
     }
     
@@ -199,9 +313,25 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
     /*
      Method skips to the next song in the queue
      Created by Paul Shamoon on 10/17/2024.
+     Updated by Mohammad on 11/03/2024
      */
     func skipToNext() {
-        playbackController.skipToNext()
+        if appRemote.isConnected {
+            appRemote.playerAPI?.skip(toNext: { [weak self] result, error in
+                if let error = error {
+                    print("Error skipping to next track: \(error.localizedDescription)")
+                    // Attempt to reconnect or handle the error
+                    self?.handlePlayerAPIError()
+                } else {
+                    print("Successfully skipped to the next track.")
+                }
+            })
+        } else {
+            print("App Remote is not connected. Attempting to reconnect...")
+            reconnectAndExecute {
+                self.skipToNext()
+            }
+        }
     }
     
     /*
@@ -209,10 +339,57 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
      Created by Paul Shamoon on 10/17/2024.
      */
     func skipToPrevious() {
-        playbackController.skipToPrevious()
+        if appRemote.isConnected {
+            appRemote.playerAPI?.skip(toPrevious: { [weak self] result, error in
+                if let error = error {
+                    print("Error skipping to previous track: \(error.localizedDescription)")
+                    // Attempt to reconnect or handle the error
+                    self?.handlePlayerAPIError()
+                } else {
+                    print("Successfully skipped to the previous track.")
+                }
+            })
+        } else {
+            print("App Remote is not connected. Attempting to reconnect...")
+            reconnectAndExecute {
+                self.skipToPrevious()
+            }
+        }
     }
+
     
-    
+    func reconnectAndExecute(_ action: @escaping () -> Void, delay: TimeInterval = 2.0) {
+        // Check if already connected; if so, execute the action immediately
+        guard !appRemote.isConnected else {
+            print("Spotify is already connected.")
+            action() // Execute the action immediately since we're already connected
+            return
+        }
+        
+        // If not connected, attempt to reconnect
+        print("Spotify is not connected. Attempting to reconnect...")
+        resetFirstConnectionAttempt()
+        
+        // Attempt to establish the connection and authorize
+        appRemote.authorizeAndPlayURI("") // Opens Spotify to establish a connection
+        
+        // Delay to allow connection and then check if connected
+        DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+            if self.appRemote.isConnected {
+                // Refresh the player state to ensure everything is up-to-date
+                self.refreshPlayerState()
+                action() // Execute the provided action after refreshing player state
+            } else {
+                print("Failed to reconnect to Spotify.")
+            }
+        }
+    }
+
+     private func handlePlayerAPIError() {
+         // Add error handleing
+         print("Handling player API error. Make sure Spotify is open and playing.")
+     }
+
     /*
      Method to clear the current queue
      
@@ -235,116 +412,30 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
         }
     }
     
-    /*
-     Function that determines the mood-based audio feature ranges (e.g., valence, energy) based on the provided mood. It returns a tuple with the appropriate values for each feature.
-     
-     Created by: Mohammad Sulaiman
-     */
-    private func getMoodParameters(for mood: String) -> (Double, Double, Double, Double, Double?, Double?, Double?, Double?, Double?, Double?) {
-        var minValence: Double = 0.5
-        var maxValence: Double = 0.5
-        var minEnergy: Double = 0.5
-        var maxEnergy: Double = 0.5
-        var minLoudness: Double? = nil
-        var maxLoudness: Double? = nil
-        var minAcousticness: Double? = nil
-        var maxAcousticness: Double? = nil
-        var minDanceability: Double? = nil
-        var maxDanceability: Double? = nil
-        
-        switch mood.lowercased() {
-        case "happy":
-            minValence = 0.7
-            maxValence = 1.0
-            minEnergy = 0.6
-            maxEnergy = 0.9
-            /*
-             minDanceability = 0.7
-             maxDanceability = 1.0 // Danceable, upbeat tracks
-             */
-            
-            
-        case "sad":
-            minValence = 0.0
-            maxValence = 0.3
-            minEnergy = 0.3
-            maxEnergy = 0.5
-            minAcousticness = 0.6
-            maxAcousticness = 1.0 // Softer, acoustic-style tracks
-            
-        case "angry":
-            minValence = 0.0
-            maxValence = 0.3
-            minEnergy = 0.8
-            maxEnergy = 1.0
-            minLoudness = -5.0 // Louder tracks for intensity
-            
-        case "chill":
-            minValence = 0.4
-            maxValence = 0.6
-            minEnergy = 0.4
-            maxEnergy = 0.6
-            minAcousticness = 0.3
-            maxAcousticness = 0.6 // Balanced range for chill mood
-            
-        default:
-            break
-        }
-        
-        return (minValence, maxValence, minEnergy, maxEnergy, minLoudness, maxLoudness, minAcousticness, maxAcousticness, minDanceability, maxDanceability)
-    }
-    
-    /*
-     Function that constructs the Spotify API recommendation URL using the provided genres and audio feature ranges. It dynamically includes each feature parameter in the URL if it’s not nil.
-     
-     Created by: Mohammad Sulaiman
-     */
-    private func buildRecommendationURL(userGenres: [String], limit: Int, minValence: Double, maxValence: Double, minEnergy: Double, maxEnergy: Double, minLoudness: Double?, maxLoudness: Double?, minAcousticness: Double?, maxAcousticness: Double?, minDanceability: Double?, maxDanceability: Double?) -> URL? {
-        // TODO: Shuffle the usergenres if more than 5 moods are selected.
-        // Convert user-selected genres to API-compatible genres
-        let seedGenres = userGenres.prefix(5).map { apiGenre(from: $0) }.joined(separator: ",")
-        
-        var urlString = """
-            https://api.spotify.com/v1/recommendations?seed_genres=\(seedGenres)&limit=\(limit)\
-            &min_valence=\(minValence)&max_valence=\(maxValence)\
-            &min_energy=\(minEnergy)&max_energy=\(maxEnergy)
-            """
-        // Organize optional parameters in a dictionary
-        let optionalParameters: [String: Double?] = [
-            "min_loudness": minLoudness,
-            "max_loudness": maxLoudness,
-            "min_acousticness": minAcousticness,
-            "max_acousticness": maxAcousticness,
-            "min_danceability": minDanceability,
-            "max_danceability": maxDanceability
-        ]
-        
-        // Iterate over optional parameters and append if non-nil
-        for (key, value) in optionalParameters {
-            if let value = value {
-                urlString += "&\(key)=\(value)"
-            }
-        }
-        
-        return URL(string: urlString)
-    }
-    
     
     /*
      Function that sends the recommendation request to Spotify, handles the response, parses the track URIs, and then calls enqueueTracks with the list of track URIs.
-     
+
      Created by: Mohammad Sulaiman
      */
     func fetchRecommendations(mood: String, profile: Profile, userGenres: [String]) {
+        guard appRemote.isConnected else {
+            print("Spotify is not connected. Attempting to reconnect...")
+            reconnectAndExecute({
+                self.fetchRecommendations(mood: mood, profile: profile, userGenres: userGenres)
+            }, delay: 3)
+            return
+        }
+        
         // Reset currentPlaylist to nil when queueing songs based off mood
         self.currentPlaylist = nil
         self.currentMood = mood
         
         // Get feature parameters based on mood
-        let (minValence, maxValence, minEnergy, maxEnergy, minLoudness, maxLoudness, minAcousticness, maxAcousticness, minDanceability, maxDanceability) = getMoodParameters(for: mood)
+        let (minValence, maxValence, minEnergy, maxEnergy, minLoudness, maxLoudness, minAcousticness, maxAcousticness, minDanceability, maxDanceability) = moodQueueHandler.getMoodParameters(for: mood)
         
         // Build the recommendation URL
-        guard let url = buildRecommendationURL(userGenres: userGenres, limit: 20, minValence: minValence, maxValence: maxValence, minEnergy: minEnergy, maxEnergy: maxEnergy, minLoudness: minLoudness, maxLoudness: maxLoudness, minAcousticness: minAcousticness, maxAcousticness: maxAcousticness, minDanceability: minDanceability, maxDanceability: maxDanceability),
+        guard let url = moodQueueHandler.buildRecommendationURL(userGenres: userGenres, limit: 20, minValence: minValence, maxValence: maxValence, minEnergy: minEnergy, maxEnergy: maxEnergy, minLoudness: minLoudness, maxLoudness: maxLoudness, minAcousticness: minAcousticness, maxAcousticness: maxAcousticness, minDanceability: minDanceability, maxDanceability: maxDanceability),
               let accessToken = self.accessToken else {
             print("Invalid URL or missing access token")
             return
@@ -468,17 +559,6 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
             }
         })
     }
-    
-    // Function to convert user-facing genre names to API-compatible genre names
-    private func apiGenre(from genre: String) -> String {
-        switch genre {
-        case "R&B": return "r-n-b"
-        case "World Music": return "world-music"
-        case "Film Scores": return "movie"
-        default: return genre.lowercased()
-        }
-    }
-    
     /*
      Method to play the passed-in "Song" object from the currentQueue
      
@@ -537,4 +617,64 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
         
         return song
     }
+    
+    func updatePlayerState() {
+        appRemote.playerAPI?.getPlayerState { [weak self] (result, error) in
+            if let playerState = result as? SPTAppRemotePlayerState {
+                self?.playerStateDidChange(playerState)
+            }
+        }
+    }
+
+
+    func ensureSpotifyConnection(completion: (() -> Void)? = nil) {
+        guard !appRemote.isConnected else {
+            print("Spotify already connected.")
+            completion?() // Trigger completion if already connected
+            return
+        }
+        
+        // Silent reconnect if token is valid but connection is lost
+        if let token = accessToken, !isAccessTokenExpired() {
+            print("Attempting silent reconnect with valid token.")
+            appRemote.connectionParameters.accessToken = token
+            appRemote.connect()
+            
+            // Listen for successful connection
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                if self.appRemote.isConnected {
+                    completion?() // Trigger completion once reconnected
+                }
+            }
+        } else {
+            print("Token expired or missing; reconnect deferred.")
+            completion?() // Call completion even if no reconnection occurs
+        }
+    }
+    
+    func initializeSpotifyConnection() {
+        guard isFirstConnectionAttempt else {
+            print("Initial connection attempt already completed.")
+            return
+        }
+        guard !appRemote.isConnected else {
+            print("Spotify already connected with valid token")
+            return
+        }
+        
+        if let token = accessToken, !isAccessTokenExpired() {
+            connect()
+        } else {
+            disconnect()
+            connect()
+        }
+        
+        isFirstConnectionAttempt = false // Ensures this only runs once
+    }
+    
+    func resetFirstConnectionAttempt() {
+        isFirstConnectionAttempt = true
+    }
+    
 }
+

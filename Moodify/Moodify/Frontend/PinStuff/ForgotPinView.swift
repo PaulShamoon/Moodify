@@ -28,7 +28,7 @@ struct ForgotPinView: View {
                             Image(systemName: "chevron.left")
                             Text("Back")
                         }
-                        .foregroundColor(.blue)
+                        .foregroundColor(.white)
                         .font(.system(size: 16, weight: .medium))
                     }
                     Spacer()
@@ -109,6 +109,7 @@ struct ForgotPinView: View {
             // Ensure the profile data is reloaded when this view is dismissed
             profileManager.loadProfiles()
         }
+        .navigationBarBackButtonHidden(true) // Hides the default back button
     }
     
     private func resetPin() {
