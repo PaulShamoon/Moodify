@@ -23,6 +23,8 @@ struct QuestionnaireView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 25) {
+                Spacer()
+                
                 headerSection
                 
                 VStack(spacing: 20) {
@@ -294,5 +296,19 @@ struct CustomTextField: View {
         .padding()
         .background(Color(white: 0.2))
         .cornerRadius(10)
+    }
+}
+
+struct QuestionnaireView_Previews: PreviewProvider {
+    static var previews: some View {
+        let profileManager = ProfileManager()
+        let navigateToMusicPreferences = Binding.constant(false)
+        let isCreatingNewProfile = Binding.constant(true)
+        
+        QuestionnaireView(
+            navigateToMusicPreferences: navigateToMusicPreferences,
+            isCreatingNewProfile: isCreatingNewProfile
+        )
+        .environmentObject(profileManager)
     }
 }

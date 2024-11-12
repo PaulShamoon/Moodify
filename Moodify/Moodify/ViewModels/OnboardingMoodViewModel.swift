@@ -23,10 +23,10 @@ class OnboardingMoodViewModel: ObservableObject {
         ),
         MoodOnboarding(
             mood: Mood(
-                name: "Anxious",
+                name: "Chill",
                 colors: [Color.blue.opacity(0.8), Color.cyan],
                 darkColors: [Color.blue.opacity(0.9), Color.cyan.opacity(0.7)],
-                icon: "exclamationmark.triangle.fill"
+                icon: "headphones"
             ),
             message: "Find calming music to ease your mind and help you relax."
         ),
@@ -66,13 +66,15 @@ class OnboardingMoodViewModel: ObservableObject {
         }
     }
     
-    func handleDragEnd(gesture: DragGesture.Value) {
-        if gesture.translation.width < -100 {
-            nextMood()
-        } else if gesture.translation.width > 100 {
-            previousMood()
-        } else {
+    func handleDragEnd(gesture: DragGesture.Value, maxIndex: Int) {
+            let dragThreshold: CGFloat = 50
+            
+            if gesture.translation.width < -dragThreshold && currentIndex < maxIndex {
+                currentIndex += 1
+            } else if gesture.translation.width > dragThreshold && currentIndex > 0 {
+                currentIndex -= 1
+            }
+            
             dragOffset = .zero
         }
-    }
 }
