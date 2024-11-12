@@ -166,9 +166,10 @@ struct PinSetupView: View {
             Button(action: handleNextStep) {
                 Text(getButtonTitle())
                     .frame(maxWidth: .infinity)
+                    .font(.title2)
                     .padding()
                     .background(Color.green)
-                    .foregroundColor(.white)
+                    .foregroundColor(.black)
                     .cornerRadius(12)
             }
         }

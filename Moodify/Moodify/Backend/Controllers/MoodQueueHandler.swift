@@ -97,7 +97,7 @@ class MoodQueueHandler {
         switch genre {
         case "R&B": return "r-n-b"
         case "World Music": return "world-music"
-        case "Film Scores": return "movie"
+        case "Film Scores": return "movies"
         default: return genre.lowercased()
         }
     }

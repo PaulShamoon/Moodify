@@ -80,15 +80,15 @@ struct GeneralMusicPreferencesView: View {
                                     VStack(spacing: 8) {
                                         Image(systemName: genreIcon(for: genre))
                                             .font(.system(size: 22))
-                                            .foregroundColor(selectedGenres.contains(genre) ? .white : .gray)
+                                            .foregroundColor(selectedGenres.contains(genre) ? .black : .gray) // Text color changes when selected
                                         
                                         Text(genre)
                                             .font(.system(size: 14, weight: .semibold, design: .rounded))
-                                            .foregroundColor(.white)
+                                            .foregroundColor(selectedGenres.contains(genre) ? .black : .white) // Text color changes when selected
                                         
                                         if selectedGenres.contains(genre) {
                                             Image(systemName: "checkmark.circle.fill")
-                                                .foregroundColor(.white)
+                                                .foregroundColor(.black)
                                                 .font(.system(size: 16))
                                         }
                                     }
@@ -156,6 +156,7 @@ struct GeneralMusicPreferencesView: View {
                             selectedGenres.isEmpty ?
                             LinearGradient(gradient: Gradient(colors: [Color.white.opacity(0.1), Color.white.opacity(0.1)]), startPoint: .leading, endPoint: .trailing) :
                                 LinearGradient(gradient: Gradient(colors: [Color.green, Color.green.opacity(0.8)]), startPoint: .leading, endPoint: .trailing)
+                            
                         )
                         .cornerRadius(16)
                         .shadow(color: selectedGenres.isEmpty ? .clear : Color.green.opacity(0.3),
