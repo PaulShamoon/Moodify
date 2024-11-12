@@ -343,8 +343,20 @@ struct homePageView: View {
             }
             
             if let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
-               let emotion = json["emotion"] as? String,
+               var emotion = json["emotion"] as? String,
                let probabilitiesDict = json["probabilities"] as? [String: Double] {
+                
+                // Adjust emotion based on specified cases
+                switch emotion.lowercased() {
+                case "surprise":
+                    emotion = "happy"
+                case "disgust", "fear":
+                    emotion = "sad"
+                case "neutral":
+                    emotion = "chill"
+                default:
+                    break
+                }
                 
                 let sortedProbabilities = probabilitiesDict.sorted { $0.value > $1.value }
                 DispatchQueue.main.async {
