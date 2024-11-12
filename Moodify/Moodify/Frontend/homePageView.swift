@@ -21,7 +21,7 @@ struct homePageView: View {
     @State private var showMenu = false
     
     // NOTE - this URL is temporary and needs to be updated each time from the backend side to detect mood properly
-    let backendURL = "/analyze"
+    let backendURL = "https://f3a5-2601-406-4d00-7af0-15b6-9855-e71d-6f63.ngrok-free.app/analyze"
     
     // Add this property to manage background color
     @State private var backgroundColors: [Color] = [
@@ -131,7 +131,7 @@ struct homePageView: View {
                         }
                     }
                     .padding(.horizontal, 16)
-                 
+                    
                     ZStack {
                         // Frosted glass effect background
                         RoundedRectangle(cornerRadius: 30)
