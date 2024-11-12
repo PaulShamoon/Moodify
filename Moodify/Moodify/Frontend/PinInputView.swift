@@ -39,7 +39,7 @@ struct PinInputView: View {
                         .foregroundColor(.red)
                         .font(.subheadline)
                         .transition(.opacity)
-                        .padding(.top, 200)
+                        .padding(.top, 155)
                 }
                 Spacer()
             }
@@ -136,6 +136,7 @@ struct PinInputView: View {
             // Auto-submit when 4 digits are entered
             if enteredPin.count == 4 {
                 onPinEntered(enteredPin)
+                enteredPin = ""
                 showError = true
             }
         }
