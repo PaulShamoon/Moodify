@@ -47,7 +47,7 @@ struct QueueView: View {
                 // Fixed header section
                 VStack(spacing: 16) {
                     CustomHeader(dismiss: dismiss, spotifyController: spotifyController)
-                    MoodSection(currentMood: spotifyController.currentMood)
+                    MoodSection(spotifyController: spotifyController)
                     NowPlayingCard(spotifyController: spotifyController)
                 }
                 .padding(.bottom)
@@ -94,7 +94,7 @@ struct QueueView: View {
 
 // Current Mood Section
 struct MoodSection: View {
-    let currentMood: String
+    let spotifyController: SpotifyController
     
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -107,15 +107,18 @@ struct MoodSection: View {
                     .font(.title)
                     .foregroundColor(.white)
                 
-                Text(currentMood)
+                Text(spotifyController.currentMood)
                     .font(.title2.bold())
                     .foregroundColor(.white)
                 
                 Spacer()
-                
                 // Mood indicator pill
-                Text("Playing \(currentMood.lowercased()) music")
-                    .font(.caption)
+                Text(
+                    spotifyController.currentPlaylist == nil
+                        ? "Playing \(spotifyController.currentMood.lowercased()) music"
+                        : "Playing \(spotifyController.currentPlaylist!.mood) playlist"
+                )
+                .font(.caption)
                     .foregroundColor(.white)
                     .padding(.horizontal, 12)
                     .padding(.vertical, 6)
@@ -136,7 +139,7 @@ struct MoodSection: View {
     
     // Helper function to get mood icon
     private func getMoodIcon() -> String {
-        switch currentMood.lowercased() {
+        switch spotifyController.currentMood.lowercased() {
         case "happy", "surprise":
             return "face.smiling"
         case "sad", "disgust", "fear":

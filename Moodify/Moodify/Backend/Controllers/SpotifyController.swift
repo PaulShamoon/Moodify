@@ -22,7 +22,8 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
     @Published var currentArtistName: String = ""
     @Published var albumCover: UIImage? = nil
     @Published var accessToken: String? = nil
-    
+    // Currently playing playlist
+    @Published var currentPlaylist: Playlist? = nil
     // Array of "Song" objects to hold the state of the queue
     @Published var currentQueue: [Song] = []
     
@@ -335,7 +336,10 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
      Created by: Mohammad Sulaiman
      */
     func fetchRecommendations(mood: String, profile: Profile, userGenres: [String]) {
+        // Reset currentPlaylist to nil when queueing songs based off mood
+        self.currentPlaylist = nil
         self.currentMood = mood
+        
         // Get feature parameters based on mood
         let (minValence, maxValence, minEnergy, maxEnergy, minLoudness, maxLoudness, minAcousticness, maxAcousticness, minDanceability, maxDanceability) = getMoodParameters(for: mood)
         
