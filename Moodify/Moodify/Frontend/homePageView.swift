@@ -20,7 +20,6 @@ struct homePageView: View {
     @Binding var isCreatingProfile: Bool // This will be passed from outside
     @State private var showMenu = false
     @State private var isCameraDismissed = false
-
     
     // NOTE - this URL is temporary and needs to be updated each time from the backend side to detect mood properly
     let backendURL = "https://f3a5-2601-406-4d00-7af0-15b6-9855-e71d-6f63.ngrok-free.app/analyze"
