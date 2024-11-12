@@ -89,7 +89,8 @@ struct OnboardingView: View {
                 }) {
                     Text(currentPage < totalPages - 1 ? "Next" : "Continue")
                         .font(.headline)
-                        .foregroundColor(.white)
+                        .foregroundColor(.black)
+                        .fontWeight(.bold)
                         .padding()
                         .frame(width: 180)
                         .background(Color.green)
