@@ -45,7 +45,7 @@ class MoodQueueHandler {
             maxEnergy = 1.0
             minLoudness = -5.0
             
-        case "neutral":
+        case "chill":
             minValence = 0.4
             maxValence = 0.6
             minEnergy = 0.4

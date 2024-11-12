@@ -58,6 +58,8 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
         }
     }
     
+    @Published var currentPlaylist: Playlist? = nil
+    
     // Array of "Song" objects to hold the state of the queue
     @Published var currentQueue: [Song] = []
     
@@ -66,6 +68,8 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
     
     // Variable to store the last known player state
     var isPaused: Bool = false
+    
+    @Published var currentMood: String = "Chill" // Default mood
     
     private lazy var configuration = SPTConfiguration(
         clientID: spotifyClientID,
@@ -162,6 +166,7 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
         // Reset track and album name and clear access token
         currentTrackName = "No track playing"
         currentAlbumName = "No album"
+        albumCover = nil
         UserDefaults.standard.removeObject(forKey: "SpotifyAccessToken")
         UserDefaults.standard.removeObject(forKey: "SpotifyTokenExpiration")
     }
@@ -248,6 +253,7 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
             self.currentTrackName = "No track playing"  // Reset track info
             self.currentAlbumName = "No album"
             self.currentArtistName = ""
+            self.albumCover = nil
             self.isPaused = true
         }
     }
@@ -264,6 +270,7 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
             self.currentArtistName = playerState.track.artist.name
             self.currentTrackURI = playerState.track.uri
             self.currentAlbumName = playerState.track.album.name
+            self.isPaused = playerState.isPaused
             self.fetchAlbumCover()
         }
     }
@@ -384,14 +391,14 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
      }
 
     /*
-    Method to clear the current queue
+     Method to clear the current queue
      
-    NOTE: The Spotify Web API nor the Spotify iOS SDK provide an API endpoint to clear the current queue.
+     NOTE: The Spotify Web API nor the Spotify iOS SDK provide an API endpoint to clear the current queue.
      Because of this, our only option is to skip through every song in the currentQueue to "clear" the queue.
      These "skip" requests happen almost instantanous and are barley noticable to the user, making it a effective loophole.
-    
+     
      Created By: Paul Shamoon
-    */
+     */
     func clearCurrentQueue() {
         // Check if currentQueue is empty
         guard !currentQueue.isEmpty else {
@@ -416,9 +423,13 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
             print("Spotify is not connected. Attempting to reconnect...")
             reconnectAndExecute({
                 self.fetchRecommendations(mood: mood, profile: profile, userGenres: userGenres)
-            }, delay: 10.0)
+            }, delay: 3)
             return
         }
+        
+        // Reset currentPlaylist to nil when queueing songs based off mood
+        self.currentPlaylist = nil
+        self.currentMood = mood
         
         // Get feature parameters based on mood
         let (minValence, maxValence, minEnergy, maxEnergy, minLoudness, maxLoudness, minAcousticness, maxAcousticness, minDanceability, maxDanceability) = moodQueueHandler.getMoodParameters(for: mood)
@@ -554,7 +565,7 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
      @param song: "Song" object from the queue to play
      
      Created By: Paul Shamoon
-    */
+     */
     func playSongFromQueue(song: Song) {
         // Get the song to play's index in the currentQueue
         if let index = currentQueue.firstIndex(where: { $0.songURI == song.songURI }) {

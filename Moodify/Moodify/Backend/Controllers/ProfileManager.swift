@@ -46,9 +46,16 @@ class ProfileManager: ObservableObject {
             return
         }
         
+        // First clear the current profile if it's the one being deleted
+        if currentProfile?.id == profile.id {
+            currentProfile = nil
+        }
+        
+        // Then remove from the array and save
         profiles.remove(at: index)
         saveProfiles()
-        loadProfiles() // Refresh profiles after deletion
+        
+        // No need to call loadProfiles() here as we've already updated the state
         print("Profile deleted successfully.")
     }
     

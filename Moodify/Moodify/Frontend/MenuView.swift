@@ -364,11 +364,7 @@ struct MenuView: View {
         if let currentProfile = profileManager.currentProfile {
             withAnimation {
                 profileManager.deleteProfile(profile: currentProfile)
-                profileManager.currentProfile = nil
-                isCreatingNewProfile = false
-                navigateToHomePage = false
-                navigateToMusicPreferences = false
-                showMenu = false
+                switchUser()
             }
         }
     }

@@ -251,3 +251,28 @@ extension Color {
         )
     }
 }
+
+#Preview {
+    ProfileSelectionView(
+        navigateToHomePage: .constant(false),
+        isCreatingNewProfile: .constant(false),
+        navigateToMusicPreferences: .constant(false)
+    )
+    .environmentObject(ProfileManager())
+}
+
+// Preview for ProfileCard
+#Preview("Profile Card") {
+    ProfileCard(
+        profile: Profile(
+            name: "John Doe",
+            dateOfBirth: Date(),
+            favoriteGenres: [],
+            hasAgreedToTerms: true
+        ),
+        defaultProfileImage: URL(string: "https://cdn.pixabay.com/photo/2016/11/08/15/21/user-1808597_1280.png")!,
+        action: {}
+    )
+    .frame(width: 180, height: 200)
+    .background(Color.black)
+}
