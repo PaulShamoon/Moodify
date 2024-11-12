@@ -39,7 +39,7 @@ struct ForgotPinView: View {
                 if showError {
                     Text(errorMessage)
                         .foregroundColor(.red)
-                        .padding(.top, 100)
+                        .padding(.top, 50)
                 }
                 Spacer()
             }

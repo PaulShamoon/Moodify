@@ -253,7 +253,7 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
         var maxDanceability: Double? = nil
         
         switch mood.lowercased() {
-        case "happy", "surprise":
+        case "happy":
             minValence = 0.7
             maxValence = 1.0
             minEnergy = 0.6
@@ -264,7 +264,7 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
              */
             
             
-        case "sad", "disgust", "fear":
+        case "sad":
             minValence = 0.0
             maxValence = 0.3
             minEnergy = 0.3
@@ -279,7 +279,7 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
             maxEnergy = 1.0
             minLoudness = -5.0 // Louder tracks for intensity
             
-        case "chill":
+        case "neutral", "chill":
             minValence = 0.4
             maxValence = 0.6
             minEnergy = 0.4

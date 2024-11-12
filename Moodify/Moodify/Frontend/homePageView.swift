@@ -49,11 +49,6 @@ struct homePageView: View {
                     Color(red: 0.1, green: 0.1, blue: 0.1),
                     Color(red: 0.2, green: 0.05, blue: 0.05)  // Subtle red dark
                 ]
-            case "surprise":
-                backgroundColors = [
-                    Color(red: 0.1, green: 0.1, blue: 0.1),
-                    Color(red: 0.15, green: 0.05, blue: 0.2)  // Subtle purple dark
-                ]
             case "chill":
                 backgroundColors = [
                     Color(red: 0.1, green: 0.1, blue: 0.1),
@@ -389,7 +384,6 @@ struct homePageView: View {
         case "happy": return "😄"
         case "sad": return "😢"
         case "angry": return "😡"
-        case "surprise": return "😲"
         case "chill": return "😌"
         default: return "😶"
         }
@@ -496,7 +490,6 @@ struct ManualMoodSelector: View {
         ("Happy", "😄", .yellow, "sun.max.fill"),
         ("Sad", "😢", .blue, "cloud.rain"),
         ("Angry", "😡", .red, "flame.fill"),
-        ("Anxious", "😰", .purple, "tornado"),
         ("Chill", "😌", .mint, "leaf.fill")
     ]
     
@@ -538,23 +531,10 @@ struct ManualMoodSelector: View {
                             action: { selectedMood = moods[2].name; updateMood(mood: moods[2].name.lowercased()) }
                         )
                         MoodCard(
-                            mood: moods[3], // Anxious
+                            mood: moods[3], // Chill
                             isSelected: selectedMood == moods[3].name,
                             action: { selectedMood = moods[3].name; updateMood(mood: moods[3].name.lowercased()) }
                         )
-                    }
-                    .padding(.horizontal)
-                    
-                    // Third row - centered single item
-                    HStack {
-                        Spacer()
-                        MoodCard(
-                            mood: moods[4], // Chill
-                            isSelected: selectedMood == moods[4].name,
-                            action: { selectedMood = moods[4].name; updateMood(mood: moods[4].name.lowercased()) }
-                        )
-                        .frame(maxWidth: UIScreen.main.bounds.width / 2.3) // Match the width of cards in the rows above
-                        Spacer()
                     }
                     .padding(.horizontal)
                 }

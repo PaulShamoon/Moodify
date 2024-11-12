@@ -243,16 +243,6 @@ struct PinSetupView: View {
             errorMessage = "PINs don't match"
             return false
         }
-        guard !pin.allSatisfy({ $0 == pin[pin.startIndex] }) else {
-            showError = true
-            errorMessage = "PIN cannot be all same digits"
-            return false
-        }
-        guard !["0000", "1111", "1234", "4321"].contains(pin) else {
-            showError = true
-            errorMessage = "PIN is too common. Please choose a more secure PIN"
-            return false
-        }
         return true
     }
     
@@ -271,9 +261,29 @@ struct PinSetupView: View {
     private func savePin() {
         if let profile = profile {
             if let existingPin = profile.userPin {
+                guard !currentPin.isEmpty else {
+                    showError = true
+                    errorMessage = "Please enter your current PIN"
+                    return
+                }
                 guard currentPin == existingPin else {
                     showError = true
                     errorMessage = "Current PIN is incorrect"
+                    return
+                }
+                guard !pin.isEmpty else {
+                    showError = true
+                    errorMessage = "Please enter a new PIN"
+                    return
+                }
+                guard pin.count == 4 else {
+                    showError = true
+                    errorMessage = "Please enter a 4 digit PIN"
+                    return
+                }
+                guard !confirmPin.isEmpty else {
+                    showError = true
+                    errorMessage = "Please confirm your new PIN"
                     return
                 }
                 guard pin == confirmPin else {

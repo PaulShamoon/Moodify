@@ -36,24 +36,14 @@ class PlaylistManager: ObservableObject {
             return
         }
         
-        var combined_mood: String
-        switch mood {
-        case "happy", "surprise":
-            combined_mood = "happy"
-        case "sad", "disgust", "fear":
-            combined_mood = "sad"
-        default:
-            combined_mood = mood
-        }
-        
-        if let index = playlists.firstIndex(where: { $0.profileId == profile.id && $0.mood == combined_mood }) {
+        if let index = playlists.firstIndex(where: { $0.profileId == profile.id && $0.mood == mood }) {
             playlists[index].songs = songs
             playlists[index].dateCreated = Date()
-            print("Playlist updated for \(profile.name) with mood: \(combined_mood).")
+            print("Playlist updated for \(profile.name) with mood: \(mood).")
         } else {
-            let newPlaylist = Playlist(mood: combined_mood, profileId: profile.id, songs: songs)
+            let newPlaylist = Playlist(mood: mood, profileId: profile.id, songs: songs)
             playlists.append(newPlaylist)
-            print("New playlist created for \(profile.name) with mood: \(combined_mood).")
+            print("New playlist created for \(profile.name) with mood: \(mood).")
         }
         savePlaylists()
     }
