@@ -252,9 +252,6 @@ struct homePageView: View {
                 .zIndex(1)
             }
         }
-        .alert(isPresented: $showingAlert) {
-            Alert(title: Text("Error"), message: Text(alertMessage), dismissButton: .default(Text("OK")))
-        }
         .sheet(isPresented: $showingCamera) {
             CameraView(image: $capturedImage)
                 .onDisappear {
