@@ -151,6 +151,19 @@ struct homePageView: View {
                                 hasConnectedSpotify = true
                             }
                         }
+                        .navigationBarBackButtonHidden(true)
+                        .toolbar {
+                            ToolbarItem(placement: .navigationBarLeading) {
+                                Button(action: {
+                                    navigateToSpotify = false
+                                }) {
+                                    Image(systemName: "chevron.backward")
+                                        .foregroundColor(.white)
+                                    Text("Back")
+                                        .foregroundColor(.white)
+                                }
+                            }
+                        }
                 }
             }
             

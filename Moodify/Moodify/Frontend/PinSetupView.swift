@@ -58,8 +58,6 @@ struct PinSetupView: View {
                 .padding()
             }
         }
-        .navigationBarBackButtonHidden(true)
-        .navigationBarItems(leading: backButton)
     }
     
     private var headerView: some View {
