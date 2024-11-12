@@ -22,7 +22,7 @@ struct homePageView: View {
     @State private var isCameraDismissed = false
     
     // NOTE - this URL is temporary and needs to be updated each time from the backend side to detect mood properly
-    let backendURL = "https://f3a5-2601-406-4d00-7af0-15b6-9855-e71d-6f63.ngrok-free.app/analyze"
+    let backendURL = "/analyze"
     
     // Add this property to manage background color
     @State private var backgroundColors: [Color] = [
@@ -424,7 +424,7 @@ struct MoodPreferenceView: View {
                     HStack {
                         Image(systemName: "cloud.rain")
                             .font(.title3)
-                        Text("Embrace the moment\nwith calming music")
+                        Text("Lean into the feeling\nwith sad melodies")
                             .multilineTextAlignment(.center)
                             .lineLimit(2)
                     }
