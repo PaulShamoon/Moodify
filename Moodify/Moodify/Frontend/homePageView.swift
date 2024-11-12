@@ -666,7 +666,7 @@ struct MoodCard: View {
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         homePageView(
-            profile: Profile(name: "Naz", dateOfBirth: Date(), favoriteGenres: ["Pop", "Rock"], hasAgreedToTerms: true, completedMusicPreferences: true),
+            profile: Profile(name: "Naz", dateOfBirth: Date(), favoriteGenres: ["Pop", "Rock"], hasAgreedToTerms: true),
             navigateToHomePage: .constant(false),
             isCreatingNewProfile: .constant(false),
             navigateToMusicPreferences: .constant(false), isCreatingProfile: .constant(false)

@@ -156,7 +156,6 @@ struct ForgotPinView: View {
                 dateOfBirth: profile.dateOfBirth,
                 favoriteGenres: profile.favoriteGenres,
                 hasAgreedToTerms: profile.hasAgreedToTerms,
-                completedMusicPreferences: profile.completedMusicPreferences,
                 userPin: newPin,
                 personalSecurityQuestion: profile.personalSecurityQuestion,
                 securityQuestionAnswer: profile.securityQuestionAnswer

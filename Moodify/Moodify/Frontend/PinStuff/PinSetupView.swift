@@ -298,7 +298,6 @@ struct PinSetupView: View {
                 dateOfBirth: profile.dateOfBirth,
                 favoriteGenres: profile.favoriteGenres,
                 hasAgreedToTerms: profile.hasAgreedToTerms,
-                completedMusicPreferences: profile.completedMusicPreferences,
                 userPin: pin,
                 personalSecurityQuestion: profile.userPin == nil ? securityQuestion : profile.personalSecurityQuestion,
                 securityQuestionAnswer: profile.userPin == nil ? securityQuestionAnswer : profile.securityQuestionAnswer
