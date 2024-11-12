@@ -75,6 +75,9 @@ class PlaylistManager: ObservableObject {
             // Clear currentQueue before queueing the playlist's songs
             self.spotifyController.clearCurrentQueue()
             
+            // Set the currently playing playlist
+            self.spotifyController.currentPlaylist = playlist
+            
             for (index, track) in playlist.songs.enumerated() {
                 let uri = track.songURI
                 
