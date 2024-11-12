@@ -39,6 +39,7 @@
 		6EEDBF492CA3B94D0079295D /* SplashPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EEDBF482CA3B9470079295D /* SplashPage.swift */; };
 		8917A3D92CA4D11400253254 /* MenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8917A3D82CA4D10F00253254 /* MenuView.swift */; };
 		8917A3DB2CA4D87400253254 /* AccountInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8917A3DA2CA4D86100253254 /* AccountInfoView.swift */; };
+		892C8B3D2CD806AA000C2CE4 /* MoodQueueHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 892C8B3C2CD806AA000C2CE4 /* MoodQueueHandler.swift */; };
 		8966A3A32CC3304F00FA58DE /* PinSetupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8966A3A22CC3304500FA58DE /* PinSetupView.swift */; };
 		89AD05632CB083B8004D8FAD /* Profile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89AD05622CB083B3004D8FAD /* Profile.swift */; };
 		89AD05652CB08452004D8FAD /* ProfileManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89AD05642CB08439004D8FAD /* ProfileManager.swift */; };
@@ -118,6 +119,7 @@
 		6EFE6C522C9E4AD40000DE46 /* Moodify-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Moodify-Bridging-Header.h"; sourceTree = "<group>"; };
 		8917A3D82CA4D10F00253254 /* MenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuView.swift; sourceTree = "<group>"; };
 		8917A3DA2CA4D86100253254 /* AccountInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountInfoView.swift; sourceTree = "<group>"; };
+		892C8B3C2CD806AA000C2CE4 /* MoodQueueHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodQueueHandler.swift; sourceTree = "<group>"; };
 		8966A3A22CC3304500FA58DE /* PinSetupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PinSetupView.swift; sourceTree = "<group>"; };
 		89AD05622CB083B3004D8FAD /* Profile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Profile.swift; sourceTree = "<group>"; };
 		89AD05642CB08439004D8FAD /* ProfileManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileManager.swift; sourceTree = "<group>"; };
@@ -267,6 +269,7 @@
 				6E52B8532CC98F370049BF08 /* PlayBackController.swift */,
 				6E728B922CD1B97900017EA4 /* QueueManager.swift */,
 				6EA47A6F2C9E5199006FB5C6 /* SpotifyController.swift */,
+				892C8B3C2CD806AA000C2CE4 /* MoodQueueHandler.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -470,6 +473,7 @@
 				6EA2E3B82CDAF29E00B4E6C8 /* PlaylistManager.swift in Sources */,
 				6E52B8542CC98F3E0049BF08 /* PlayBackController.swift in Sources */,
 				6982AB742CDD95AC005F9750 /* OnBoarding.swift in Sources */,
+				892C8B3D2CD806AA000C2CE4 /* MoodQueueHandler.swift in Sources */,
 				6EEDBF492CA3B94D0079295D /* SplashPage.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -636,7 +640,8 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Moodify/Preview Content\"";
-				DEVELOPMENT_TEAM = B2RSHDDNFF;
+
+				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Moodify/Info.plist;
@@ -654,7 +659,7 @@
 				);
 				MARKETING_VERSION = 1.0;
 				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_BUNDLE_IDENTIFIER = Moodify1;
+
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -675,7 +680,8 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Moodify/Preview Content\"";
-				DEVELOPMENT_TEAM = B2RSHDDNFF;
+
+				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Moodify/Info.plist;
@@ -693,7 +699,7 @@
 				);
 				MARKETING_VERSION = 1.0;
 				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_BUNDLE_IDENTIFIER = Moodify1;
+
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;

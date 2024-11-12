@@ -1,10 +1,3 @@
-//
-//  Player.swift
-//  Moodify
-//
-//  Created by Paul Shamoon on 10/29/24.
-//
-
 import SwiftUI
 
 /*
@@ -15,7 +8,8 @@ import SwiftUI
 struct PlayerView: View {
     @ObservedObject var spotifyController: SpotifyController
     @State private var navigateToQueue = false
-    
+    @AppStorage("hasConnectedSpotify") private var hasConnectedSpotify = false
+
     var body: some View {
         ZStack {
             // Background
@@ -71,13 +65,13 @@ struct PlayerView: View {
                             .font(.title2)
                             .foregroundColor(.white)
                     }
-                    
+
                     Button(action: { spotifyController.togglePlayPause() }) {
                         Image(systemName: spotifyController.isPaused ? "play.circle.fill" : "pause.circle.fill")
                             .font(.system(size: 44))
                             .foregroundColor(.white)
                     }
-                    
+
                     Button(action: { spotifyController.skipToNext() }) {
                         Image(systemName: "forward.fill")
                             .font(.title2)
@@ -91,19 +85,37 @@ struct PlayerView: View {
                             .font(.title2)
                             .foregroundColor(.white)
                     }
+                    .sheet(isPresented: $navigateToQueue) {
+                        QueueView(spotifyController: spotifyController)
+                            .presentationDetents([.large]) // Optional: Allows you to control sheet sizes
+                    }
                 }
-                .padding(.top, 8)
+                
             }
-            .padding(20)
+            .padding()
         }
-        .frame(height: 160)
-        .padding(.horizontal)
-        .padding(.bottom, 8)
-        .navigationDestination(isPresented: $navigateToQueue) {
-            QueueView(spotifyController: spotifyController)
-                .transition(.blurReplace)
+        .padding()
+        
+        .onAppear {
+            NotificationCenter.default.addObserver(
+                forName: UIScene.didActivateNotification,
+                object: nil,
+                queue: .main
+            ) { _ in
+                if hasConnectedSpotify && !spotifyController.isConnected {
+                    spotifyController.initializeSpotifyConnection()
+                }
+            }
         }
+        .onDisappear {
+            NotificationCenter.default.removeObserver(self, name: UIScene.didActivateNotification, object: nil)
+        }
+        .onChange(of: spotifyController.isConnected) { _ in
+            spotifyController.updatePlayerState()
+        }/*
+        */
     }
+    
 }
 
 struct PlayerView_Previews: PreviewProvider {

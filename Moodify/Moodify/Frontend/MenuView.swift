@@ -153,35 +153,123 @@ struct MenuView: View {
                         .offset(x: showMenu ? 0 : geometry.size.width)
                         .animation(.spring(response: 0.4, dampingFraction: 0.8), value: showMenu)
                     }
-                    
+                    // For AccountInfoView
                     .navigationDestination(isPresented: $showingAccountInformation) {
                         AccountInfoView()
                             .environmentObject(profileManager)
+                            .navigationBarBackButtonHidden(true)
+                            .toolbar {
+                                ToolbarItem(placement: .navigationBarLeading) {
+                                    Button(action: {
+                                        showingAccountInformation = false
+                                    }) {
+                                        Image(systemName: "chevron.backward")
+                                            .foregroundColor(.white)
+                                        Text("Back")
+                                            .foregroundColor(.white)
+                                    }
+                                }
+                            }
                     }
+
+                    // For GeneralMusicPreferencesView
                     .navigationDestination(isPresented: $showingMusicPreferences) {
                         GeneralMusicPreferencesView(navigateToHomePage: .constant(false))
                             .environmentObject(profileManager)
+                            .navigationBarBackButtonHidden(true)
+                            .toolbar {
+                                ToolbarItem(placement: .navigationBarLeading) {
+                                    Button(action: {
+                                        showingMusicPreferences = false
+                                    }) {
+                                        Image(systemName: "chevron.backward")
+                                            .foregroundColor(.white)
+                                        Text("Back")
+                                            .foregroundColor(.white)
+                                    }
+                                }
+                            }
                     }
+
+                    // For PlaylistsView
                     .navigationDestination(isPresented: $showingPlaylists) {
                         PlaylistsView(spotifyController: spotifyController)
                             .environmentObject(profileManager)
+                            .navigationBarBackButtonHidden(true)
+                            .toolbar {
+                                ToolbarItem(placement: .navigationBarLeading) {
+                                    Button(action: {
+                                        showingPlaylists = false
+                                    }) {
+                                        Image(systemName: "chevron.backward")
+                                            .foregroundColor(.white)
+                                        Text("Back")
+                                            .foregroundColor(.white)
+                                    }
+                                }
+                            }
                     }
+
+                    // For PinSetupView (used twice)
                     .navigationDestination(isPresented: $showingPinSetup) {
                         PinSetupView(profile: profileManager.currentProfile)
                             .environmentObject(profileManager)
+                            .navigationBarBackButtonHidden(true)
+                            .toolbar {
+                                ToolbarItem(placement: .navigationBarLeading) {
+                                    Button(action: {
+                                        showingPinSetup = false
+                                    }) {
+                                        Image(systemName: "chevron.backward")
+                                            .foregroundColor(.white)
+                                        Text("Back")
+                                            .foregroundColor(.white)
+                                    }
+                                }
+                            }
                     }
                     .navigationDestination(isPresented: $showingChangePinView) {
                         PinSetupView(profile: profileManager.currentProfile)
                             .environmentObject(profileManager)
+                            .navigationBarBackButtonHidden(true)
+                            .toolbar {
+                                ToolbarItem(placement: .navigationBarLeading) {
+                                    Button(action: {
+                                        showingChangePinView = false
+                                    }) {
+                                        Image(systemName: "chevron.backward")
+                                            .foregroundColor(.white)
+                                        Text("Back")
+                                            .foregroundColor(.white)
+                                    }
+                                }
+                            }
                     }
+
+                    // For TermsOfServiceView
                     .navigationDestination(isPresented: $showingTOS) {
                         TermsOfServiceView(
                             agreedToTerms: Binding(
                                 get: { profileManager.currentProfile?.hasAgreedToTerms ?? false },
                                 set: { profileManager.currentProfile?.hasAgreedToTerms = $0 }
                             )
-                        ).environmentObject(profileManager)
+                        )
+                        .environmentObject(profileManager)
+                        .navigationBarBackButtonHidden(true)
+                        .toolbar {
+                            ToolbarItem(placement: .navigationBarLeading) {
+                                Button(action: {
+                                    showingTOS = false
+                                }) {
+                                    Image(systemName: "chevron.backward")
+                                        .foregroundColor(.white)
+                                    Text("Back")
+                                        .foregroundColor(.white)
+                                }
+                            }
+                        }
                     }
+
                 }
                 .alert(isPresented: $showingAlert) {
                     switch activeAlert {

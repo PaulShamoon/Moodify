@@ -4,13 +4,13 @@ import SwiftUI
  A view that displays a button allowing the user to
  connect their Spotify account to the application
  
- Created By: Paul Shamoon
+ Created by Paul Shamoon on 9/12/24.
+ Updated by [Assistant] on 11/04/24
  */
 struct ConnectToSpotifyView: View {
     @ObservedObject var spotifyController: SpotifyController
-    
-    // Environment property to handle view dismissal
-    @Environment(\.dismiss) var dismiss
+    @Environment(\.dismiss) var dismiss // Environment property to handle view dismissal
+    @AppStorage("hasConnectedSpotify") private var hasConnectedSpotify = false
 
     var body: some View {
         VStack(spacing: 20) {
@@ -21,7 +21,7 @@ struct ConnectToSpotifyView: View {
             
             Button(action: {
                 print("button pressed")
-                spotifyController.connect()
+                spotifyController.initializeSpotifyConnection()
             }) {
                 HStack(spacing: 0) {
                     Text("Connect with")
@@ -31,6 +31,7 @@ struct ConnectToSpotifyView: View {
                         .resizable()
                         .frame(width: 45, height: 45)
                         .aspectRatio(contentMode: .fit)
+                    
                     Text("Spotify")
                         .font(.headline)
                 }
@@ -44,10 +45,24 @@ struct ConnectToSpotifyView: View {
         
          // We can access the url when spotify redirects us to Moodify
         .onOpenURL { url in
-            // We call setAccessToken passing in the url so it can retrieve the access token from it
+            print("Received Spotify redirect URL")
             spotifyController.setAccessToken(from: url)
-            // This navigates us back to the homepage
-            dismiss()
+            
+            // Only set hasConnectedSpotify and dismiss if we got a valid token
+            if spotifyController.accessToken != nil {
+                print("Successfully connected to Spotify")
+                hasConnectedSpotify = true
+                dismiss()
+            } else {
+                print("Failed to get valid token from Spotify")
+            }
+        }
+        .onChange(of: spotifyController.accessToken) { newToken in
+            if newToken != nil {
+                print("Access token updated, dismissing view")
+                hasConnectedSpotify = true
+                dismiss()
+            }
         }
     }
 }

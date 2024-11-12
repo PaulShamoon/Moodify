@@ -26,7 +26,7 @@ struct PinInputView: View {
                             Image(systemName: "chevron.left")
                             Text("Back")
                         }
-                        .foregroundColor(.blue)
+                        .foregroundColor(.white)
                         .font(.system(size: 16, weight: .medium))
                     }
                     Spacer()
