@@ -252,7 +252,6 @@
 		6E52B8522CC98F1B0049BF08 /* Backend */ = {
 			isa = PBXGroup;
 			children = (
-				6982AB772CDD9959005F9750 /* MoodModels.swift */,
 				6EA2E3BB2CDB072900B4E6C8 /* Models */,
 				6EA2E3BA2CDB04C100B4E6C8 /* Controllers */,
 				6E52B8592CC9A9EE0049BF08 /* Constants.swift */,
@@ -275,6 +274,7 @@
 		6EA2E3BB2CDB072900B4E6C8 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				6982AB772CDD9959005F9750 /* MoodModels.swift */,
 				6EA2E3B52CDAF29200B4E6C8 /* Playlist.swift */,
 				89AD05622CB083B3004D8FAD /* Profile.swift */,
 				6E728B902CD1B94F00017EA4 /* Song.swift */,
