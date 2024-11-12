@@ -370,7 +370,7 @@ struct homePageView: View {
     // Function to update resync button visibility
     private func updateResyncButtonVisibility() {
         // Show Resync button only if Spotify was connected before (hasConnectedSpotify) but is now disconnected
-        showResyncSpotifyButton = hasConnectedSpotify && !spotifyController.isConnected
+        showResyncSpotifyButton = hasConnectedSpotify && !spotifyController.isConnected && !showConnectToSpotifyButton
     }
     
     // Check camera permissions
