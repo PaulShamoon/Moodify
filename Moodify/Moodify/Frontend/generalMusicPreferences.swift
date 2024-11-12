@@ -117,9 +117,6 @@ struct GeneralMusicPreferencesView: View {
                             Button(action: {
                                 withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
                                     toggleGenreSelection(genre: genre)
-                                    if !isFirstTimeUser {
-                                        savePreferences()
-                                    }
                                 }
                             }) {
                                 ZStack {
@@ -187,85 +184,57 @@ struct GeneralMusicPreferencesView: View {
                     
                     Spacer()
                     
-                    if isFirstTimeUser {
-                        Button(action: {
-                            savePreferences()
-                            navigateToHomePage = true
-                            presentationMode.wrappedValue.dismiss()
-                        }) {
-                            HStack {
-                                Text(selectedGenres.isEmpty ? "Skip for now" : "Save preferences")
-                                    .font(.system(size: 18, weight: .bold, design: .rounded))
-                                
-                                if !selectedGenres.isEmpty {
-                                    Image(systemName: "arrow.right.circle.fill")
-                                        .font(.system(size: 20))
-                                }
-                            }
-                            .foregroundColor(selectedGenres.isEmpty ? .gray : .black)
-                            .frame(maxWidth: .infinity)
-                            .frame(height: 56)
-                            .background(
-                                selectedGenres.isEmpty ?
-                                LinearGradient(gradient: Gradient(colors: [Color.white.opacity(0.1), Color.white.opacity(0.1)]), startPoint: .leading, endPoint: .trailing) :
-                                    LinearGradient(gradient: Gradient(colors: [Color.green, Color.green.opacity(0.8)]), startPoint: .leading, endPoint: .trailing)
+                    // Submit Button
+                    Button(action: {
+                        if let currentProfile = profileManager.currentProfile {
+                            profileManager.updateProfile(
+                                profile: currentProfile,
+                                name: currentProfile.name,
+                                dateOfBirth: currentProfile.dateOfBirth,
+                                favoriteGenres: Array(selectedGenres),
+                                hasAgreedToTerms: currentProfile.hasAgreedToTerms,
+                                userPin: currentProfile.userPin,
+                                personalSecurityQuestion: currentProfile.personalSecurityQuestion,
+                                securityQuestionAnswer: currentProfile.personalSecurityQuestion
                             )
-                            .cornerRadius(16)
-                            .shadow(color: selectedGenres.isEmpty ? .clear : Color.green.opacity(0.3),
-                                    radius: 8, x: 0, y: 4)
                         }
-                        .padding(.horizontal)
-                        .padding(.bottom, 20)
+                        
+                        navigateToHomePage = true
+                        presentationMode.wrappedValue.dismiss()
+                    }) {
+                        HStack {
+                            Text(selectedGenres.isEmpty ? "Skip for now" : "Save preferences")
+                                .font(.system(size: 18, weight: .bold, design: .rounded))
+                            
+                            if !selectedGenres.isEmpty {
+                                Image(systemName: "arrow.right.circle.fill")
+                                    .font(.system(size: 20))
+                            }
+                        }
+                        .foregroundColor(selectedGenres.isEmpty ? .gray : .black)
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 56)
+                        .background(
+                            selectedGenres.isEmpty ?
+                            LinearGradient(gradient: Gradient(colors: [Color.white.opacity(0.1), Color.white.opacity(0.1)]), startPoint: .leading, endPoint: .trailing) :
+                                LinearGradient(gradient: Gradient(colors: [Color.green, Color.green.opacity(0.8)]), startPoint: .leading, endPoint: .trailing)
+                        )
+                        .cornerRadius(16)
+                        .shadow(color: selectedGenres.isEmpty ? .clear : Color.green.opacity(0.3),
+                                radius: 8, x: 0, y: 4)
                     }
+                    .padding(.horizontal)
+                    .padding(.bottom, 20)
                 }
             }
         }
-        .navigationBarBackButtonHidden(true)
-        .navigationBarItems(leading: Button(action: {
-            if !isFirstTimeUser {
-                savePreferences()
-            }
-            presentationMode.wrappedValue.dismiss()
-        }) {
-            HStack(spacing: 4) {
-                Image(systemName: "chevron.left")
-                    .font(.system(size: 16, weight: .semibold))
-                Text(isFirstTimeUser ? "Back" : "Save")
-                    .font(.system(size: 16, weight: .semibold))
-            }
-            .foregroundColor(.blue)
-        })
         .onAppear {
-            checkIfFirstTimeUser()
             loadSelectedGenres()
-        }
-    }
-    
-    private func checkIfFirstTimeUser() {
-        if let profile = profileManager.currentProfile {
-            let status = profileManager.verifyCompletedMusicPreferences(profile: profile)
-            isFirstTimeUser = !status
         }
     }
     
     private func loadSelectedGenres() {
         selectedGenres = Set(profileManager.currentProfile?.favoriteGenres ?? [])
-    }
-    
-    private func savePreferences() {
-        if let currentProfile = profileManager.currentProfile {
-            profileManager.updateProfile(
-                profile: currentProfile,
-                name: currentProfile.name,
-                dateOfBirth: currentProfile.dateOfBirth,
-                favoriteGenres: Array(selectedGenres),
-                hasAgreedToTerms: currentProfile.hasAgreedToTerms,
-                completedMusicPreferences: true,
-                userPin: currentProfile.userPin,
-                personalSecurityQuestion: currentProfile.personalSecurityQuestion,
-                securityQuestionAnswer: currentProfile.personalSecurityQuestion
-            )
-        }
     }
     
     private func toggleGenreSelection(genre: String) {
@@ -278,7 +247,6 @@ struct GeneralMusicPreferencesView: View {
 }
 
 struct GeneralMusicPreferencesView_Previews: PreviewProvider {
-    let profileManager = ProfileManager()
     static var previews: some View {
         GeneralMusicPreferencesView(navigateToHomePage: .constant(false))
             .environmentObject(ProfileManager())
