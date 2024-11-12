@@ -1,4 +1,3 @@
-// Add text to inform user to select in order of preference
 import SwiftUICore
 import SwiftUI
 
@@ -39,15 +38,51 @@ struct GeneralMusicPreferencesView: View {
     @Binding var navigateToHomePage: Bool
     @State private var isPlaying = false
     @State private var isFirstTimeUser: Bool = true
+    @State private var showAllGenres: Bool = false
     
     @Environment(\.presentationMode) var presentationMode
     
-    let genres = [
-        "Pop", "Hip-Hop", "Rock", "Indie", "Electronic", "Jazz", "Dance", "R&B", "House", "Classical",
-        "Reggae", "Soul", "Country", "Metal", "Techno", "Latin", "Punk", "Blues", "Ambient", "Acoustic",
-        "Folk", "Alternative", "K-Pop", "Chill", "Lo-Fi", "EDM", "Disco", "Trance", "Ska", "Gospel",
-        "Funk", "Garage", "Grunge", "Synth-Pop", "Opera", "Bluegrass", "Film Scores", "World Music",
-        "Samba", "Tango"
+    let allGenres = [
+        "Pop": "star.fill",
+        "Hip-Hop": "headphones",
+        "Rock": "guitars",
+        "Indie": "music.microphone",
+        "Electronic": "airplayaudio",
+        "Jazz": "music.quarternote.3",
+        "Dance": "music.note",
+        "R&B": "music.mic",
+        "House": "music.note.house",
+        "Classical": "music.note.list",
+        "Reggae": "music.quarternote.3",
+        "Soul": "music.note.tv",
+        "Country": "guitars.fill",
+        "Metal": "guitar.fill",
+        "Techno": "music.note.tv",
+        "Latin": "music.mic",
+        "Punk": "guitars.fill",
+        "Blues": "music.quarternote.3",
+        "Ambient": "cloud.fill",
+        "Acoustic": "music.note",
+        "Folk": "guitars.fill",
+        "Alternative": "music.note.list",
+        "K-Pop": "music.note.house",
+        "Chill": "music.note",
+        "Lo-Fi": "cloud.fill",
+        "EDM": "airplayaudio",
+        "Disco": "music.note",
+        "Trance": "music.note.house",
+        "Ska": "music.note",
+        "Gospel": "music.mic",
+        "Funk": "music.mic",
+        "Garage": "guitars.fill",
+        "Grunge": "music.note",
+        "Synth-Pop": "music.note",
+        "Opera": "music.note",
+        "Bluegrass": "guitars.fill",
+        "Film Scores": "film.fill",
+        "World Music": "globe",
+        "Samba": "music.note",
+        "Tango": "music.note"
     ]
     
     var body: some View {
@@ -67,7 +102,7 @@ struct GeneralMusicPreferencesView: View {
                     .padding(.top, 20)
                     
                     LazyVGrid(columns: [GridItem(.adaptive(minimum: 100), spacing: 12)], spacing: 12) {
-                        ForEach(genres, id: \.self) { genre in
+                        ForEach(Array(allGenres.keys.prefix(showAllGenres ? allGenres.count : 12)), id: \.self) { genre in
                             Button(action: {
                                 withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
                                     toggleGenreSelection(genre: genre)
@@ -84,7 +119,7 @@ struct GeneralMusicPreferencesView: View {
                                         .shadow(color: selectedGenres.contains(genre) ? Color.green.opacity(0.3) : Color.black.opacity(0.2), radius: 6, x: 0, y: 3)
                                     
                                     VStack(spacing: 8) {
-                                        Image(systemName: genreIcon(for: genre))
+                                        Image(systemName: allGenres[genre] ?? "music.note")
                                             .font(.system(size: 22))
                                             .foregroundColor(selectedGenres.contains(genre) ? .white : .gray)
                                         
@@ -106,6 +141,19 @@ struct GeneralMusicPreferencesView: View {
                     }
                     .padding(.horizontal)
                     
+                    if !showAllGenres && allGenres.count > 12 {
+                        Button(action: {
+                            withAnimation {
+                                showAllGenres.toggle()
+                            }
+                        }) {
+                            Text("Show more...")
+                                .font(.system(size: 16, weight: .semibold, design: .rounded))
+                                .foregroundColor(.blue)
+                                .padding(.vertical, 12)
+                        }
+                    }
+                    
                     VStack(spacing: 16) {
                         PreferenceInfoRow(
                             icon: "music.note.list",
@@ -117,7 +165,7 @@ struct GeneralMusicPreferencesView: View {
                         PreferenceInfoRow(
                             icon: "number.circle.fill",
                             title: "Total Selected",
-                            value: "\(selectedGenres.count) of \(genres.count) genres",
+                            value: "\(selectedGenres.count) of \(allGenres.count) genres",
                             iconColor: .blue
                         )
                     }
@@ -214,23 +262,6 @@ struct GeneralMusicPreferencesView: View {
             selectedGenres.remove(genre)
         } else {
             selectedGenres.insert(genre)
-        }
-    }
-    
-    private func genreIcon(for genre: String) -> String {
-        switch genre {
-        case "Pop":
-            return "star.fill"
-        case "Classical":
-            return "music.note.list"
-        case "Hip-Hop":
-            return "beats.headphones"
-        case "Country":
-            return "guitars.fill"
-        case "Dance":
-            return "music.note"
-        default:
-            return "music.note"
         }
     }
 }
