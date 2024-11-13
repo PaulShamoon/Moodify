@@ -196,6 +196,10 @@ struct QuestionnaireView: View {
     
     private func validateForm() -> Bool {
         nameError = name.isEmpty ? "Name is required." : nil
+        // Unique name check
+        if profileManager.profiles.contains(where: { $0.name.lowercased() == name.lowercased() && $0.id != profileManager.currentProfile?.id }) {
+            nameError = "This name is already taken. Please choose another."
+        }
         let age = Calendar.current.dateComponents([.year], from: dateOfBirth, to: Date()).year ?? 0
         ageError = age < 13 ? "You must be at least 13 years old." : nil
         let hasAgreed = profileManager.currentProfile?.hasAgreedToTerms ?? agreedToTerms
