@@ -59,21 +59,33 @@ struct PlayerView: View {
                 }
                 
                 // Playback Controls
-                HStack(spacing: 32) {
+                HStack(spacing: 25) {
                     Button(action: { spotifyController.skipToPrevious() }) {
-                        Image(systemName: "backward.fill")
+                        Image(systemName: "backward.end.fill")
                             .font(.title2)
                             .foregroundColor(.white)
                     }
-
+                    
+                    Button(action: { spotifyController.seekForwardOrBackward(forward: false) }) {
+                        Image(systemName: "gobackward.15")
+                            .font(.title2)
+                            .foregroundColor(.white)
+                    }
+                    
                     Button(action: { spotifyController.togglePlayPause() }) {
                         Image(systemName: spotifyController.isPaused ? "play.circle.fill" : "pause.circle.fill")
                             .font(.system(size: 44))
                             .foregroundColor(.white)
                     }
+                    
+                    Button(action: { spotifyController.seekForwardOrBackward(forward: true) }) {
+                        Image(systemName: "goforward.15")
+                            .font(.title2)
+                            .foregroundColor(.white)
+                    }
 
                     Button(action: { spotifyController.skipToNext() }) {
-                        Image(systemName: "forward.fill")
+                        Image(systemName: "forward.end.fill")
                             .font(.title2)
                             .foregroundColor(.white)
                     }
