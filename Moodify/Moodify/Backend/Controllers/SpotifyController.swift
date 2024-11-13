@@ -357,6 +357,22 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
         }
     }
 
+    /*
+     Calls the `seekForwardOrBackward` method of the `playbackController`
+     to skip forward or backward in the current track by 15 seconds.
+
+     - Parameters:
+        - forward: A Boolean that determines the direction to skip.
+                   `true` for forward, `false` for backward.
+
+     - Returns:
+         Void
+         
+     - Created By: Paul Shamoon
+     */
+    func seekForwardOrBackward(forward: Bool) -> Void {
+        playbackController.seekForwardOrBackward(forward: forward)
+    }
     
     func reconnectAndExecute(_ action: @escaping () -> Void, delay: TimeInterval = 2.0) {
         // Check if already connected; if so, execute the action immediately
