@@ -4,6 +4,7 @@ import PDFKit
 struct QuestionnaireView: View {
     @EnvironmentObject var profileManager: ProfileManager
     @State private var agreedToTerms: Bool = false
+    @Binding var isEditingProfile: Bool
     @Binding var navigateToMusicPreferences: Bool
     @Binding var isCreatingNewProfile: Bool
     
@@ -75,11 +76,16 @@ struct QuestionnaireView: View {
     }
     
     private var headerSection: some View {
-        VStack(spacing: 15) {
-            if isCreatingNewProfile {
+        VStack() {
+            if isCreatingNewProfile || isEditingProfile {
                 HStack {
                     Button(action: {
-                        isCreatingNewProfile = false
+                        if isCreatingNewProfile {
+                            isCreatingNewProfile = false
+                        }
+                        if isEditingProfile {
+                            isEditingProfile = false
+                        }
                         presentationMode.wrappedValue.dismiss()
                     }) {
                         HStack(spacing: 8) {
@@ -101,7 +107,7 @@ struct QuestionnaireView: View {
             }
             .font(.system(size: 36, weight: .bold, design: .rounded))
             
-            Text("Create Your Profile")
+            Text(isCreatingNewProfile ? "Create Your Profile" : "Edit Your Profile")
                 .font(.system(size: 24, weight: .medium))
                 .foregroundColor(.white)
                 .padding(.top, 5)
@@ -308,9 +314,9 @@ struct QuestionnaireView_Previews: PreviewProvider {
         let profileManager = ProfileManager()
         let navigateToMusicPreferences = Binding.constant(false)
         let isCreatingNewProfile = Binding.constant(true)
-        
+        let isEditingProfile = Binding.constant(false)
         QuestionnaireView(
-            navigateToMusicPreferences: navigateToMusicPreferences,
+            isEditingProfile: isEditingProfile, navigateToMusicPreferences: navigateToMusicPreferences,
             isCreatingNewProfile: isCreatingNewProfile
         )
         .environmentObject(profileManager)

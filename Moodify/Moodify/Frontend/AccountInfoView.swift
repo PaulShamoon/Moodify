@@ -2,7 +2,7 @@ import SwiftUI
 
 struct AccountInfoView: View {
     @EnvironmentObject var profileManager: ProfileManager
-    
+    @State private var isEditingProfile = false
     var body: some View {
         VStack(alignment: .leading) {
             Spacer()
@@ -59,9 +59,11 @@ struct AccountInfoView: View {
                 
                 NavigationLink(
                     destination: QuestionnaireView(
-                        navigateToMusicPreferences: .constant(true),
+                        isEditingProfile: .constant(true), navigateToMusicPreferences: .constant(true),
                         isCreatingNewProfile: .constant(false)
-                    ).environmentObject(profileManager)
+                    )
+                    .environmentObject(profileManager)
+                    .navigationBarBackButtonHidden(true)
                 ) {
                     HStack {
                         Image(systemName: "pencil.circle.fill")
