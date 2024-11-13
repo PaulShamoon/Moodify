@@ -206,6 +206,11 @@ struct QuestionnaireView: View {
         if profileManager.profiles.contains(where: { $0.name.lowercased() == name.lowercased() && $0.id != profileManager.currentProfile?.id }) {
             nameError = "This name is already taken. Please choose another."
         }
+        // Only allows alphanumeric 
+        if !name.trimmingCharacters(in: .whitespaces).allSatisfy({ $0.isLetter || $0.isNumber }) {
+            nameError = "Only alphanumeric characters are allowed."
+        }
+        
         let age = Calendar.current.dateComponents([.year], from: dateOfBirth, to: Date()).year ?? 0
         ageError = age < 13 ? "You must be at least 13 years old." : nil
         let hasAgreed = profileManager.currentProfile?.hasAgreedToTerms ?? agreedToTerms
