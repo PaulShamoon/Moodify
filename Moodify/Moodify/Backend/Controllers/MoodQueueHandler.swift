@@ -65,10 +65,10 @@ class MoodQueueHandler {
      Created by: Mohammad Sulaiman
      */
     func buildRecommendationURL(userGenres: [String], limit: Int, minValence: Double, maxValence: Double, minEnergy: Double, maxEnergy: Double, minLoudness: Double?, maxLoudness: Double?, minAcousticness: Double?, maxAcousticness: Double?, minDanceability: Double?, maxDanceability: Double?) -> URL? {
-        // TODO: Shuffle the usergenres if more than 5 moods are selected.
-        // Convert user-selected genres to API-compatible genres
-        let seedGenres = userGenres.prefix(5).map { apiGenre(from: $0) }.joined(separator: ",")
-        
+        // Shuffle the genres if more than 5 are selected
+        let shuffledGenres = userGenres.count > 5 ? userGenres.shuffled() : userGenres
+        // Convert user selected genres to compatible genres and limit to 5 for the API
+        let seedGenres = shuffledGenres.prefix(5).map { apiGenre(from: $0) }.joined(separator: ",")
         var urlString = """
             https://api.spotify.com/v1/recommendations?seed_genres=\(seedGenres)&limit=\(limit)&min_valence=\(minValence)&max_valence=\(maxValence)&min_energy=\(minEnergy)&max_energy=\(maxEnergy)
             """
@@ -88,7 +88,7 @@ class MoodQueueHandler {
                 urlString += "&\(key)=\(value)"
             }
         }
-        
+        print("Shuffled Genres: ", shuffledGenres)
         return URL(string: urlString)
     }
     
