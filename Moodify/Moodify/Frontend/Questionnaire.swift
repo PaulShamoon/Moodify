@@ -4,6 +4,7 @@ import PDFKit
 struct QuestionnaireView: View {
     @EnvironmentObject var profileManager: ProfileManager
     @State private var agreedToTerms: Bool = false
+    @Binding var isEditingProfile: Bool
     @Binding var navigateToMusicPreferences: Bool
     @Binding var isCreatingNewProfile: Bool
     
@@ -75,11 +76,16 @@ struct QuestionnaireView: View {
     }
     
     private var headerSection: some View {
-        VStack(spacing: 15) {
-            if isCreatingNewProfile {
+        VStack() {
+            if isCreatingNewProfile || isEditingProfile {
                 HStack {
                     Button(action: {
-                        isCreatingNewProfile = false
+                        if isCreatingNewProfile {
+                            isCreatingNewProfile = false
+                        }
+                        if isEditingProfile {
+                            isEditingProfile = false
+                        }
                         presentationMode.wrappedValue.dismiss()
                     }) {
                         HStack(spacing: 8) {
@@ -101,7 +107,7 @@ struct QuestionnaireView: View {
             }
             .font(.system(size: 36, weight: .bold, design: .rounded))
             
-            Text("Create Your Profile")
+            Text(isCreatingNewProfile ? "Create Your Profile" : "Edit Your Profile")
                 .font(.system(size: 24, weight: .medium))
                 .foregroundColor(.white)
                 .padding(.top, 5)
@@ -196,6 +202,15 @@ struct QuestionnaireView: View {
     
     private func validateForm() -> Bool {
         nameError = name.isEmpty ? "Name is required." : nil
+        // Unique name check
+        if profileManager.profiles.contains(where: { $0.name.lowercased() == name.lowercased() && $0.id != profileManager.currentProfile?.id }) {
+            nameError = "This name is already taken. Please choose another."
+        }
+        // Only allows alphanumeric 
+        if !name.trimmingCharacters(in: .whitespaces).allSatisfy({ $0.isLetter || $0.isNumber }) {
+            nameError = "Only alphanumeric characters are allowed."
+        }
+        
         let age = Calendar.current.dateComponents([.year], from: dateOfBirth, to: Date()).year ?? 0
         ageError = age < 13 ? "You must be at least 13 years old." : nil
         let hasAgreed = profileManager.currentProfile?.hasAgreedToTerms ?? agreedToTerms
@@ -304,9 +319,9 @@ struct QuestionnaireView_Previews: PreviewProvider {
         let profileManager = ProfileManager()
         let navigateToMusicPreferences = Binding.constant(false)
         let isCreatingNewProfile = Binding.constant(true)
-        
+        let isEditingProfile = Binding.constant(false)
         QuestionnaireView(
-            navigateToMusicPreferences: navigateToMusicPreferences,
+            isEditingProfile: isEditingProfile, navigateToMusicPreferences: navigateToMusicPreferences,
             isCreatingNewProfile: isCreatingNewProfile
         )
         .environmentObject(profileManager)

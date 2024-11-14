@@ -14,7 +14,7 @@ struct MoodifyApp: App {
     @State private var showSplash = true
     @State private var isCreatingNewProfile = false
     @State private var isCreatingProfile = false
-    
+    @State private var isEditingProfile = false
     var body: some Scene {
         WindowGroup {
             NavigationStack {
@@ -39,7 +39,7 @@ struct MoodifyApp: App {
                                 }
                                 .environmentObject(profileManager)
                         } else {
-                            QuestionnaireView(navigateToMusicPreferences: $navigateToMusicPreferences, isCreatingNewProfile: $isCreatingNewProfile)
+                            QuestionnaireView(isEditingProfile: $isEditingProfile, navigateToMusicPreferences: $navigateToMusicPreferences, isCreatingNewProfile: $isCreatingNewProfile)
                                 .environmentObject(profileManager)
                         }
                     } else {
