@@ -35,13 +35,15 @@ class PlaylistManager: ObservableObject {
             print("Songs were empty, not creating a playlist.")
             return
         }
+        let playlistGenres = profile.favoriteGenres
         
         if let index = playlists.firstIndex(where: { $0.profileId == profile.id && $0.mood == mood }) {
             playlists[index].songs = songs
             playlists[index].dateCreated = Date()
+            playlists[index].genres = playlistGenres
             print("Playlist updated for \(profile.name) with mood: \(mood).")
         } else {
-            let newPlaylist = Playlist(mood: mood, profileId: profile.id, songs: songs)
+            let newPlaylist = Playlist(mood: mood, profileId: profile.id, songs: songs, genres: playlistGenres)
             playlists.append(newPlaylist)
             print("New playlist created for \(profile.name) with mood: \(mood).")
         }
@@ -103,6 +105,67 @@ class PlaylistManager: ObservableObject {
         })  // Using a 10-second delay for reconnect if needed
     }
 
+    
+    /*
+     Method to toggle a song as favorite or unfavorited
+     
+     @param playlist: the Playlist where the song to be favorited/unfavorite is in
+     @param song: the Song object to favorite/unfavorite
+     
+     @return: Void
+     
+     Created By: Paul Shamoon
+     */
+    func toggleFavorite(playlist: inout Playlist, song: Song) -> Void {
+        guard let index = playlist.songs.firstIndex(where: { $0.id == song.id }) else {
+            print("Song not found in playlist.")
+            return
+        }
+
+        // Toggle the `isFavorited` property
+        playlist.songs[index].isFavorited.toggle()
+
+        // Temporarily remove the song from the array
+        let toggledSong = playlist.songs.remove(at: index)
+
+        if toggledSong.isFavorited {
+            // Move to top if now favorited
+            playlist.songs.insert(toggledSong, at: 0)
+        } else {
+            // Move just below the last favorited song if unfavorited
+            if let lastFavoritedIndex = playlist.songs.lastIndex(where: { $0.isFavorited }) {
+                playlist.songs.insert(toggledSong, at: lastFavoritedIndex + 1)
+            } else {
+                // If no other favorited songs, place at the end
+                playlist.songs.append(toggledSong)
+            }
+        }
+        savePlaylists()
+    }
+
+    
+    /*
+     Method to remove a song from a playlist
+     
+     @param playlist: the Playlist where the song to be removed is in
+     @param song: the song object to be removed from the playlist
+     
+     @return: Void
+     
+     Created By: Paul Shamoon
+     */
+    func removeSongFromPlaylist(playlist: inout Playlist, song: Song) -> Void {
+        // Find the index of the song in the playlist
+        if let index = playlist.songs.firstIndex(where: { $0.id == song.id }) {
+            // Remove the song from the playlist
+            playlist.songs.remove(at: index)
+            
+            savePlaylists()            
+            print("Song removed from playlist: \(song.trackName)")
+        } else {
+            print("Song not found in playlist.")
+        }
+    }
     
     
     /*

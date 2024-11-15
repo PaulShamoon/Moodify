@@ -626,7 +626,7 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
         let songURI = track["uri"] as? String ?? "Unknown URI"
         
         // Create a "Song" object
-        let song = Song(trackName: trackName, albumName: albumName, artistName: artistNames, songURI: songURI)
+        let song = Song(trackName: trackName, albumName: albumName, artistName: artistNames, songURI: songURI, isFavorited: false)
         
         // Add the "Song" object to the current queue
         currentQueue = queueManager.addSongToQueue(song: song)
