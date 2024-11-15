@@ -109,15 +109,15 @@ class PlaylistManager: ObservableObject {
     /*
      Method to toggle a song as favorite or unfavorited
      
-     @param playlist: the Playlist that song to be favorited/unfavorite is in
-     @param songID: the Id of the passed in Song object to favorite/unfavorite
+     @param playlist: the Playlist where the song to be favorited/unfavorite is in
+     @param song: the Song object to favorite/unfavorite
      
      @return: Void
      
      Created By: Paul Shamoon
      */
-    func toggleFavorite(playlist: inout Playlist, songID: UUID) -> Void {
-        guard let index = playlist.songs.firstIndex(where: { $0.id == songID }) else {
+    func toggleFavorite(playlist: inout Playlist, song: Song) -> Void {
+        guard let index = playlist.songs.firstIndex(where: { $0.id == song.id }) else {
             print("Song not found in playlist.")
             return
         }
@@ -143,6 +143,29 @@ class PlaylistManager: ObservableObject {
         savePlaylists()
     }
 
+    
+    /*
+     Method to remove a song from a playlist
+     
+     @param playlist: the Playlist where the song to be removed is in
+     @param song: the song object to be removed from the playlist
+     
+     @return: Void
+     
+     Created By: Paul Shamoon
+     */
+    func removeSongFromPlaylist(playlist: inout Playlist, song: Song) -> Void {
+        // Find the index of the song in the playlist
+        if let index = playlist.songs.firstIndex(where: { $0.id == song.id }) {
+            // Remove the song from the playlist
+            playlist.songs.remove(at: index)
+            
+            savePlaylists()            
+            print("Song removed from playlist: \(song.trackName)")
+        } else {
+            print("Song not found in playlist.")
+        }
+    }
     
     
     /*
