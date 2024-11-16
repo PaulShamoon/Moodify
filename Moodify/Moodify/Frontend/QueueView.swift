@@ -194,7 +194,7 @@ struct CustomHeader: View {
 
 // Now Playing Card
 struct NowPlayingCard: View {
-    let spotifyController: SpotifyController
+    @ObservedObject var spotifyController: SpotifyController
     
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -237,6 +237,10 @@ struct NowPlayingCard: View {
                 .shadow(color: .black.opacity(0.2), radius: 10, x: 0, y: 5)
         )
         .padding(.horizontal)
+        
+        .onChange(of: spotifyController.currentTrackName) { _ in
+            spotifyController.updatePlayerState()
+        }
     }
 }
 
