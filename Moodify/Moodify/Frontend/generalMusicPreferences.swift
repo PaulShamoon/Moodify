@@ -39,6 +39,7 @@ struct GeneralMusicPreferencesView: View {
     @State private var isPlaying = false
     @State private var isFirstTimeUser: Bool = true
     @State private var showAllGenres: Bool = false
+    @State private var showError: Bool = false
     
     @Environment(\.presentationMode) var presentationMode
     
@@ -109,6 +110,12 @@ struct GeneralMusicPreferencesView: View {
                         Text("\(profileManager.currentProfile?.name ?? "User"), select your favorite genres")
                             .font(.system(size: 18, weight: .medium, design: .rounded))
                             .foregroundColor(.gray)
+                        
+                        Text("The more genres you select, the better your recommendations will be.")
+                            .font(.system(size: 14, weight: .medium, design: .rounded))
+                            .foregroundColor(.green)
+                            .multilineTextAlignment(.center)
+                            .padding(.horizontal)
                     }
                     .padding(.top, 20)
                     
@@ -117,6 +124,7 @@ struct GeneralMusicPreferencesView: View {
                             Button(action: {
                                 withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
                                     toggleGenreSelection(genre: genre)
+                                    showError = false
                                 }
                             }) {
                                 ZStack {
@@ -129,11 +137,11 @@ struct GeneralMusicPreferencesView: View {
                                     VStack(spacing: 8) {
                                         Image(systemName: genreIcon(for: genre))
                                             .font(.system(size: 22))
-                                            .foregroundColor(selectedGenres.contains(genre) ? .black : .gray) // Text color changes when selected
+                                            .foregroundColor(selectedGenres.contains(genre) ? .black : .gray)
                                         
                                         Text(genre)
                                             .font(.system(size: 14, weight: .semibold, design: .rounded))
-                                            .foregroundColor(selectedGenres.contains(genre) ? .black : .white) // Text color changes when selected
+                                            .foregroundColor(selectedGenres.contains(genre) ? .black : .white)
                                         
                                         if selectedGenres.contains(genre) {
                                             Image(systemName: "checkmark.circle.fill")
@@ -182,11 +190,18 @@ struct GeneralMusicPreferencesView: View {
                     .cornerRadius(16)
                     .padding(.horizontal)
                     
-                    Spacer()
+                    if showError {
+                        Text("Please select at least one genre to proceed.")
+                            .font(.system(size: 14, weight: .medium))
+                            .foregroundColor(.red)
+                            .padding(.top, 8)
+                    }
                     
                     // Submit Button
                     Button(action: {
-                        if let currentProfile = profileManager.currentProfile {
+                        if selectedGenres.isEmpty {
+                            showError = true
+                        } else if let currentProfile = profileManager.currentProfile {
                             profileManager.updateProfile(
                                 profile: currentProfile,
                                 name: currentProfile.name,
@@ -197,29 +212,30 @@ struct GeneralMusicPreferencesView: View {
                                 personalSecurityQuestion: currentProfile.personalSecurityQuestion,
                                 securityQuestionAnswer: currentProfile.personalSecurityQuestion
                             )
+                            navigateToHomePage = true
+                            presentationMode.wrappedValue.dismiss()
                         }
-                        
-                        navigateToHomePage = true
-                        presentationMode.wrappedValue.dismiss()
                     }) {
                         HStack {
-                            Text(selectedGenres.isEmpty ? "Skip for now" : "Save preferences")
+                            Text("Save preferences")
                                 .font(.system(size: 18, weight: .bold, design: .rounded))
                             
-                            if !selectedGenres.isEmpty {
-                                Image(systemName: "arrow.right.circle.fill")
-                                    .font(.system(size: 20))
-                            }
+                            Image(systemName: "arrow.right.circle.fill")
+                                .font(.system(size: 20))
                         }
-                        .foregroundColor(selectedGenres.isEmpty ? .gray : .black)
+                        .foregroundColor(.black)
                         .frame(maxWidth: .infinity)
                         .frame(height: 56)
                         .background(
-                            selectedGenres.isEmpty ?
-                            LinearGradient(gradient: Gradient(colors: [Color.white.opacity(0.1), Color.white.opacity(0.1)]), startPoint: .leading, endPoint: .trailing) :
-                                LinearGradient(gradient: Gradient(colors: [Color.green, Color.green.opacity(0.8)]), startPoint: .leading, endPoint: .trailing)
-                            
+                            Group {
+                                if selectedGenres.isEmpty {
+                                    Color.gray.opacity(0.5)
+                                } else {
+                                    LinearGradient(gradient: Gradient(colors: [Color.green, Color.green.opacity(0.8)]), startPoint: .leading, endPoint: .trailing)
+                                }
+                            }
                         )
+
                         .cornerRadius(16)
                         .shadow(color: selectedGenres.isEmpty ? .clear : Color.green.opacity(0.3),
                                 radius: 8, x: 0, y: 4)
