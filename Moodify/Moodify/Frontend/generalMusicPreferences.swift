@@ -44,10 +44,10 @@ struct GeneralMusicPreferencesView: View {
     @Environment(\.presentationMode) var presentationMode
     
     let genres = [
-        "Pop", "Hip-Hop", "Rock", "Indie", "Electronic", "Jazz", "Dance", "R&B", "House", "Classical",
+        "Pop", "Hip-Hop", "Rock", "Indie", "Electronic", "Jazz", "Dance", "R&B", "Classical",
         "Reggae", "Soul", "Country", "Metal", "Techno", "Latin", "Punk", "Blues", "Ambient", "Acoustic",
-        "Folk", "Alternative", "K-Pop", "Chill", "Lo-Fi", "EDM", "Disco", "Trance", "Ska", "Gospel",
-        "Funk", "Garage", "Grunge", "Synth-Pop", "Opera", "Bluegrass", "Film Scores", "World Music",
+        "Folk", "K-Pop", "Lo-Fi", "EDM", "Disco",
+        "Funk", "Garage", "Synth-Pop", "Opera", "Bluegrass", "Film Scores", "World Music",
         "Samba", "Tango"
     ]
     
@@ -61,7 +61,6 @@ struct GeneralMusicPreferencesView: View {
         case "Jazz": return "music.quarternote.3"
         case "Dance": return "music.note"
         case "R&B": return "music.mic"
-        case "House": return "music.note.house"
         case "Classical": return "music.note.list"
         case "Reggae": return "music.quarternote.3"
         case "Soul": return "music.note.tv"
@@ -74,18 +73,12 @@ struct GeneralMusicPreferencesView: View {
         case "Ambient": return "cloud.fill"
         case "Acoustic": return "music.note"
         case "Folk": return "guitars.fill"
-        case "Alternative": return "music.note.list"
         case "K-Pop": return "music.note.house"
-        case "Chill": return "music.note"
         case "Lo-Fi": return "cloud.fill"
         case "EDM": return "bolt"
         case "Disco": return "music.note"
-        case "Trance": return "music.note.house"
-        case "Ska": return "music.note"
-        case "Gospel": return "music.mic"
         case "Funk": return "music.mic"
         case "Garage": return "guitars.fill"
-        case "Grunge": return "music.note"
         case "Synth-Pop": return "music.note"
         case "Opera": return "music.note"
         case "Bluegrass": return "guitars.fill"
