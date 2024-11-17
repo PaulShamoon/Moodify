@@ -15,17 +15,16 @@ struct MoodifyApp: App {
     @State private var isCreatingNewProfile = false
     @State private var isCreatingProfile = false
     @State private var isEditingProfile = false
+    
     var body: some Scene {
         WindowGroup {
             NavigationStack {
                 if showSplash {
                     SplashPageView(showSplash: $showSplash)
-                    /* this is where the splash page is displayed and then the onboarding view is displayed
-                     */
                 } else if !hasCompletedOnboarding {
                     OnboardingView {
                         hasCompletedOnboarding = true
-                        hasCompletedQuestionnaire = false /* User gets taken to the account set up page */
+                        hasCompletedQuestionnaire = false
                     }
                 } else {
                     if isCreatingNewProfile || !hasCompletedQuestionnaire {
@@ -39,13 +38,24 @@ struct MoodifyApp: App {
                                 }
                                 .environmentObject(profileManager)
                         } else {
-                            QuestionnaireView(isEditingProfile: $isEditingProfile, navigateToMusicPreferences: $navigateToMusicPreferences, isCreatingNewProfile: $isCreatingNewProfile)
-                                .environmentObject(profileManager)
+                            QuestionnaireView(
+                                isEditingProfile: $isEditingProfile,
+                                navigateToMusicPreferences: $navigateToMusicPreferences,
+                                isCreatingNewProfile: $isCreatingNewProfile
+                            )
+                            .environmentObject(profileManager)
                         }
                     } else {
                         if navigateToHomePage, let currentProfile = profileManager.currentProfile {
-                            homePageView(
-                                profile: currentProfile,
+                            HomePageView(
+                                viewModel: HomePageViewModel(
+                                    profile: currentProfile,
+                                    spotifyController: SpotifyController()
+                                ),
+                                moodViewModel: MoodDetectionViewModel(
+                                    profile: currentProfile,
+                                    spotifyController: SpotifyController()
+                                ),
                                 navigateToHomePage: $navigateToHomePage,
                                 isCreatingNewProfile: $isCreatingNewProfile,
                                 navigateToMusicPreferences: $navigateToMusicPreferences,
