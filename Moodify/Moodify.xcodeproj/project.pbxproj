@@ -191,12 +191,12 @@
 		6934A10B2C8FDA840086CC91 /* Moodify */ = {
 			isa = PBXGroup;
 			children = (
+				6934A10C2C8FDA840086CC91 /* MoodifyApp.swift */,
+				6982AB752CDD9646005F9750 /* ColorExtension.swift */,
 				693E71452CEAAA1A00446CF7 /* Machine Learning */,
 				6982AB7F2CDD9BE8005F9750 /* ViewModels */,
-				6982AB752CDD9646005F9750 /* ColorExtension.swift */,
 				694B6C002C9A4431002F0931 /* Frontend */,
 				6E52B8522CC98F1B0049BF08 /* Backend */,
-				6934A10C2C8FDA840086CC91 /* MoodifyApp.swift */,
 				6EFE6C522C9E4AD40000DE46 /* Moodify-Bridging-Header.h */,
 				6EA47A752C9E52C7006FB5C6 /* SpotifyiOS.xcframework */,
 				6EA47A6B2C9E50D3006FB5C6 /* Moodify.plist */,
