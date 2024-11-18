@@ -10,7 +10,7 @@
  
  Created By: Paul Shamoon
  */
-struct Playlist: Identifiable, Codable {
+struct Playlist: Identifiable, Codable, Equatable {
     var id: UUID = UUID()
     var mood: String
     var profileId: UUID
