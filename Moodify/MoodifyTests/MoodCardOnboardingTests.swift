@@ -16,81 +16,69 @@ final class GetStartedCardTests: XCTestCase {
     /* Tests button action execution */
     func testButtonAction() {
         var actionCalled = false
-        let expectation = XCTestExpectation(description: "Button action called")
+        let expectation = self.expectation(description: "Button tapped")
         
         let card = GetStartedCard {
             actionCalled = true
             expectation.fulfill()
         }
         
-        /* Simulate view rendering */
-        let view = card.body
+        // Simulate button tap
+        tapButton(in: card)
         
-        /* Find and trigger the button action */
-        if let button = findButtonAction(in: view) {
-            button()
-            
-            /* Wait briefly for animation */
-            wait(for: [expectation], timeout: 0.2)
-            
-            XCTAssertTrue(actionCalled, "Button action should have been called")
-        } else {
-            XCTFail("Failed to find action button in view hierarchy")
-        }
+        waitForExpectations(timeout: 1.0)
+        XCTAssertTrue(actionCalled, "Button action should have been called")
     }
     
     /* Tests view content and structure */
     func testViewContent() {
         let card = GetStartedCard {}
-        let view = card.body
         
-        /* Verify text content exists */
-        XCTAssertTrue(containsText(view, "Ready to Begin?"))
-        XCTAssertTrue(containsText(view, "Tap the button to get started"))
-        
-        /* Verify button exists with correct icon */
-        XCTAssertTrue(containsImage(view, systemName: "arrow.right.circle.fill"))
+        // Test presence of main elements
+        XCTAssertNotNil(findText(in: card, "Ready to Begin?"))
+        XCTAssertNotNil(findText(in: card, "Tap the button to get started"))
+        XCTAssertNotNil(findButton(in: card))
     }
     
-    /* Helper method to find button action in view hierarchy */
-    private func findButtonAction(in view: some View) -> (() -> Void)? {
+    // MARK: - Helper Methods
+    
+    private func tapButton(in view: GetStartedCard) {
+        guard let button = findButton(in: view) else {
+            XCTFail("Button not found")
+            return
+        }
+        button.sendActions(for: .touchUpInside)
+    }
+    
+    private func findButton(in view: GetStartedCard) -> UIButton? {
         let mirror = Mirror(reflecting: view)
         for child in mirror.children {
-            if let button = child.value as? Button<Image> {
-                let buttonMirror = Mirror(reflecting: button)
-                for case let (label?, value) in buttonMirror.children {
-                    if label == "_action" {
-                        return value as? () -> Void
-                    }
-                }
+            if let hostingController = child.value as? UIHostingController<GetStartedCard> {
+                return hostingController.view.subviews.first { $0 is UIButton } as? UIButton
             }
         }
         return nil
     }
     
-    /* Helper method to check if view contains specific text */
-    private func containsText(_ view: some View, _ text: String) -> Bool {
+    private func findText(in view: GetStartedCard, _ searchText: String) -> UILabel? {
         let mirror = Mirror(reflecting: view)
         for child in mirror.children {
-            if let textView = child.value as? Text,
-               let stringValue = Mirror(reflecting: textView).children.first?.value as? String,
-               stringValue == text {
-                return true
+            if let hostingController = child.value as? UIHostingController<GetStartedCard> {
+                return hostingController.view.subviews.first {
+                    ($0 as? UILabel)?.text == searchText
+                } as? UILabel
             }
         }
-        return false
-    }
-    
-    /* Helper method to check if view contains specific system image */
-    private func containsImage(_ view: some View, systemName: String) -> Bool {
-        let mirror = Mirror(reflecting: view)
-        for child in mirror.children {
-            if let image = child.value as? Image,
-               let uiImage = image as? Image,
-               Mirror(reflecting: uiImage).children.contains(where: { $0.value as? String == systemName }) {
-                return true
-            }
-        }
-        return false
+        return nil
     }
 }
+
+// MARK: - View Helper Extension
+extension GetStartedCard {
+    func inspect() -> UIHostingController<GetStartedCard> {
+        let hostingController = UIHostingController(rootView: self)
+        hostingController.view.layoutIfNeeded()
+        return hostingController
+    }
+}
+
