@@ -35,6 +35,7 @@ class PlaylistManager: ObservableObject {
             print("Songs were empty, not creating a playlist.")
             return
         }
+
         let playlistGenres = profile.favoriteGenres
         
         if let index = playlists.firstIndex(where: { $0.profileId == profile.id && $0.mood == mood }) {
@@ -140,6 +141,11 @@ class PlaylistManager: ObservableObject {
                 playlist.songs.append(toggledSong)
             }
         }
+    
+        // Update the playlist in playlistManager.playlists
+        if let playlistIndex = playlists.firstIndex(where: { $0.id == playlist.id }) {
+            playlists[playlistIndex] = playlist
+        }
         savePlaylists()
     }
 
@@ -160,7 +166,12 @@ class PlaylistManager: ObservableObject {
             // Remove the song from the playlist
             playlist.songs.remove(at: index)
             
-            savePlaylists()            
+            // Update the playlist in playlistManager.playlists
+            if let playlistIndex = playlists.firstIndex(where: { $0.id == playlist.id }) {
+                playlists[playlistIndex] = playlist
+            }
+            
+            savePlaylists()
             print("Song removed from playlist: \(song.trackName)")
         } else {
             print("Song not found in playlist.")
