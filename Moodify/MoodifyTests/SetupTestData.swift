@@ -73,7 +73,7 @@ class SetupTestData {
             albumName: "album2",
             artistName: "artist2",
             songURI: "spotify:track:song2",
-            isFavorited: true
+            isFavorited: false
         )
         
         song3 = Song(

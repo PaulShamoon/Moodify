@@ -148,47 +148,50 @@ class PlaylistManagerTests: XCTestCase {
     }
     
     
-//    /*
-//     Method to test that the toggleFavorite method of the playlistManager
-//     behaves as expected.
-//     
-//     If the passed in Song objects isFavorited attribute is set to false, then calling
-//     toggleFavorite should set it to true and move the favorited song to the begining of
-//     the playlists songs
-//     
-//     If the passed in song objects isFavorited attribute is set to true, then calling
-//     toggleFavorite should set it to false and move the unfavorited song underneath the last
-//     favorited song OR to the bottom of the songs if there are no favorited song in the playlist
-//     
-//     Created By: Paul Shamoon
-//     */
-//    func testToggleFavorite() {
-//        var playlist1 = playlistManager.playlists[0]
-//        let song2 = playlist1.songs[1]
-//        
-//        // Set song2 to be favorited
-//        playlistManager.toggleFavorite(playlist: &playlist1, song: song2)
-//        
-//        // Retrieve the updated playlist from playlistManager
-//        var updated_playlist = playlistManager.playlists[0]
-//        
-//        // Ensure the first element in updated_playlists is song2
-//        XCTAssertTrue(updated_playlist.songs.first == song2, "The first song in updated_playlist is not song2, it was \(String(describing: updated_playlist.songs.first?.trackName))")
-//        
-//        
-//        // Ensure updated_playlists song2 is favorited
-//        XCTAssertTrue(updated_playlist.songs.first?.isFavorited ?? false, "song2 is not favorited")
+    /*
+     Method to test that the toggleFavorite method
+     of the playlistManager behaves as expected.
+     
+     If the passed in Song objects isFavorited attribute is set to false, then calling toggleFavorite
+     should set it to true and move the favorited song to the front of the playlists songs array
+     
+     If the passed in song objects isFavorited attribute is set to true, then calling toggleFavorite
+     should set it to false and move the unfavorited song either behind the last favorited song in
+     the array OR to the bottom of the songs array if there are no favorited song in the playlist
+     
+     Created By: Paul Shamoon
+     */
+    func testToggleFavorite() {
+        var playlist1 = playlistManager.playlists[0]
+        let song2 = playlist1.songs[1]
         
-//        // Set song2 to be unfavorited
-//        playlistManager.toggleFavorite(playlist: &playlist1, song: song2)
-//        
-//        
-//        // Retrieve the updated playlist from playlistManager
-//        updated_playlist = playlistManager.playlists[0]
-//        
-//        // Ensure updated_playlists song2 is not favorited
+        // Set song2 to be favorited
+        playlistManager.toggleFavorite(playlist: &playlist1, song: song2)
         
-//    }
+        // Retrieve the updated playlist from playlistManager
+        var updated_playlist = playlistManager.playlists[0]
+        
+        // Ensure the first element in updated_playlists is song2
+        XCTAssertTrue(updated_playlist.songs.first == song2,
+            "The first song in updated_playlist is not song2, it was \(String(describing: updated_playlist.songs.first?.trackName))")
+        
+        
+        // Ensure updated_playlists song2 is favorited
+        XCTAssertTrue(updated_playlist.songs.first?.isFavorited ?? false, "song2 is not favorited")
+        
+        // Set song2 to be unfavorited
+        playlistManager.toggleFavorite(playlist: &playlist1, song: song2)
+
+        // Retrieve the updated playlist from playlistManager
+        updated_playlist = playlistManager.playlists[0]
+        
+        // Ensure song2 is now the last song in the playlist
+        XCTAssertTrue(updated_playlist.songs.last == song2,
+            "The last song in updated_playlist is not song2, it was \(String(describing: updated_playlist.songs.last?.trackName))")
+        
+        // Ensure updated_playlists song2 is not favorited
+        XCTAssertFalse(updated_playlist.songs.first?.isFavorited ?? true, "song2 is favorited")
+    }
     
     
     /*
@@ -214,4 +217,3 @@ class PlaylistManagerTests: XCTestCase {
         XCTAssertEqual(updated_playlist.songs.count, 1, "updated_playlist should only have 1 song after removal")
     }
 }
-
