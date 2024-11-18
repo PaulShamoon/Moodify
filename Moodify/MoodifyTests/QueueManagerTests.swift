@@ -16,6 +16,12 @@ import XCTest
  */
 class QueueManagerTests: XCTestCase {
     var queueManager: QueueManager!
+    var originalQueue: [Song]!
+    
+    var song1: Song!
+    var song2: Song!
+    var song3: Song!
+    
     
     /*
      Method to setup all the data we
@@ -25,8 +31,17 @@ class QueueManagerTests: XCTestCase {
      */
     override func setUp() {
         super.setUp()
+        // Initialize the queueManager
         queueManager = QueueManager()
+        
+        // Initialize queues
         queueManager.currentQueue = SetupTestData.shared.currentQueue
+        originalQueue = queueManager.currentQueue
+        
+        // Initialize songs
+        song1 = SetupTestData.shared.song1
+        song2 = SetupTestData.shared.song2
+        song3 = SetupTestData.shared.song3
     }
     
     
@@ -49,10 +64,6 @@ class QueueManagerTests: XCTestCase {
      Created By: Paul Shamoon
      */
     func testAddSongToQueue() -> Void {
-        // Make a copy of the original queue
-        let originalQueue = queueManager.currentQueue
-        let song3 = SetupTestData.shared.song3
-        
         // Add song3 to the queue
         let updatedQueue = queueManager.addSongToQueue(song: song3)
         
@@ -74,11 +85,6 @@ class QueueManagerTests: XCTestCase {
      Created By: Paul Shamoon
      */
     func testRemoveSongsFromQueue() -> Void {
-        let originalQueue = queueManager.currentQueue
-        let song1 = SetupTestData.shared.song1
-        let song2 = SetupTestData.shared.song2
-        let song3 = SetupTestData.shared.song3
-        
         // Remove song1 from the currentQueue
         var updatedQueue = queueManager.removeSongsFromQueue(trackURI: song1.songURI)
         
@@ -100,6 +106,4 @@ class QueueManagerTests: XCTestCase {
         // Ensure that originalQueue and updatedQueue are NOT equal
         XCTAssertNotEqual(originalQueue, updatedQueue, "currentQueue should not be equal to updatedQueue.")
     }
-    
-    
 }

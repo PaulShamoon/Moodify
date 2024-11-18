@@ -11,6 +11,7 @@ import XCTest
  Class
  */
 class SetupTestData {
+    // This allows any testing class to access data defined in this class
     static let shared = SetupTestData()
 
     var currentQueue: [Song] = []

@@ -21,6 +21,13 @@ class PlaylistManagerTests: XCTestCase {
     var playlistManager: PlaylistManager!
     var spotifyController: SpotifyController!
     
+    var song1: Song!
+    var song2: Song!
+    var song3: Song!
+    
+    var profile1: Profile!
+    var profile2: Profile!
+
     
     /*
      Method to setup all the data we
@@ -30,11 +37,22 @@ class PlaylistManagerTests: XCTestCase {
      */
     override func setUp() {
         super.setUp()
+        // Initialize controllers
         queueManager = QueueManager()
         spotifyController = SpotifyController()
-        
         playlistManager = PlaylistManager(queueManager: queueManager, spotifyController: spotifyController)
+        
+        // Initialize all playlists
         playlistManager.playlists = SetupTestData.shared.playlists
+        
+        // Initialize songs
+        song1 = SetupTestData.shared.song1
+        song2 = SetupTestData.shared.song2
+        song3 = SetupTestData.shared.song3
+        
+        // Initialize profiles
+        profile1 = SetupTestData.shared.profile1
+        profile2 = SetupTestData.shared.profile2
     }
     
     
@@ -59,7 +77,6 @@ class PlaylistManagerTests: XCTestCase {
      */
     func testUpdatePlaylist() {
         let originalPlaylist = playlistManager.playlists[0]
-        let profile1 = SetupTestData.shared.profile1
         let updatedSongs = originalPlaylist.songs + [SetupTestData.shared.song3]
         
         // Update the originalPlaylists songs with updatedSongs
@@ -93,10 +110,6 @@ class PlaylistManagerTests: XCTestCase {
      */
     func testCreatePlaylist() {
         let original_playlists = playlistManager.playlists
-        let profile2 = SetupTestData.shared.profile2
-        let song1 = SetupTestData.shared.song1
-        let song2 = SetupTestData.shared.song2
-        let song3 = SetupTestData.shared.song3
         
         // Create a new playlist
         playlistManager.updateOrCreatePlaylist(
@@ -163,7 +176,6 @@ class PlaylistManagerTests: XCTestCase {
      */
     func testToggleFavorite() {
         var playlist1 = playlistManager.playlists[0]
-        let song2 = playlist1.songs[1]
         
         // Set song2 to be favorited
         playlistManager.toggleFavorite(playlist: &playlist1, song: song2)
@@ -202,7 +214,6 @@ class PlaylistManagerTests: XCTestCase {
      */
     func testRemoveSongFromPlaylist() {
         var original_playlist = playlistManager.playlists[0]
-        let song1 = original_playlist.songs[0]
         
         // Remove song1 from original_playlist
         playlistManager.removeSongFromPlaylist(playlist: &original_playlist, song: song1)
