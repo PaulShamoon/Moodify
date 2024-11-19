@@ -71,7 +71,7 @@ final class PlaylistManagerTests: XCTestCase {
     
     /*
      Method to test that the updateOrCreatePlaylist method of the playlistManager
-     behaves as expected and can propperly UPDATE a playlist
+     behaves as expected and can properly UPDATE a playlist
      
      Created By: Paul Shamoon
      */
@@ -104,7 +104,7 @@ final class PlaylistManagerTests: XCTestCase {
     
     /*
      Method to test that the updateOrCreatePlaylist method of the playlistManager
-     behaves as expected and can propperly CREATE a playlist
+     behaves as expected and can properly CREATE a playlist
      
      Created By: Paul Shamoon
      */
@@ -136,7 +136,7 @@ final class PlaylistManagerTests: XCTestCase {
     
     /*
      Method to test that the getUsersPlaylists method of the playlistManager
-     behaves as expected and can propperly get all of a users playlists
+     behaves as expected and can properly get all of a users playlists
      
      Created By: Paul Shamoon
      */
@@ -208,7 +208,7 @@ final class PlaylistManagerTests: XCTestCase {
     
     /*
      Method to test that the removeSongFromPlaylist method of the playlistManager
-     behaves as expected and can propperly remove a Song object from a playlist
+     behaves as expected and can properly remove a Song object from a playlist
      
      Created By: Paul Shamoon
      */

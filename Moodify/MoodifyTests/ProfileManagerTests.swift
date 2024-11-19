@@ -58,7 +58,7 @@ final class ProfileManagerTests: XCTestCase {
     
     /*
      Method to test that the createProfile method of the profileManager
-     behaves as expected and can propperly create a profile
+     behaves as expected and can properly create a profile
      
      Created By: Paul Shamoon
      */
@@ -95,7 +95,7 @@ final class ProfileManagerTests: XCTestCase {
     
     /*
      Method to test that the updateProfile method of the profileManager
-     behaves as expected and can propperly update a profile
+     behaves as expected and can properly update a profile
      
      Created By: Paul Shamoon
      */
@@ -111,7 +111,7 @@ final class ProfileManagerTests: XCTestCase {
         // Update the profile
         profileManager.updateProfile(
             profile: profile1,
-            name: "UpdateUser1",
+            name: "UpdatedUser1",
             dateOfBirth: updatedDateOfBirth,
             favoriteGenres: ["classical", "folk"],
             hasAgreedToTerms: true,
@@ -133,7 +133,7 @@ final class ProfileManagerTests: XCTestCase {
         XCTAssertNotEqual(originalProfile1, updatedProfile1, "The profile did not update properly")
         
         // Make sure that everything we updated persisted
-        XCTAssertEqual(updatedProfile1?.name, "UpdateUser1", "The name did not update properly")
+        XCTAssertEqual(updatedProfile1?.name, "UpdatedUser1", "The name did not update properly")
         XCTAssertEqual(updatedProfile1?.favoriteGenres, ["classical", "folk"], "The genres did not update properly")
         XCTAssertEqual(updatedProfile1?.userPin, "1234", "The pin did not update properly")
         XCTAssertEqual(updatedProfile1?.personalSecurityQuestion, "What is this projects name?", "The security question did not update properly")
@@ -148,7 +148,7 @@ final class ProfileManagerTests: XCTestCase {
     
     /*
      Method to test that the deleteProfile method of the profileManager
-     behaves as expected and can propperly delete a profile
+     behaves as expected and can properly delete a profile
      
      Created By: Paul Shamoon
      */
@@ -177,7 +177,7 @@ final class ProfileManagerTests: XCTestCase {
     
     /*
      Method to test that the deletePin method of the profileManager
-     behaves as expected and can propperly delete a profiles pin
+     behaves as expected and can properly delete a profiles pin
      
      Created By: Paul Shamoon
      */
@@ -197,7 +197,7 @@ final class ProfileManagerTests: XCTestCase {
     
     /*
      Method to test that the verifyPin method of the profileManager behaves as
-     expected and can propperly verify if the passed in pin matches the profiles pin
+     expected and can properly verify if the passed in pin matches the profiles pin
      
      Created By: Paul Shamoon
      */
