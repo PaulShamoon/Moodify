@@ -11,7 +11,7 @@ class ProfileManager: ObservableObject {
     }
     
     // Create a new profile
-    func createProfile(name: String, dateOfBirth: Date, favoriteGenres: [String], hasAgreedToTerms: Bool) {
+    func createProfile(name: String, dateOfBirth: Date, favoriteGenres: [String], hasAgreedToTerms: Bool) -> Void {
         let newProfile = Profile(name: name, dateOfBirth: dateOfBirth, favoriteGenres: favoriteGenres, hasAgreedToTerms: hasAgreedToTerms)
         profiles.append(newProfile)
         saveProfiles()
@@ -19,7 +19,7 @@ class ProfileManager: ObservableObject {
     }
     
     // Update an existing profile
-    func updateProfile(profile: Profile, name: String, dateOfBirth: Date, favoriteGenres: [String], hasAgreedToTerms: Bool, userPin: String?, personalSecurityQuestion: String?, securityQuestionAnswer: String?) {
+    func updateProfile(profile: Profile, name: String, dateOfBirth: Date, favoriteGenres: [String], hasAgreedToTerms: Bool, userPin: String?, personalSecurityQuestion: String?, securityQuestionAnswer: String?) -> Void {
         if let index = profiles.firstIndex(where: { $0.id == profile.id }) {
             profiles[index].name = name
             profiles[index].dateOfBirth = dateOfBirth
@@ -35,12 +35,12 @@ class ProfileManager: ObservableObject {
     }
     
     // Select a profile
-    func selectProfile(_ profile: Profile) {
+    func selectProfile(_ profile: Profile) -> Void {
         currentProfile = profile
     }
     
     // Delete a profile
-    func deleteProfile(profile: Profile) {
+    func deleteProfile(profile: Profile) -> Void {
         guard let index = profiles.firstIndex(where: { $0.id == profile.id }) else {
             print("Profile not found. No deletion performed.")
             return
@@ -82,7 +82,7 @@ class ProfileManager: ObservableObject {
         }
     }
     
-    func deletePin(profile: Profile) {
+    func deletePin(profile: Profile) -> Void {
         guard let index = profiles.firstIndex(where: { $0.id == profile.id }) else {
             print("Profile not found. No deletion performed.")
             return

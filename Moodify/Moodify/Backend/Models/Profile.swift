@@ -1,6 +1,6 @@
 import Foundation
 
-struct Profile: Identifiable, Codable {
+struct Profile: Identifiable, Codable, Equatable {
     var id: UUID = UUID()
     var name: String
     var dateOfBirth: Date

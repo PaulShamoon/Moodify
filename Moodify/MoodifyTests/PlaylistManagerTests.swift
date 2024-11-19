@@ -16,7 +16,7 @@ import XCTest
  
  Created By: Paul Shamoon
  */
-class PlaylistManagerTests: XCTestCase {
+final class PlaylistManagerTests: XCTestCase {
     var queueManager: QueueManager!
     var playlistManager: PlaylistManager!
     var spotifyController: SpotifyController!

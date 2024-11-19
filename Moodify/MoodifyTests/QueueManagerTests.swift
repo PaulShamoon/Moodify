@@ -14,7 +14,7 @@ import XCTest
  
  Created By: Paul Shamoon
  */
-class QueueManagerTests: XCTestCase {
+final class QueueManagerTests: XCTestCase {
     var queueManager: QueueManager!
     var originalQueue: [Song]!
     
