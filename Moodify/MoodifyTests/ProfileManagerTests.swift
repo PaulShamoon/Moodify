@@ -31,6 +31,7 @@ final class ProfileManagerTests: XCTestCase {
      */
     override func setUp() {
         super.setUp()
+        
         // Initialize the profileManager
         profileManager = ProfileManager()
         
