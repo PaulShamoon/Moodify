@@ -14,6 +14,11 @@
 		6934A11E2C8FDA850086CC91 /* PlaylistManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6934A11D2C8FDA850086CC91 /* PlaylistManagerTests.swift */; };
 		6934A1282C8FDA850086CC91 /* MoodifyUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6934A1272C8FDA850086CC91 /* MoodifyUITests.swift */; };
 		6934A12A2C8FDA850086CC91 /* MoodifyUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6934A1292C8FDA850086CC91 /* MoodifyUITestsLaunchTests.swift */; };
+		693E71472CEAAA7400446CF7 /* homePageViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 693E71462CEAAA6600446CF7 /* homePageViewModel.swift */; };
+		693E71492CEAAB6C00446CF7 /* MoodDetectionViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 693E71482CEAAB6400446CF7 /* MoodDetectionViewModel.swift */; };
+		693E714B2CEAAD5D00446CF7 /* MoodDetectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 693E714A2CEAAD5400446CF7 /* MoodDetectionView.swift */; };
+		693E714D2CEAAEE000446CF7 /* MoodPrefrenceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 693E714C2CEAAEDA00446CF7 /* MoodPrefrenceView.swift */; };
+		693E714F2CEAAF2B00446CF7 /* ManualMoodSelector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 693E714E2CEAAF2400446CF7 /* ManualMoodSelector.swift */; };
 		696300582CC6E65E00AE7814 /* DetectEmotionServices.swift in Sources */ = {isa = PBXBuildFile; fileRef = 696300572CC6E65E00AE7814 /* DetectEmotionServices.swift */; };
 		6982AB742CDD95AC005F9750 /* OnBoarding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6982AB732CDD95A3005F9750 /* OnBoarding.swift */; };
 		6982AB762CDD964B005F9750 /* ColorExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6982AB752CDD9646005F9750 /* ColorExtension.swift */; };
@@ -96,6 +101,11 @@
 		6934A1232C8FDA850086CC91 /* MoodifyUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MoodifyUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		6934A1272C8FDA850086CC91 /* MoodifyUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodifyUITests.swift; sourceTree = "<group>"; };
 		6934A1292C8FDA850086CC91 /* MoodifyUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodifyUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		693E71462CEAAA6600446CF7 /* homePageViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = homePageViewModel.swift; sourceTree = "<group>"; };
+		693E71482CEAAB6400446CF7 /* MoodDetectionViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodDetectionViewModel.swift; sourceTree = "<group>"; };
+		693E714A2CEAAD5400446CF7 /* MoodDetectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodDetectionView.swift; sourceTree = "<group>"; };
+		693E714C2CEAAEDA00446CF7 /* MoodPrefrenceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodPrefrenceView.swift; sourceTree = "<group>"; };
+		693E714E2CEAAF2400446CF7 /* ManualMoodSelector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManualMoodSelector.swift; sourceTree = "<group>"; };
 		696300572CC6E65E00AE7814 /* DetectEmotionServices.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetectEmotionServices.swift; sourceTree = "<group>"; };
 		6982AB732CDD95A3005F9750 /* OnBoarding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnBoarding.swift; sourceTree = "<group>"; };
 		6982AB752CDD9646005F9750 /* ColorExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorExtension.swift; sourceTree = "<group>"; };
@@ -185,11 +195,12 @@
 		6934A10B2C8FDA840086CC91 /* Moodify */ = {
 			isa = PBXGroup;
 			children = (
-				6982AB7F2CDD9BE8005F9750 /* ViewModels */,
+				6934A10C2C8FDA840086CC91 /* MoodifyApp.swift */,
 				6982AB752CDD9646005F9750 /* ColorExtension.swift */,
+				693E71452CEAAA1A00446CF7 /* Machine Learning */,
+				6982AB7F2CDD9BE8005F9750 /* ViewModels */,
 				694B6C002C9A4431002F0931 /* Frontend */,
 				6E52B8522CC98F1B0049BF08 /* Backend */,
-				6934A10C2C8FDA840086CC91 /* MoodifyApp.swift */,
 				6EFE6C522C9E4AD40000DE46 /* Moodify-Bridging-Header.h */,
 				6EA47A752C9E52C7006FB5C6 /* SpotifyiOS.xcframework */,
 				6EA47A6B2C9E50D3006FB5C6 /* Moodify.plist */,
@@ -226,12 +237,23 @@
 			path = MoodifyUITests;
 			sourceTree = "<group>";
 		};
+		693E71452CEAAA1A00446CF7 /* Machine Learning */ = {
+			isa = PBXGroup;
+			children = (
+				693E714E2CEAAF2400446CF7 /* ManualMoodSelector.swift */,
+				693E714C2CEAAEDA00446CF7 /* MoodPrefrenceView.swift */,
+				69EA65912CE1BBB500723081 /* CameraView.swift */,
+				693E714A2CEAAD5400446CF7 /* MoodDetectionView.swift */,
+				693E71482CEAAB6400446CF7 /* MoodDetectionViewModel.swift */,
+			);
+			path = "Machine Learning";
+			sourceTree = "<group>";
+		};
 		694B6C002C9A4431002F0931 /* Frontend */ = {
 			isa = PBXGroup;
 			children = (
-				6EE6C3302CE3B6330026D489 /* OnBoardingStuff */,
-				6EE6C32F2CE3B55C0026D489 /* PinStuff */,
-				69EA65912CE1BBB500723081 /* CameraView.swift */,
+				6EE6C3302CE3B6330026D489 /* OnBoardingFolder */,
+				6EE6C32F2CE3B55C0026D489 /* PinFolder */,
 				6EA2E3BC2CDC8DDC00B4E6C8 /*  PlaylistsView.swift */,
 				89C558392CDC11CB00F67E99 /* TermsOfServiceView.swift */,
 				6E9DDAFA2CD2B57900C17DCB /* QueueView.swift */,
@@ -252,6 +274,7 @@
 		6982AB7F2CDD9BE8005F9750 /* ViewModels */ = {
 			isa = PBXGroup;
 			children = (
+				693E71462CEAAA6600446CF7 /* homePageViewModel.swift */,
 				6982AB802CDD9BFC005F9750 /* OnboardingMoodViewModel.swift */,
 			);
 			path = ViewModels;
@@ -291,17 +314,17 @@
 			path = Models;
 			sourceTree = "<group>";
 		};
-		6EE6C32F2CE3B55C0026D489 /* PinStuff */ = {
+		6EE6C32F2CE3B55C0026D489 /* PinFolder */ = {
 			isa = PBXGroup;
 			children = (
 				89B1EC0F2CC9C1BF0041F9EE /* ForgotPinView.swift */,
 				89B1EC0D2CC9BDB10041F9EE /* PinInputView.swift */,
 				8966A3A22CC3304500FA58DE /* PinSetupView.swift */,
 			);
-			path = PinStuff;
+			path = PinFolder;
 			sourceTree = "<group>";
 		};
-		6EE6C3302CE3B6330026D489 /* OnBoardingStuff */ = {
+		6EE6C3302CE3B6330026D489 /* OnBoardingFolder */ = {
 			isa = PBXGroup;
 			children = (
 				6982AB792CDD9B3E005F9750 /* OnboardingMood.swift */,
@@ -309,7 +332,7 @@
 				6982AB7D2CDD9BA6005F9750 /* GetStartedCardView.swift */,
 				6982AB732CDD95A3005F9750 /* OnBoarding.swift */,
 			);
-			path = OnBoardingStuff;
+			path = OnBoardingFolder;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -451,6 +474,7 @@
 				6E728B912CD1B95700017EA4 /* Song.swift in Sources */,
 				6982AB7E2CDD9BB1005F9750 /* GetStartedCardView.swift in Sources */,
 				6982AB762CDD964B005F9750 /* ColorExtension.swift in Sources */,
+				693E714B2CEAAD5D00446CF7 /* MoodDetectionView.swift in Sources */,
 				6E728B912CD1B95700017EA4 /* Song.swift in Sources */,
 				6E728B952CD1CD9B00017EA4 /* PlayerView.swift in Sources */,
 				69EA65922CE1BBB500723081 /* CameraView.swift in Sources */,
@@ -458,6 +482,7 @@
 				89C5583A2CDC11CB00F67E99 /* TermsOfServiceView.swift in Sources */,
 				6E728B932CD1B98600017EA4 /* QueueManager.swift in Sources */,
 				6982AB782CDD995D005F9750 /* MoodModels.swift in Sources */,
+				693E714D2CEAAEE000446CF7 /* MoodPrefrenceView.swift in Sources */,
 				6982AB812CDD9C0C005F9750 /* OnboardingMoodViewModel.swift in Sources */,
 				696300582CC6E65E00AE7814 /* DetectEmotionServices.swift in Sources */,
 				6982AB7A2CDD9B4F005F9750 /* OnboardingMood.swift in Sources */,
@@ -474,12 +499,15 @@
 				89AD05632CB083B8004D8FAD /* Profile.swift in Sources */,
 				6934A10D2C8FDA840086CC91 /* MoodifyApp.swift in Sources */,
 				89AD05652CB08452004D8FAD /* ProfileManager.swift in Sources */,
+				693E71492CEAAB6C00446CF7 /* MoodDetectionViewModel.swift in Sources */,
+				693E714F2CEAAF2B00446CF7 /* ManualMoodSelector.swift in Sources */,
 				89AD05672CB0847D004D8FAD /* ProfileSelectionView.swift in Sources */,
 				89FA8A452C9A6F40005480D8 /* Questionnaire.swift in Sources */,
 				6EA2E3B82CDAF29E00B4E6C8 /* PlaylistManager.swift in Sources */,
 				6E52B8542CC98F3E0049BF08 /* PlayBackController.swift in Sources */,
 				6982AB742CDD95AC005F9750 /* OnBoarding.swift in Sources */,
 				892C8B3D2CD806AA000C2CE4 /* MoodQueueHandler.swift in Sources */,
+				693E71472CEAAA7400446CF7 /* homePageViewModel.swift in Sources */,
 				6EEDBF492CA3B94D0079295D /* SplashPage.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -666,7 +694,9 @@
 				);
 				MARKETING_VERSION = 1.0;
 				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_BUNDLE_IDENTIFIER = Moodify;
+
+				PRODUCT_BUNDLE_IDENTIFIER = Moodify1;
+
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -705,7 +735,8 @@
 				);
 				MARKETING_VERSION = 1.0;
 				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_BUNDLE_IDENTIFIER = Moodify;
+				PRODUCT_BUNDLE_IDENTIFIER = Moodify1;
+
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
