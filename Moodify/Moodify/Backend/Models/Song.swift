@@ -16,6 +16,8 @@ struct Song: Identifiable, Codable {
     var albumName: String
     var artistName: String
     var songURI: String
+    // Songs should only be favorited in a Playlist
+    var isFavorited: Bool
 }
 
 /*
