@@ -8,11 +8,12 @@ import Foundation
 class MoodQueueHandler {
     
     // Function to get mood parameters
-    func getMoodParameters(for mood: String) -> (Double, Double, Double, Double, Double?, Double?, Double?, Double?, Double?, Double?) {
-        var minValence: Double = 0.5
-        var maxValence: Double = 0.5
-        var minEnergy: Double = 0.5
-        var maxEnergy: Double = 0.5
+    func getMoodParameters(for mood: String, genresSelected: [String]) -> (Double, Double, Double, Double, Double?, Double?, Double?, Double?, Double?, Double?) {
+        // Default values for broad coverage
+        var minValence: Double = 0.4
+        var maxValence: Double = 0.7
+        var minEnergy: Double = 0.4
+        var maxEnergy: Double = 0.7
         var minLoudness: Double? = nil
         var maxLoudness: Double? = nil
         var minAcousticness: Double? = nil
@@ -39,22 +40,42 @@ class MoodQueueHandler {
             minAcousticness = 0.6
             maxAcousticness = 1.0
         case "angry":
-            minValence = 0.0
-            maxValence = 0.3
+            minValence = 0.1
+            maxValence = 0.4
             minEnergy = 0.8
             maxEnergy = 1.0
-            minLoudness = -5.0
+            minLoudness = -6.0
+            maxLoudness = nil
             
         case "chill":
-            minValence = 0.4
+            minValence = 0.3
             maxValence = 0.6
             minEnergy = 0.4
             maxEnergy = 0.6
             minAcousticness = 0.3
-            maxAcousticness = 0.6
+            maxAcousticness = 0.7
+        
         default:
-            break
+            minValence = 0.4
+            maxValence = 0.7
+            minEnergy = 0.4
+            maxEnergy = 0.7
         }
+        
+        // Adjust ranges dynamically based on selected genres
+        if genresSelected.count <= 2 {
+            // Relax constraints if user has selected few genres
+            minValence -= 0.1
+            maxValence += 0.1
+            minEnergy -= 0.1
+            maxEnergy += 0.1
+        }
+        
+        // Ensure values stay within valid bounds
+        minValence = max(0.0, minValence)
+        maxValence = min(1.0, maxValence)
+        minEnergy = max(0.0, minEnergy)
+        maxEnergy = min(1.0, maxEnergy)
         
         return (minValence, maxValence, minEnergy, maxEnergy, minLoudness, maxLoudness, minAcousticness, maxAcousticness, minDanceability, maxDanceability)
     }
