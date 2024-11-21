@@ -179,6 +179,11 @@ final class ProfileManagerTests: XCTestCase {
      Method to test that the deletePin method of the profileManager
      behaves as expected and can properly delete a profiles pin
      
+     Assumptions:
+      - We do not need to test the case where a non-existing profile is attempted to be deleted
+        because the function won't accept anything that is not a profile object, and it also
+        won't allow itself to be ran if it is called without passing in a profile
+     
      Created By: Paul Shamoon
      */
     func testDeletePin() -> Void {
