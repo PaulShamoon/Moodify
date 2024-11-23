@@ -8,7 +8,7 @@ import Foundation
 class MoodQueueHandler {
     
     // Function to get mood parameters
-    func getMoodParameters(for mood: String, genresSelected: [String]) -> (Double, Double, Double, Double, Double?, Double?, Double?, Double?, Double?, Double?) {
+    func getMoodParameters(for mood: String, genresSelected: [String]) -> (Double, Double, Double, Double, Double?, Double?, Double?, Double?) {
         // Default values for broad coverage
         var minValence: Double = 0.4
         var maxValence: Double = 0.7
@@ -18,8 +18,6 @@ class MoodQueueHandler {
         var maxLoudness: Double? = nil
         var minAcousticness: Double? = nil
         var maxAcousticness: Double? = nil
-        var minDanceability: Double? = nil
-        var maxDanceability: Double? = nil
 
         switch mood.lowercased() {
         case "happy", "surprise":
@@ -27,11 +25,7 @@ class MoodQueueHandler {
             maxValence = 1.0
             minEnergy = 0.6
             maxEnergy = 0.9
-            /*
-             minDanceability = 0.7
-             maxDanceability = 1.0 // Danceable, upbeat tracks
-             */
-            
+
         case "sad", "disgust", "fear":
             minValence = 0.0
             maxValence = 0.3
@@ -77,7 +71,7 @@ class MoodQueueHandler {
         minEnergy = max(0.0, minEnergy)
         maxEnergy = min(1.0, maxEnergy)
         
-        return (minValence, maxValence, minEnergy, maxEnergy, minLoudness, maxLoudness, minAcousticness, maxAcousticness, minDanceability, maxDanceability)
+        return (minValence, maxValence, minEnergy, maxEnergy, minLoudness, maxLoudness, minAcousticness, maxAcousticness)
     }
 
     /*
@@ -85,7 +79,7 @@ class MoodQueueHandler {
      
      Created by: Mohammad Sulaiman
      */
-    func buildRecommendationURL(userGenres: [String], limit: Int, minValence: Double, maxValence: Double, minEnergy: Double, maxEnergy: Double, minLoudness: Double?, maxLoudness: Double?, minAcousticness: Double?, maxAcousticness: Double?, minDanceability: Double?, maxDanceability: Double?) -> URL? {
+    func buildRecommendationURL(userGenres: [String], limit: Int, minValence: Double, maxValence: Double, minEnergy: Double, maxEnergy: Double, minLoudness: Double?, maxLoudness: Double?, minAcousticness: Double?, maxAcousticness: Double?) -> URL? {
         // Shuffle the genres if more than 5 are selected
         let shuffledGenres = userGenres.count > 5 ? userGenres.shuffled() : userGenres
         // Convert user selected genres to compatible genres and limit to 5 for the API
@@ -99,8 +93,7 @@ class MoodQueueHandler {
             "max_loudness": maxLoudness,
             "min_acousticness": minAcousticness,
             "max_acousticness": maxAcousticness,
-            "min_danceability": minDanceability,
-            "max_danceability": maxDanceability
+
         ]
         
         // Iterate over optional parameters and append if non-nil
