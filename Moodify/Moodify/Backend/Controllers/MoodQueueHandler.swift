@@ -9,7 +9,7 @@ class MoodQueueHandler {
     
     // Function to get mood parameters
     func getMoodParameters(for mood: String, genresSelected: [String]) -> (Double, Double, Double, Double, Double?, Double?, Double?, Double?) {
-        // Default values for broad coverage
+        // Default values set to broad coverage
         var minValence: Double = 0.4
         var maxValence: Double = 0.7
         var minEnergy: Double = 0.4
@@ -20,13 +20,13 @@ class MoodQueueHandler {
         var maxAcousticness: Double? = nil
 
         switch mood.lowercased() {
-        case "happy", "surprise":
+        case "happy":
             minValence = 0.7
             maxValence = 1.0
             minEnergy = 0.6
             maxEnergy = 0.9
-
-        case "sad", "disgust", "fear":
+            
+        case "sad":
             minValence = 0.0
             maxValence = 0.3
             minEnergy = 0.3
@@ -39,7 +39,6 @@ class MoodQueueHandler {
             minEnergy = 0.8
             maxEnergy = 1.0
             minLoudness = -6.0
-            maxLoudness = nil
             
         case "chill":
             minValence = 0.3
@@ -48,31 +47,23 @@ class MoodQueueHandler {
             maxEnergy = 0.6
             minAcousticness = 0.3
             maxAcousticness = 0.7
-        
+
         default:
-            minValence = 0.4
-            maxValence = 0.7
-            minEnergy = 0.4
-            maxEnergy = 0.7
+            break
         }
         
         // Adjust ranges dynamically based on selected genres
         if genresSelected.count <= 2 {
-            // Relax constraints if user has selected few genres
-            minValence -= 0.1
-            maxValence += 0.1
-            minEnergy -= 0.1
-            maxEnergy += 0.1
+            minValence = max(0.0, minValence - 0.1)
+            maxValence = min(1.0, maxValence + 0.1)
+            minEnergy = max(0.0, minEnergy - 0.1)
+            maxEnergy = min(1.0, maxEnergy + 0.1)
         }
-        
-        // Ensure values stay within valid bounds
-        minValence = max(0.0, minValence)
-        maxValence = min(1.0, maxValence)
-        minEnergy = max(0.0, minEnergy)
-        maxEnergy = min(1.0, maxEnergy)
-        
+
         return (minValence, maxValence, minEnergy, maxEnergy, minLoudness, maxLoudness, minAcousticness, maxAcousticness)
     }
+
+
 
     /*
      Function that constructs the Spotify API recommendation URL using the provided genres and audio feature ranges. It dynamically includes each feature parameter in the URL if it’s not nil.
