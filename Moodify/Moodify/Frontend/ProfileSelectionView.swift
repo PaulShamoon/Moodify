@@ -148,7 +148,6 @@ struct ProfileSelectionView: View {
     }
 }
 
-// ProfileCard View remains unchanged
 struct ProfileCard: View {
     let profile: Profile
     let defaultProfileImage: URL
@@ -158,36 +157,62 @@ struct ProfileCard: View {
     var body: some View {
         Button(action: action) {
             VStack(spacing: 16) {
-                AsyncImage(url: defaultProfileImage) { phase in
-                    switch phase {
-                    case .empty:
-                        ProgressView()
-                            .frame(width: 100, height: 100)
-                    case .success(let image):
-                        image
-                            .resizable()
-                            .scaledToFill()
-                            .frame(width: 100, height: 100)
-                            .clipShape(Circle())
-                            .overlay(
-                                Circle()
-                                    .stroke(
-                                        LinearGradient(
-                                            colors: [
-                                                Color(hex: "4ADE80"),
-                                                Color(hex: "22C55E")
-                                            ],
-                                            startPoint: .topLeading,
-                                            endPoint: .bottomTrailing
-                                        ),
-                                        lineWidth: 3
-                                    )
-                            )
-                            .shadow(color: Color(hex: "4ADE80").opacity(0.2), radius: 8, x: 0, y: 4)
-                    case .failure:
-                        fallbackImage
-                    @unknown default:
-                        fallbackImage
+                if let imagePath = String(data: profile.profilePicture ?? Data(), encoding: .utf8),
+                   let savedImage = UIImage(contentsOfFile: imagePath) {
+                    // Display the saved profile picture
+                    Image(uiImage: savedImage)
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: 100, height: 100)
+                        .clipShape(Circle())
+                        .overlay(
+                            Circle()
+                                .stroke(
+                                    LinearGradient(
+                                        colors: [
+                                            Color(hex: "4ADE80"),
+                                            Color(hex: "22C55E")
+                                        ],
+                                        startPoint: .topLeading,
+                                        endPoint: .bottomTrailing
+                                    ),
+                                    lineWidth: 3
+                                )
+                        )
+                        .shadow(color: Color(hex: "4ADE80").opacity(0.2), radius: 8, x: 0, y: 4)
+                } else {
+                    // Fallback to default image
+                    AsyncImage(url: defaultProfileImage) { phase in
+                        switch phase {
+                        case .empty:
+                            ProgressView()
+                                .frame(width: 100, height: 100)
+                        case .success(let image):
+                            image
+                                .resizable()
+                                .scaledToFill()
+                                .frame(width: 100, height: 100)
+                                .clipShape(Circle())
+                                .overlay(
+                                    Circle()
+                                        .stroke(
+                                            LinearGradient(
+                                                colors: [
+                                                    Color(hex: "4ADE80"),
+                                                    Color(hex: "22C55E")
+                                                ],
+                                                startPoint: .topLeading,
+                                                endPoint: .bottomTrailing
+                                            ),
+                                            lineWidth: 3
+                                        )
+                                )
+                                .shadow(color: Color(hex: "4ADE80").opacity(0.2), radius: 8, x: 0, y: 4)
+                        case .failure:
+                            fallbackImage
+                        @unknown default:
+                            fallbackImage
+                        }
                     }
                 }
                 
@@ -224,6 +249,7 @@ struct ProfileCard: View {
             .foregroundColor(Color(hex: "94A3B8"))
     }
 }
+
 
 // Color extension remains unchanged
 extension Color {
