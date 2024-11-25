@@ -3,6 +3,7 @@ import SwiftUI
 struct AccountInfoView: View {
     @EnvironmentObject var profileManager: ProfileManager
     @State private var isEditingProfile = false
+    
     var body: some View {
         VStack(alignment: .leading) {
             Spacer()
@@ -16,7 +17,9 @@ struct AccountInfoView: View {
             if let profile = profileManager.currentProfile {
                 VStack(alignment: .leading, spacing: 20) {
                     HStack {
-                        if let imageData = profile.profilePicture, let uiImage = UIImage(data: imageData) {
+                        if let imagePath = String(data: profile.profilePicture ?? Data(), encoding: .utf8),
+                           let uiImage = UIImage(contentsOfFile: imagePath) {
+                            // Display the profile picture
                             Image(uiImage: uiImage)
                                 .resizable()
                                 .scaledToFill()
@@ -27,6 +30,7 @@ struct AccountInfoView: View {
                                         .stroke(Color.green, lineWidth: 4)
                                 )
                         } else {
+                            // Fallback to default placeholder
                             Circle()
                                 .fill(Color.green.opacity(0.2))
                                 .frame(width: 60, height: 60)

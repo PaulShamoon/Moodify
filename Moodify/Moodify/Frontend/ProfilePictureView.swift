@@ -23,6 +23,7 @@ struct ProfilePictureView: View {
                 .padding()
             
             if let image = selectedImage {
+                // If a new image is selected, show it
                 Image(uiImage: image)
                     .resizable()
                     .scaledToFill()
@@ -33,7 +34,22 @@ struct ProfilePictureView: View {
                             .stroke(Color.green, lineWidth: 4)
                     )
                     .shadow(radius: 10)
+            } else if let profile = profileManager.currentProfile,
+                      let imagePath = String(data: profile.profilePicture ?? Data(), encoding: .utf8),
+                      let savedImage = UIImage(contentsOfFile: imagePath) {
+                // Load and display the saved profile picture if it exists
+                Image(uiImage: savedImage)
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: 150, height: 150)
+                    .clipShape(Circle())
+                    .overlay(
+                        Circle()
+                            .stroke(Color.green, lineWidth: 4)
+                    )
+                    .shadow(radius: 10)
             } else {
+                // Display placeholder if no image is set or saved
                 Circle()
                     .fill(Color.gray.opacity(0.3))
                     .frame(width: 150, height: 150)
@@ -43,6 +59,7 @@ struct ProfilePictureView: View {
                             .foregroundColor(.white.opacity(0.7))
                     )
             }
+            
             
             HStack {
                 Button(action: {
@@ -99,9 +116,50 @@ struct ProfilePictureView: View {
     
     func saveProfilePicture() {
         guard let profile = profileManager.currentProfile else { return }
-        if let selectedImage = selectedImage {
-            print("Profile picture saved for \(profile.name)")
+        guard let selectedImage = selectedImage else { return }
+        
+        // Convert the UIImage to Data
+        guard let imageData = selectedImage.jpegData(compressionQuality: 0.8) else {
+            print("Failed to convert image to data")
+            return
         }
+        
+        // Create a unique file name for the image using the profile ID
+        let fileName = "\(profile.id.uuidString).jpg"
+        
+        // Get the file URL for saving the image in the app's documents directory
+        let fileURL = getDocumentsDirectory().appendingPathComponent(fileName)
+        
+        do {
+            // Save the image data to the file
+            try imageData.write(to: fileURL)
+            
+            // Update the profile using ProfileManager's updateProfile method
+            profileManager.updateProfile(
+                profile: profile,
+                name: profile.name,
+                dateOfBirth: profile.dateOfBirth,
+                favoriteGenres: profile.favoriteGenres,
+                hasAgreedToTerms: profile.hasAgreedToTerms,
+                userPin: profile.userPin,
+                personalSecurityQuestion: profile.personalSecurityQuestion,
+                securityQuestionAnswer: profile.securityQuestionAnswer
+            )
+            
+            // Add the file path as the profile picture
+            if let index = profileManager.profiles.firstIndex(where: { $0.id == profile.id }) {
+                profileManager.profiles[index].profilePicture = fileURL.path.data(using: .utf8)
+            }
+            
+            print("Profile picture saved for \(profile.name) at \(fileURL.path)")
+        } catch {
+            print("Failed to save profile picture: \(error.localizedDescription)")
+        }
+    }
+    
+    // Helper function to get the app's documents directory
+    func getDocumentsDirectory() -> URL {
+        FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
     }
 }
 
