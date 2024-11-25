@@ -10,7 +10,7 @@ import SpotifyiOS
 class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDelegate, SPTAppRemoteDelegate {
     
     var isFirstConnectionAttempt = true
-    
+
     // Tracks if reconnect was attempted
     private var reconnectAttempted = false
     
@@ -83,7 +83,7 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
         }
         // Fetch or update the current player state
         updatePlayerState()
-    }
+        }
     
     // Spotify App Remote instance
     private lazy var appRemote: SPTAppRemote = {
@@ -356,18 +356,18 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
             }
         }
     }
-    
+
     /*
      Calls the `seekForwardOrBackward` method of the `playbackController`
      to skip forward or backward in the current track by 15 seconds.
-     
+
      - Parameters:
-     - forward: A Boolean that determines the direction to skip.
-     `true` for forward, `false` for backward.
-     
+        - forward: A Boolean that determines the direction to skip.
+                   `true` for forward, `false` for backward.
+
      - Returns:
-     Void
-     
+         Void
+         
      - Created By: Paul Shamoon
      */
     func seekForwardOrBackward(forward: Bool) -> Void {
@@ -400,12 +400,12 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
             }
         }
     }
-    
-    private func handlePlayerAPIError() {
-        // Add error handleing
-        print("Handling player API error. Make sure Spotify is open and playing.")
-    }
-    
+
+     private func handlePlayerAPIError() {
+         // Add error handleing
+         print("Handling player API error. Make sure Spotify is open and playing.")
+     }
+
     /*
      Method to clear the current queue
      
@@ -431,7 +431,7 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
     
     /*
      Function that sends the recommendation request to Spotify, handles the response, parses the track URIs, and then calls enqueueTracks with the list of track URIs.
-     
+
      Created by: Mohammad Sulaiman
      */
     func fetchRecommendations(mood: String, profile: Profile, userGenres: [String]) {
@@ -641,8 +641,8 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
             }
         }
     }
-    
-    
+
+
     func ensureSpotifyConnection(completion: (() -> Void)? = nil) {
         guard !appRemote.isConnected else {
             print("Spotify already connected.")
