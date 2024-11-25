@@ -693,4 +693,3 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
     }
     
 }
-

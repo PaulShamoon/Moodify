@@ -4,6 +4,7 @@
 //
 //  Created by Paul Shamoon on 11/17/24.
 //
+
 import XCTest
 @testable import Moodify
 
@@ -17,7 +18,7 @@ class SetupTestData {
     var profile1: Profile
     var profile2: Profile
     var profile3: Profile
-
+    
     var song1: Song
     var song2: Song
     var song3: Song
@@ -40,7 +41,7 @@ class SetupTestData {
             personalSecurityQuestion: nil,
             securityQuestionAnswer: nil
         )
-
+        
         profile2 = Profile(
             name: "user2",
             dateOfBirth: Calendar.current.date(byAdding: .year, value: -20, to: Date())!,

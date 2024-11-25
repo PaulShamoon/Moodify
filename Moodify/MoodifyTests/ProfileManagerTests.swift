@@ -13,7 +13,7 @@ import XCTest
  Class to test all the methods of the ProfileManager
  
  Assumption: Testing selectProfile is unnecessary as it involves
-             only a straightforward variable assignment
+ only a straightforward variable assignment
  
  Created By: Paul Shamoon
  */
@@ -21,7 +21,7 @@ final class ProfileManagerTests: XCTestCase {
     var profileManager: ProfileManager!
     var profile1: Profile!
     var profile2: Profile!
-
+    
     
     /*
      Method to setup all the data we
@@ -81,13 +81,13 @@ final class ProfileManagerTests: XCTestCase {
         
         // Ensure that the newly created profile exists
         XCTAssertNotNil(createdProfile, "The createdProfile does not exist")
-
+        
         // Ensure that the total amount of profiles are now 4
         XCTAssertEqual(newProfiles.count, 4, "The total amount of profiles should be 4")
         
         // Ensure that the created profile is user4
         XCTAssertEqual(createdProfile?.name, "user4", "The name of the created profile should be user4")
-
+        
         // Ensure that originalProfiles does not equal newProfiles since we created a new profile
         XCTAssertNotEqual(originalProfiles, newProfiles, "The old and new state of profiles should not be equal.")
     }
@@ -107,7 +107,7 @@ final class ProfileManagerTests: XCTestCase {
         let originalProfile1 = profile1
         
         let updatedDateOfBirth: Date = Calendar.current.date(byAdding: .year, value: -16, to: Date())!
-
+        
         // Update the profile
         profileManager.updateProfile(
             profile: profile1,
@@ -128,7 +128,7 @@ final class ProfileManagerTests: XCTestCase {
         
         // Ensure that no new profiles were created
         XCTAssertEqual(originalProfiles.count, updatedProfiles.count)
-    
+        
         // Ensure that the original profile does not equal the updated profile
         XCTAssertNotEqual(originalProfile1, updatedProfile1, "The profile did not update properly")
         
@@ -180,9 +180,9 @@ final class ProfileManagerTests: XCTestCase {
      behaves as expected and can properly delete a profiles pin
      
      Assumptions:
-      - We do not need to test the case where a non-existing profile is attempted to be deleted
-        because the function won't accept anything that is not a profile object, and it also
-        won't allow itself to be ran if it is called without passing in a profile
+     - We do not need to test the case where a non-existing profile is attempted to be deleted
+     because the function won't accept anything that is not a profile object, and it also
+     won't allow itself to be ran if it is called without passing in a profile
      
      Created By: Paul Shamoon
      */
@@ -216,4 +216,3 @@ final class ProfileManagerTests: XCTestCase {
         XCTAssertTrue(profileManager.verifyPin(for: profile1, enteredPin: "1234"), "Pins did not match")
     }
 }
-

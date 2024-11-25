@@ -93,16 +93,16 @@ final class QueueManagerTests: XCTestCase {
         
         // Ensure that the first song in the queue is Song2
         XCTAssertEqual(updatedQueue.first, song2, "First song in the queue should be song2.")
-
+        
         // Add song3 to the currentQueue
         updatedQueue = queueManager.addSongToQueue(song: song3)
         
         // Remove song3 from the currentQueue
         updatedQueue = queueManager.removeSongsFromQueue(trackURI: song3.songURI)
-
+        
         // Ensure that the updatedQueue is empty since removing a song from the queue removes everything in front of it
         XCTAssertEqual(updatedQueue.count, 0, "The updatedQueue should be empty")
-
+        
         // Ensure that originalQueue and updatedQueue are NOT equal
         XCTAssertNotEqual(originalQueue, updatedQueue, "currentQueue should not be equal to updatedQueue.")
     }
