@@ -13,9 +13,6 @@ import XCTest
 class SetupTestData {
     // This allows any testing class to access data defined in this class
     static let shared = SetupTestData()
-
-    var currentQueue: [Song] = []
-    var playlists: [Playlist] = []
     
     var profile1: Profile
     var profile2: Profile
@@ -27,6 +24,10 @@ class SetupTestData {
     
     var playlist1: Playlist
     var playlist2: Playlist
+    
+    var currentQueue: [Song] = []
+    var playlists: [Playlist] = []
+    var profiles: [Profile] = []
     
     init() {
         // Initialize profiles
@@ -107,5 +108,8 @@ class SetupTestData {
         
         // Initialize playlists
         playlists = [playlist1, playlist2]
+        
+        // Initialize profiles
+        profiles = [profile1, profile2, profile3]
     }
 }
