@@ -1,36 +1,4 @@
-import SwiftUICore
 import SwiftUI
-
-struct PreferenceInfoRow: View {
-    let icon: String
-    let title: String
-    let value: String
-    let iconColor: Color
-    
-    var body: some View {
-        HStack(spacing: 14) {
-            Image(systemName: icon)
-                .font(.system(size: 24))
-                .foregroundColor(iconColor)
-                .frame(width: 32)
-            
-            VStack(alignment: .leading, spacing: 4) {
-                Text(title)
-                    .font(.system(size: 14, weight: .medium, design: .rounded))
-                    .foregroundColor(.gray)
-                
-                Text(value)
-                    .font(.system(size: 16, weight: .semibold, design: .rounded))
-                    .foregroundColor(.white)
-            }
-            Spacer()
-        }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 12)
-        .background(Color.white.opacity(0.1))
-        .cornerRadius(12)
-    }
-}
 
 struct GeneralMusicPreferencesView: View {
     @EnvironmentObject var profileManager: ProfileManager
@@ -38,19 +6,29 @@ struct GeneralMusicPreferencesView: View {
     @Binding var navigateToHomePage: Bool
     @State private var isPlaying = false
     @State private var isFirstTimeUser: Bool = true
-    @State private var showAllGenres: Bool = false
     @State private var showError: Bool = false
     
     @Environment(\.presentationMode) var presentationMode
     
     let genres = [
-        "Pop", "Hip-Hop", "Rock", "Indie", "Electronic", "Jazz", "Dance", "R&B", "Classical",
-        "Reggae", "Soul", "Country", "Metal", "Techno", "Latin", "Punk", "Blues", "Ambient", "Acoustic",
-        "Folk", "K-Pop", "Lo-Fi", "EDM", "Disco",
-        "Funk", "Garage", "Synth-Pop", "Opera", "Bluegrass", "Film Scores", "World Music",
-        "Samba", "Tango"
+        "Pop", "Hip-Hop", "Rock", "Electronic", "R&B", "Classical", "Jazz", "Dance", "K-Pop",
+        "Country", "Soul", "EDM", "Latin", "Reggae", "Lo-Fi", "Blues", "Funk", "Ambient",
+        "Techno", "Indie", "Disco", "Synth-Pop", "Garage", "Punk", "Acoustic", "Folk",
+        "World Music", "Film Scores", "Metal", "Opera", "Tango", "Bluegrass", "Samba"
     ]
     
+    var sortedGenres: [String] {
+        let selected = genres.filter { selectedGenres.contains($0) }
+        let unselected = genres.filter { !selectedGenres.contains($0) }
+        return selected + unselected
+    }
+    
+    var genrePages: [[String]] {
+        sortedGenres.chunked(into: 12)
+    }
+    
+    @State private var currentPage = 0
+
     func genreIcon(for genre: String) -> String {
         switch genre {
         case "Pop": return "star.fill"
@@ -97,145 +75,142 @@ struct GeneralMusicPreferencesView: View {
                            endPoint: .bottom)
             .edgesIgnoringSafeArea(.all)
             
-            ScrollView {
-                VStack(spacing: 24) {
-                    VStack(spacing: 8) {
-                        Text("\(profileManager.currentProfile?.name ?? "User"), select your favorite genres")
-                            .font(.system(size: 18, weight: .medium, design: .rounded))
-                            .foregroundColor(.gray)
-                        
-                        Text("The more genres you select, the better your recommendations will be.")
-                            .font(.system(size: 14, weight: .medium, design: .rounded))
-                            .foregroundColor(.green)
-                            .multilineTextAlignment(.center)
-                            .padding(.horizontal)
-                    }
-                    .padding(.top, 20)
-                    
-                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 100), spacing: 12)], spacing: 12) {
-                        ForEach(Array(genres.prefix(showAllGenres ? genres.count : 12)), id: \.self) { genre in
-                            Button(action: {
-                                withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
-                                    toggleGenreSelection(genre: genre)
-                                    showError = false
-                                }
-                            }) {
-                                ZStack {
-                                    RoundedRectangle(cornerRadius: 12)
-                                        .fill(selectedGenres.contains(genre) ?
-                                              LinearGradient(gradient: Gradient(colors: [Color.green, Color.green.opacity(0.7)]), startPoint: .topLeading, endPoint: .bottomTrailing) :
-                                                LinearGradient(gradient: Gradient(colors: [Color.white.opacity(0.1), Color.white.opacity(0.05)]), startPoint: .topLeading, endPoint: .bottomTrailing))
-                                        .shadow(color: selectedGenres.contains(genre) ? Color.green.opacity(0.3) : Color.black.opacity(0.2), radius: 6, x: 0, y: 3)
-                                    
-                                    VStack(spacing: 8) {
-                                        Image(systemName: genreIcon(for: genre))
-                                            .font(.system(size: 22))
-                                            .foregroundColor(selectedGenres.contains(genre) ? .black : .gray)
-                                        
-                                        Text(genre)
-                                            .font(.system(size: 14, weight: .semibold, design: .rounded))
-                                            .foregroundColor(selectedGenres.contains(genre) ? .black : .white)
-                                        
-                                        if selectedGenres.contains(genre) {
-                                            Image(systemName: "checkmark.circle.fill")
-                                                .foregroundColor(.black)
-                                                .font(.system(size: 16))
-                                        }
-                                    }
-                                    .padding(.vertical, 6)
-                                }
-                                .frame(height: 100)
-                            }
-                        }
-                    }
-                    .padding(.horizontal)
-                    
-                    if !showAllGenres && genres.count > 12 {
-                        Button(action: {
-                            withAnimation {
-                                showAllGenres.toggle()
-                            }
-                        }) {
-                            Text("Show more...")
-                                .font(.system(size: 16, weight: .semibold, design: .rounded))
-                                .foregroundColor(.blue)
-                                .padding(.vertical, 12)
-                        }
-                    }
-                    
-                    VStack(spacing: 16) {
-                        PreferenceInfoRow(
-                            icon: "music.note.list",
-                            title: "Selected Genres",
-                            value: selectedGenres.isEmpty ? "No genres selected" : selectedGenres.joined(separator: ", "),
-                            iconColor: .green
-                        )
-                        
-                        PreferenceInfoRow(
-                            icon: "number.circle.fill",
-                            title: "Total Selected",
-                            value: "\(selectedGenres.count) of \(genres.count) genres",
-                            iconColor: .blue
-                        )
-                    }
-                    .padding(16)
-                    .background(Color.white.opacity(0.05))
-                    .cornerRadius(16)
-                    .padding(.horizontal)
-                    
-                    if showError {
-                        Text("Please select at least one genre to proceed.")
-                            .font(.system(size: 14, weight: .medium))
-                            .foregroundColor(.red)
-                            .padding(.top, 8)
-                    }
-                    
-                    // Submit Button
-                    Button(action: {
-                        if selectedGenres.isEmpty {
-                            showError = true
-                        } else if let currentProfile = profileManager.currentProfile {
-                            profileManager.updateProfile(
-                                profile: currentProfile,
-                                name: currentProfile.name,
-                                dateOfBirth: currentProfile.dateOfBirth,
-                                favoriteGenres: Array(selectedGenres),
-                                hasAgreedToTerms: currentProfile.hasAgreedToTerms,
-                                userPin: currentProfile.userPin,
-                                personalSecurityQuestion: currentProfile.personalSecurityQuestion,
-                                securityQuestionAnswer: currentProfile.personalSecurityQuestion
+            VStack(spacing: 32) {
+                // Title Section
+                VStack(spacing: 8) {
+                    Text("\(profileManager.currentProfile?.name ?? "User"),")
+                        .font(.system(size: 26, weight: .bold, design: .rounded))
+                        .foregroundStyle(
+                            LinearGradient(
+                                colors: [Color(hex: "4ADE80"), Color(hex: "22C55E")],
+                                startPoint: .leading,
+                                endPoint: .trailing
                             )
-                            navigateToHomePage = true
-                            presentationMode.wrappedValue.dismiss()
-                        }
-                    }) {
-                        HStack {
-                            Text("Save preferences")
-                                .font(.system(size: 18, weight: .bold, design: .rounded))
-                            
-                            Image(systemName: "arrow.right.circle.fill")
-                                .font(.system(size: 20))
-                        }
-                        .foregroundColor(.black)
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 56)
+                        )
+                        .multilineTextAlignment(.center)
+                    
+                    Text("Select your favorite genres")
+                        .font(.system(size: 18, weight: .medium, design: .rounded))
+                        .foregroundColor(Color(hex: "94A3B8"))
+                        .multilineTextAlignment(.center)
+                    
+                    Text("The more genres you choose, the better your recommendations.")
+                        .font(.system(size: 14, weight: .regular, design: .rounded))
+                        .foregroundStyle(
+                            LinearGradient(
+                                colors: [Color.green.opacity(0.9), Color.green.opacity(0.6)],
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            )
+                        )
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 10)
                         .background(
-                            Group {
-                                if selectedGenres.isEmpty {
-                                    Color.gray.opacity(0.5)
-                                } else {
-                                    LinearGradient(gradient: Gradient(colors: [Color.green, Color.green.opacity(0.8)]), startPoint: .leading, endPoint: .trailing)
+                            RoundedRectangle(cornerRadius: 12)
+                                .fill(Color.white.opacity(0.05))
+                        )
+                }
+                .padding(.horizontal)
+                
+                // Genre Pages
+                TabView(selection: $currentPage) {
+                    ForEach(genrePages.indices, id: \.self) { index in
+                        LazyVGrid(columns: [GridItem(.adaptive(minimum: 100), spacing: 12)], spacing: 12) {
+                            ForEach(genrePages[index], id: \.self) { genre in
+                                Button(action: {
+                                    withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                                        toggleGenreSelection(genre: genre)
+                                        showError = false
+                                    }
+                                }) {
+                                    ZStack {
+                                        RoundedRectangle(cornerRadius: 12)
+                                            .fill(selectedGenres.contains(genre) ?
+                                                  LinearGradient(gradient: Gradient(colors: [Color.green, Color.green.opacity(0.7)]), startPoint: .topLeading, endPoint: .bottomTrailing) :
+                                                    LinearGradient(gradient: Gradient(colors: [Color.white.opacity(0.1), Color.white.opacity(0.05)]), startPoint: .topLeading, endPoint: .bottomTrailing))
+                                            .shadow(color: selectedGenres.contains(genre) ? Color.green.opacity(0.3) : Color.black.opacity(0.2), radius: 6, x: 0, y: 3)
+                                        
+                                        VStack(spacing: 8) {
+                                            Image(systemName: genreIcon(for: genre))
+                                                .font(.system(size: 22))
+                                                .foregroundColor(selectedGenres.contains(genre) ? .black : .gray)
+                                            
+                                            Text(genre)
+                                                .font(.system(size: 14, weight: .semibold, design: .rounded))
+                                                .foregroundColor(selectedGenres.contains(genre) ? .black : .white)
+                                            
+                                            if selectedGenres.contains(genre) {
+                                                Image(systemName: "checkmark.circle.fill")
+                                                    .foregroundColor(.black)
+                                                    .font(.system(size: 16))
+                                            }
+                                        }
+                                        .padding(.vertical, 6)
+                                    }
+                                    .frame(height: 100)
                                 }
                             }
-                        )
-
-                        .cornerRadius(16)
-                        .shadow(color: selectedGenres.isEmpty ? .clear : Color.green.opacity(0.3),
-                                radius: 8, x: 0, y: 4)
+                        }
+                        .padding(.horizontal)
+                        .tag(index)
                     }
-                    .padding(.horizontal)
-                    .padding(.bottom, 20)
                 }
+                .tabViewStyle(PageTabViewStyle(indexDisplayMode: .automatic))
+                .frame(height: 510)
+                
+                // Error Message
+                if showError {
+                    Text("Please select at least one genre to proceed.")
+                        .font(.system(size: 14, weight: .medium))
+                        .foregroundColor(.red)
+                        .padding(.top, 8)
+                }
+                
+                // Submit Button
+                Button(action: {
+                    if selectedGenres.isEmpty {
+                        showError = true
+                    } else if let currentProfile = profileManager.currentProfile {
+                        profileManager.updateProfile(
+                            profile: currentProfile,
+                            name: currentProfile.name,
+                            dateOfBirth: currentProfile.dateOfBirth,
+                            favoriteGenres: Array(selectedGenres),
+                            hasAgreedToTerms: currentProfile.hasAgreedToTerms,
+                            userPin: currentProfile.userPin,
+                            personalSecurityQuestion: currentProfile.personalSecurityQuestion,
+                            securityQuestionAnswer: currentProfile.personalSecurityQuestion
+                        )
+                        navigateToHomePage = true
+                        presentationMode.wrappedValue.dismiss()
+                    }
+                }) {
+                    HStack {
+                        Text("Save preferences")
+                            .font(.system(size: 18, weight: .bold, design: .rounded))
+                        
+                        Image(systemName: "arrow.right.circle.fill")
+                            .font(.system(size: 20))
+                    }
+                    .foregroundColor(.black)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 56)
+                    .background(
+                        Group {
+                            if selectedGenres.isEmpty {
+                                Color.gray.opacity(0.5)
+                            } else {
+                                LinearGradient(gradient: Gradient(colors: [Color.green, Color.green.opacity(0.8)]), startPoint: .leading, endPoint: .trailing)
+                            }
+                        }
+                    )
+                    .cornerRadius(16)
+                    .shadow(color: selectedGenres.isEmpty ? .clear : Color.green.opacity(0.3),
+                            radius: 8, x: 0, y: 4)
+                }
+                .padding(.horizontal)
+                .padding(.bottom, 20)
             }
         }
         .onAppear {
@@ -252,6 +227,14 @@ struct GeneralMusicPreferencesView: View {
             selectedGenres.remove(genre)
         } else {
             selectedGenres.insert(genre)
+        }
+    }
+}
+
+extension Array {
+    func chunked(into size: Int) -> [[Element]] {
+        stride(from: 0, to: count, by: size).map {
+            Array(self[$0..<Swift.min($0 + size, count)])
         }
     }
 }
