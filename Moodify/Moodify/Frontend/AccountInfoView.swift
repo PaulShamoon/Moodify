@@ -16,15 +16,27 @@ struct AccountInfoView: View {
             if let profile = profileManager.currentProfile {
                 VStack(alignment: .leading, spacing: 20) {
                     HStack {
-                        Circle()
-                            .fill(Color.green.opacity(0.2))
-                            .frame(width: 60, height: 60)
-                            .overlay(
-                                Image(systemName: "person.circle.fill")
-                                    .resizable()
-                                    .foregroundColor(.green)
-                                    .padding(12)
-                            )
+                        if let imageData = profile.profilePicture, let uiImage = UIImage(data: imageData) {
+                            Image(uiImage: uiImage)
+                                .resizable()
+                                .scaledToFill()
+                                .frame(width: 60, height: 60)
+                                .clipShape(Circle())
+                                .overlay(
+                                    Circle()
+                                        .stroke(Color.green, lineWidth: 4)
+                                )
+                        } else {
+                            Circle()
+                                .fill(Color.green.opacity(0.2))
+                                .frame(width: 60, height: 60)
+                                .overlay(
+                                    Image(systemName: "person.circle.fill")
+                                        .resizable()
+                                        .foregroundColor(.green)
+                                        .padding(12)
+                                )
+                        }
                         
                         Text(profile.name)
                             .font(.system(size: 24, weight: .semibold, design: .rounded))
@@ -77,6 +89,26 @@ struct AccountInfoView: View {
                     .background(
                         RoundedRectangle(cornerRadius: 15)
                             .fill(Color.green.opacity(0.2))
+                    )
+                }
+                .padding(.top, 10)
+                
+                NavigationLink(
+                    destination: ProfilePictureView()
+                        .environmentObject(profileManager)
+                ) {
+                    HStack {
+                        Image(systemName: "camera.circle.fill")
+                            .font(.title2)
+                        Text("Set Profile Picture")
+                            .font(.system(size: 18, weight: .semibold, design: .rounded))
+                    }
+                    .foregroundColor(.blue)
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(
+                        RoundedRectangle(cornerRadius: 15)
+                            .fill(Color.blue.opacity(0.2))
                     )
                 }
                 .padding(.top, 10)
