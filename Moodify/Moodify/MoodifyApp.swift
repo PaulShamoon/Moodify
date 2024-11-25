@@ -21,10 +21,12 @@ struct MoodifyApp: App {
             NavigationStack {
                 if showSplash {
                     SplashPageView(showSplash: $showSplash)
+                    /* this is where the splash page is displayed and then the onboarding view is displayed
+                     */
                 } else if !hasCompletedOnboarding {
                     OnboardingView {
                         hasCompletedOnboarding = true
-                        hasCompletedQuestionnaire = false
+                        hasCompletedQuestionnaire = false /* User gets taken to the account set up page */
                     }
                 } else {
                     if isCreatingNewProfile || !hasCompletedQuestionnaire {
@@ -38,24 +40,13 @@ struct MoodifyApp: App {
                                 }
                                 .environmentObject(profileManager)
                         } else {
-                            QuestionnaireView(
-                                isEditingProfile: $isEditingProfile,
-                                navigateToMusicPreferences: $navigateToMusicPreferences,
-                                isCreatingNewProfile: $isCreatingNewProfile
-                            )
-                            .environmentObject(profileManager)
+                            QuestionnaireView(isEditingProfile: $isEditingProfile, navigateToMusicPreferences: $navigateToMusicPreferences, isCreatingNewProfile: $isCreatingNewProfile)
+                                .environmentObject(profileManager)
                         }
                     } else {
                         if navigateToHomePage, let currentProfile = profileManager.currentProfile {
-                            HomePageView(
-                                viewModel: HomePageViewModel(
-                                    profile: currentProfile,
-                                    spotifyController: SpotifyController()
-                                ),
-                                moodViewModel: MoodDetectionViewModel(
-                                    profile: currentProfile,
-                                    spotifyController: SpotifyController()
-                                ),
+                            homePageView(
+                                profile: currentProfile,
                                 navigateToHomePage: $navigateToHomePage,
                                 isCreatingNewProfile: $isCreatingNewProfile,
                                 navigateToMusicPreferences: $navigateToMusicPreferences,
