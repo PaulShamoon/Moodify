@@ -25,7 +25,7 @@ struct homePageView: View {
     
     
     // NOTE - this URL is temporary and needs to be updated each time from the backend side to detect mood properly
-    let backendURL = "https://0086-2601-406-4d00-7af0-3024-4646-c0e0-48d8.ngrok-free.app/analyze"
+    let backendURL = "/analyze"
     
     // Add this property to manage background color
     @State private var backgroundColors: [Color] = [
@@ -112,73 +112,104 @@ struct homePageView: View {
                 }
                 .padding(.horizontal)
                 
-                // Mood Display
-                VStack {
-                    HStack {
-                        Text("Your Current Mood")
-                            .font(.system(size: 20, weight: .bold))
-                            .foregroundColor(.white.opacity(0.9))
-                        
-                        Spacer()
-                        
-                        Button(action: {
-                            showMoodSelector = true
-                        }) {
-                            Image(systemName: "pencil.circle.fill")
-                                .font(.system(size: 30))
-                                .foregroundColor(.white)
-                        }
+                Spacer()
+                
+                // Centered Detect Mood Button
+                Button(action: {
+                    checkCameraPermission()
+                }) {
+                    VStack(spacing: 12) {
+                        Image(systemName: "camera.fill")
+                            .font(.system(size: 32))
+                        Text(isDetectingMood ? "Detecting..." : "Detect Mood")
+                            .font(.system(size: 20, weight: .semibold))
                     }
-                    .padding(.horizontal, 16)
-                    
-                    ZStack {
-                        RoundedRectangle(cornerRadius: 30)
-                            .fill(.ultraThinMaterial)
-                            .frame(width: 150, height: 150)
+                    .foregroundColor(.white)
+                    .frame(width: 180, height: 180)
+                    .background(
+                        Circle()
+                            .fill(Color(red: 0.4, green: 0.3, blue: 0.2).opacity(0.3))
                             .overlay(
-                                RoundedRectangle(cornerRadius: 30)
-                                    .stroke(.white.opacity(0.2), lineWidth: 1)
+                                Circle()
+                                    .stroke(Color(red: 0.2, green: 0.4, blue: 0.3), lineWidth: 2)
                             )
-                        
-                        if isDetectingMood {
-                            /* Loading Animation for when the user's mood is being generated */
-                            VStack(spacing: 15) {
-                                ProgressView()
-                                    .scaleEffect(1.5)
-                                    .tint(.white)
-                                
-                                Text("Detecting Mood...")
-                                    .font(.system(size: 16))
+                            .shadow(color: .white.opacity(0.2), radius: 10, x: 0, y: 0)
+                    )
+                }
+                .scaleEffect(isDetectingMood ? 0.95 : 1.0)
+                .animation(.spring(response: 0.3), value: isDetectingMood)
+                
+                Spacer()
+                
+                // Mood Display (if mood has been detected)
+                if currentMood != "😶" {
+                    VStack {
+                        HStack {
+                            Text("Your Current Mood")
+                                .font(.system(size: 20, weight: .bold))
+                                .foregroundColor(.white.opacity(0.9))
+                            
+                            Spacer()
+                            
+                            Button(action: {
+                                showMoodSelector = true
+                            }) {
+                                Image(systemName: "pencil.circle.fill")
+                                    .font(.system(size: 30))
                                     .foregroundColor(.white)
                             }
-                        } else {
-                            Text(currentMood)
-                                .font(.system(size: 70))
                         }
+                        .padding(.horizontal, 16)
+                        
+                        ZStack {
+                            RoundedRectangle(cornerRadius: 30)
+                                .fill(.ultraThinMaterial)
+                                .frame(width: 150, height: 150)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 30)
+                                        .stroke(.white.opacity(0.2), lineWidth: 1)
+                                )
+                            
+                            if isDetectingMood {
+                                /* Loading Animation for when the user's mood is being generated */
+                                VStack(spacing: 15) {
+                                    ProgressView()
+                                        .scaleEffect(1.5)
+                                        .tint(.white)
+                                    
+                                    Text("Detecting Mood...")
+                                        .font(.system(size: 16))
+                                        .foregroundColor(.white)
+                                }
+                            } else {
+                                Text(currentMood)
+                                    .font(.system(size: 70))
+                            }
+                        }
+                        .padding(.vertical, 8)
+                        
+                        Text(currentMoodText)
+                            .font(.system(size: 16, weight: .regular))
+                            .foregroundColor(.white.opacity(0.8))
+                            .multilineTextAlignment(.center)
                     }
-                    .padding(.vertical, 8)
-                    
-                    Text(currentMoodText)
-                        .font(.system(size: 16, weight: .regular))
-                        .foregroundColor(.white.opacity(0.8))
-                        .multilineTextAlignment(.center)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 20)
+                    .background(
+                        RoundedRectangle(cornerRadius: 20)
+                            .fill(Color(red: 0.2, green: 0.4, blue: 0.3))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 20)
+                                    .stroke(Color(red: 0.4, green: 0.3, blue: 0.2), lineWidth: 3.0)
+                            )
+                    )
+                    .padding(.horizontal)
+                    .padding(.bottom, 20)
                 }
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 20)
-                .background(
-                    RoundedRectangle(cornerRadius: 20)
-                        .fill(Color(red: 0.2, green: 0.4, blue: 0.3))
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 20)
-                                .stroke(Color(red: 0.4, green: 0.3, blue: 0.2), lineWidth: 3.0)
-                        )
-                )
-                .padding(.horizontal)
-                .padding(.bottom, 20)
                 
                 // Player View
                 PlayerView(spotifyController: spotifyController)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .frame(maxWidth: .infinity, maxHeight: 200) // Fixed height
                     .background(
                         RoundedRectangle(cornerRadius: 20)
                             .fill(Color(red: 0.2, green: 0.4, blue: 0.3))
@@ -189,31 +220,8 @@ struct homePageView: View {
                     )
                     .padding(.horizontal)
                 
-                // Action Buttons
+                // Spotify Connection Buttons
                 HStack(spacing: 20) {
-                    Button(action: {
-                        checkCameraPermission()
-                    }) {
-                        HStack {
-                            Image(systemName: "camera")
-                                .font(.system(size: 16))
-                            Text(isDetectingMood ? "Detecting..." : "Detect Mood")
-                                .font(.system(size: 16, weight: .medium))
-                        }
-                        .foregroundColor(.white)
-                        .padding(.horizontal, 20)
-                        .padding(.vertical, 12)
-                        .background(
-                            Capsule()
-                                .fill(Color(red: 0.4, green: 0.3, blue: 0.2).opacity(0.3))
-                                .overlay(
-                                    Capsule()
-                                        .stroke(Color(red: 0.2, green: 0.4, blue: 0.3), lineWidth: 1.5)
-                                )
-                        )
-                    }
-                    
-                    // Connect to Spotify Button
                     if showConnectToSpotifyButton {
                         Button(action: {
                             navigateToSpotify = true
@@ -238,7 +246,6 @@ struct homePageView: View {
                         }
                     }
                     
-                    // Resync Spotify Button
                     if showResyncSpotifyButton {
                         Button(action: {
                             spotifyController.resetFirstConnectionAttempt()
@@ -266,8 +273,7 @@ struct homePageView: View {
                     }
                 }
                 .padding(.top, 20)
-                
-                Spacer()
+                .padding(.bottom, 30)
             }
             .padding(.top, 60)
             
