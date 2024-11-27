@@ -139,6 +139,11 @@ struct ProfilePictureView: View {
             // Save the image data to the file
             try imageData.write(to: fileURL)
             
+            // Add the file path as the profile picture to the profile first
+            if let index = profileManager.profiles.firstIndex(where: { $0.id == profile.id }) {
+                profileManager.profiles[index].profilePicture = fileURL.path.data(using: .utf8)
+            }
+            
             // Update the profile using ProfileManager's updateProfile method
             profileManager.updateProfile(
                 profile: profile,
@@ -151,10 +156,7 @@ struct ProfilePictureView: View {
                 securityQuestionAnswer: profile.securityQuestionAnswer
             )
             
-            // Add the file path as the profile picture
-            if let index = profileManager.profiles.firstIndex(where: { $0.id == profile.id }) {
-                profileManager.profiles[index].profilePicture = fileURL.path.data(using: .utf8)
-            }
+            // Navigate to the home page
             navigateToHomePage = true
             print("Profile picture saved for \(profile.name) at \(fileURL.path)")
         } catch {
