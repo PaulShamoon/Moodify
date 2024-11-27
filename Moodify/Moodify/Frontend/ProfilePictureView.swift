@@ -12,12 +12,18 @@ import PhotosUI
 struct ProfilePictureView: View {
     @EnvironmentObject var profileManager: ProfileManager
     @State private var selectedImage: UIImage? = nil
-    @Binding var navigateToHomePage: Bool // Add this to handle navigation
+    @State private var originalImage: UIImage? = nil // Preserve the original image
+    @State private var croppedImage: UIImage? = nil // Reflect cropping adjustments
+    
+    @Binding var navigateToHomePage: Bool
     @State private var showImagePicker: Bool = false
     @State private var sourceType: UIImagePickerController.SourceType = .photoLibrary
+    @State private var isCropping: Bool = false
+    @State private var scale: CGFloat = 1.0 // Cropping scale adjustment
+    @State private var offset: CGSize = .zero // Cropping offset adjustment
     
     @Environment(\.presentationMode) var presentationMode
-
+    
     var body: some View {
         VStack(spacing: 20) {
             Text("Set a Profile Picture")
@@ -25,44 +31,70 @@ struct ProfilePictureView: View {
                 .foregroundColor(.white)
                 .padding()
             
-            if let image = selectedImage {
-                // If a new image is selected, show it
-                Image(uiImage: image)
-                    .resizable()
-                    .scaledToFill()
-                    .frame(width: 150, height: 150)
-                    .clipShape(Circle())
-                    .overlay(
-                        Circle()
-                            .stroke(Color.green, lineWidth: 4)
-                    )
-                    .shadow(radius: 10)
-            } else if let profile = profileManager.currentProfile,
-                      let imagePath = String(data: profile.profilePicture ?? Data(), encoding: .utf8),
-                      let savedImage = UIImage(contentsOfFile: imagePath) {
-                // Load and display the saved profile picture if it exists
-                Image(uiImage: savedImage)
-                    .resizable()
-                    .scaledToFill()
-                    .frame(width: 150, height: 150)
-                    .clipShape(Circle())
-                    .overlay(
-                        Circle()
-                            .stroke(Color.green, lineWidth: 4)
-                    )
-                    .shadow(radius: 10)
-            } else {
-                // Display placeholder if no image is set or saved
-                Circle()
-                    .fill(Color.gray.opacity(0.3))
-                    .frame(width: 150, height: 150)
-                    .overlay(
-                        Image(systemName: "person.fill")
-                            .font(.system(size: 50))
-                            .foregroundColor(.white.opacity(0.7))
-                    )
+            ZStack {
+                // Show cropped image if available, otherwise fallback to selected or saved image
+                if let image = croppedImage {
+                    Image(uiImage: image)
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: 150, height: 150)
+                        .clipShape(Circle())
+                        .overlay(
+                            Circle()
+                                .stroke(Color.green, lineWidth: 4)
+                        )
+                        .shadow(radius: 10)
+                } else if let image = originalImage {
+                    Image(uiImage: image)
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: 150, height: 150)
+                        .clipShape(Circle())
+                        .overlay(
+                            Circle()
+                                .stroke(Color.green, lineWidth: 4)
+                        )
+                        .shadow(radius: 10)
+                } else if let profile = profileManager.currentProfile,
+                          let imagePath = String(data: profile.profilePicture ?? Data(), encoding: .utf8),
+                          let savedImage = UIImage(contentsOfFile: imagePath) {
+                    Image(uiImage: savedImage)
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: 150, height: 150)
+                        .clipShape(Circle())
+                        .overlay(
+                            Circle()
+                                .stroke(Color.green, lineWidth: 4)
+                        )
+                        .shadow(radius: 10)
+                } else {
+                    // Placeholder for when no image is selected
+                    Circle()
+                        .fill(Color.gray.opacity(0.3))
+                        .frame(width: 150, height: 150)
+                        .overlay(
+                            Image(systemName: "person.fill")
+                                .font(.system(size: 50))
+                                .foregroundColor(.white.opacity(0.7))
+                        )
+                }
+                
+                // Crop Icon Button
+                if croppedImage != nil || originalImage != nil {
+                    Button(action: {
+                        isCropping = true
+                    }) {
+                        Image(systemName: "crop")
+                            .font(.system(size: 20))
+                            .padding(8)
+                            .background(Color.black.opacity(0.6))
+                            .foregroundColor(.white)
+                            .clipShape(Circle())
+                    }
+                    .offset(x: 60, y: 60)
+                }
             }
-            
             
             HStack {
                 Button(action: {
@@ -95,7 +127,7 @@ struct ProfilePictureView: View {
             
             Spacer()
             
-            if selectedImage != nil {
+            if selectedImage != nil || croppedImage != nil{
                 Button(action: {
                     saveProfilePicture()
                     navigateToHomePage = true
@@ -123,15 +155,29 @@ struct ProfilePictureView: View {
         }
         .sheet(isPresented: $showImagePicker) {
             ImagePicker(sourceType: sourceType, selectedImage: $selectedImage)
+                .onDisappear {
+                    if let selectedImage = selectedImage {
+                        originalImage = selectedImage // Save original image
+                    }
+                }
+        }
+        .sheet(isPresented: $isCropping) {
+            CropView(
+                originalImage: $originalImage,
+                croppedImage: $croppedImage,
+                isCropping: $isCropping,
+                scale: $scale,
+                offset: $offset
+            )
         }
     }
     
     func saveProfilePicture() {
         guard let profile = profileManager.currentProfile else { return }
-        guard let selectedImage = selectedImage else { return }
+        guard let imageToSave = croppedImage ?? originalImage else { return } // Save cropped or original image
         
         // Convert the UIImage to Data
-        guard let imageData = selectedImage.jpegData(compressionQuality: 0.8) else {
+        guard let imageData = imageToSave.jpegData(compressionQuality: 0.8) else {
             print("Failed to convert image to data")
             return
         }
