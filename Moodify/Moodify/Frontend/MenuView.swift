@@ -174,7 +174,7 @@ struct MenuView: View {
 
                     // For GeneralMusicPreferencesView
                     .navigationDestination(isPresented: $showingMusicPreferences) {
-                        GeneralMusicPreferencesView(navigateToHomePage: .constant(false))
+                        GeneralMusicPreferencesView(navigateToHomePage: .constant(false), navigateToProfilePicture: .constant(false), navigateToMusicPreferences: .constant(false))
                             .environmentObject(profileManager)
                             .navigationBarBackButtonHidden(true)
                             .toolbar {

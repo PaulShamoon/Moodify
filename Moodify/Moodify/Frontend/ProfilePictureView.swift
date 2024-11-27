@@ -12,9 +12,12 @@ import PhotosUI
 struct ProfilePictureView: View {
     @EnvironmentObject var profileManager: ProfileManager
     @State private var selectedImage: UIImage? = nil
+    @Binding var navigateToHomePage: Bool // Add this to handle navigation
     @State private var showImagePicker: Bool = false
     @State private var sourceType: UIImagePickerController.SourceType = .photoLibrary
     
+    @Environment(\.presentationMode) var presentationMode
+
     var body: some View {
         VStack(spacing: 20) {
             Text("Set a Profile Picture")
@@ -95,6 +98,8 @@ struct ProfilePictureView: View {
             if selectedImage != nil {
                 Button(action: {
                     saveProfilePicture()
+                    navigateToHomePage = true
+                    presentationMode.wrappedValue.dismiss()
                 }) {
                     Text("Save Profile Picture")
                         .font(.system(size: 18, weight: .semibold, design: .rounded))
@@ -150,7 +155,7 @@ struct ProfilePictureView: View {
             if let index = profileManager.profiles.firstIndex(where: { $0.id == profile.id }) {
                 profileManager.profiles[index].profilePicture = fileURL.path.data(using: .utf8)
             }
-            
+            navigateToHomePage = true
             print("Profile picture saved for \(profile.name) at \(fileURL.path)")
         } catch {
             print("Failed to save profile picture: \(error.localizedDescription)")

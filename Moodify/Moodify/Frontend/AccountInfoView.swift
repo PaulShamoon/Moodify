@@ -98,7 +98,7 @@ struct AccountInfoView: View {
                 .padding(.top, 10)
                 
                 NavigationLink(
-                    destination: ProfilePictureView()
+                    destination: ProfilePictureView( navigateToHomePage: .constant(false))
                         .environmentObject(profileManager)
                 ) {
                     HStack {
