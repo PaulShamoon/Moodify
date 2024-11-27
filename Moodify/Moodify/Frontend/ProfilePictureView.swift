@@ -201,3 +201,28 @@ struct ImagePicker: UIViewControllerRepresentable {
         }
     }
 }
+
+struct ProfilePictureView_Previews: PreviewProvider {
+    static var previews: some View {
+        // Create a mock profile for testing
+        let mockProfile = Profile(
+            id: UUID(),
+            name: "Test User",
+            dateOfBirth: Date(),
+            favoriteGenres: ["Rock", "Jazz"],
+            hasAgreedToTerms: true,
+            userPin: nil,
+            personalSecurityQuestion: nil,
+            securityQuestionAnswer: nil,
+            profilePicture: nil
+        )
+        
+        // Mock ProfileManager
+        let mockProfileManager = ProfileManager()
+        mockProfileManager.currentProfile = mockProfile
+        mockProfileManager.profiles.append(mockProfile)
+        
+        return ProfilePictureView(navigateToHomePage: .constant(false))
+            .environmentObject(mockProfileManager)
+    }
+}
