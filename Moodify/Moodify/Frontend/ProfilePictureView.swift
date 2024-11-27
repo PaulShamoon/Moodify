@@ -114,6 +114,13 @@ struct ProfilePictureView: View {
         }
         .padding()
         .background(Color.black.edgesIgnoringSafeArea(.all))
+        .onChange(of: sourceType) { newSourceType in
+            // Reset the picker to force re-creation
+            showImagePicker = false
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                showImagePicker = true
+            }
+        }
         .sheet(isPresented: $showImagePicker) {
             ImagePicker(sourceType: sourceType, selectedImage: $selectedImage)
         }
@@ -182,7 +189,12 @@ struct ImagePicker: UIViewControllerRepresentable {
         return picker
     }
     
-    func updateUIViewController(_ uiViewController: UIImagePickerController, context: Context) {}
+    func updateUIViewController(_ uiViewController: UIImagePickerController, context: Context) {
+        // Dynamically update sourceType to handle changes
+        if uiViewController.sourceType != sourceType {
+            uiViewController.sourceType = sourceType
+        }
+    }
     
     func makeCoordinator() -> Coordinator {
         Coordinator(self)
