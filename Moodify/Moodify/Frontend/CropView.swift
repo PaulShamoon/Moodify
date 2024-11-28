@@ -1,106 +1,148 @@
 import SwiftUI
 
 struct CropView: View {
-    @Binding var originalImage: UIImage? // The original image
-    @Binding var croppedImage: UIImage? // The final cropped image
+    @Binding var originalImage: UIImage?
+    @Binding var croppedImage: UIImage?
     @Binding var isCropping: Bool
-
-    @Binding var scale: CGFloat
-    @Binding var offset: CGSize
-
+    
+    @State private var scale: CGFloat = 1.0
+    @State private var lastScale: CGFloat = 1.0
+    @State private var offset: CGSize = .zero
+    @State private var lastOffset: CGSize = .zero
+    
+    private let minScale: CGFloat = 1.0
+    private let maxScale: CGFloat = 4.0
+    
     var body: some View {
-        VStack {
-            if let image = originalImage {
-                GeometryReader { geometry in
-                    ZStack {
-                        Image(uiImage: image)
-                            .resizable()
-                            .scaledToFill()
-                            .frame(width: geometry.size.width, height: geometry.size.width)
-                            .clipped()
-                            .scaleEffect(scale)
-                            .offset(offset)
-                            .gesture(
-                                DragGesture().onChanged { value in
-                                    offset = value.translation
-                                }
-                            )
-                            .gesture(
-                                MagnificationGesture().onChanged { value in
-                                    scale = value
-                                }
-                            )
-
-                        // Circular Overlay
-                        Circle()
-                            .stroke(Color.white.opacity(0.8), lineWidth: 2)
-                            .frame(width: geometry.size.width - 40, height: geometry.size.width - 40)
-
-                        // Grid Overlay (Optional)
-                        GridOverlay()
-                    }
-                }
-                .frame(height: UIScreen.main.bounds.width) // Square cropping frame
-
+        ZStack {
+            Color.black.edgesIgnoringSafeArea(.all)
+            
+            VStack(spacing: 20) {
+                Text("Adjust Your Photo")
+                    .font(.system(size: 24, weight: .bold, design: .rounded))
+                    .foregroundColor(.white)
+                
                 Spacer()
-
-                HStack {
-                    Button(action: {
-                        isCropping = false
-                    }) {
-                        Text("Cancel")
-                            .foregroundColor(.red)
-                            .padding()
-                            .frame(maxWidth: .infinity)
-                            .background(Color.white)
-                            .cornerRadius(10)
-                    }
-
-                    Button(action: saveCroppedImage) {
-                        Text("Save")
-                            .foregroundColor(.green)
-                            .padding()
-                            .frame(maxWidth: .infinity)
-                            .background(Color.white)
-                            .cornerRadius(10)
-                    }
-                }
-                .padding()
-            } else {
-                Text("No Image Selected")
-            }
-        }
-    }
-
-    func saveCroppedImage() {
-        croppedImage = generateCroppedImage(from: originalImage, scale: scale, offset: offset)
-        isCropping = false
-    }
-
-    func generateCroppedImage(from image: UIImage?, scale: CGFloat, offset: CGSize) -> UIImage? {
-        guard let image = image else { return nil }
-        return image // Simply return the same image as this app relies on adjustments, not actual cropping.
-    }
-}
-
-struct GridOverlay: View {
-    var body: some View {
-        GeometryReader { geometry in
-            Path { path in
-                let step = geometry.size.width / 3
-                for i in 1..<3 {
-                    // Vertical lines
-                    let x = step * CGFloat(i)
-                    path.move(to: CGPoint(x: x, y: 0))
-                    path.addLine(to: CGPoint(x: x, y: geometry.size.height))
+                
+                GeometryReader { geo in
+                    let size = min(geo.size.width, geo.size.height) - 40
                     
-                    // Horizontal lines
-                    let y = step * CGFloat(i)
-                    path.move(to: CGPoint(x: 0, y: y))
-                    path.addLine(to: CGPoint(x: geometry.size.width, y: y))
+                    ZStack {
+                        Color.black.opacity(0.8)
+                        
+                        if let image = originalImage{
+                            Image(uiImage: image)
+                                .resizable()
+                                .scaledToFit()
+                                .scaleEffect(scale)
+                                .offset(offset)
+                                .clipShape(Circle())
+                                .gesture(
+                                    SimultaneousGesture(
+                                        MagnificationGesture()
+                                            .onChanged { value in
+                                                let delta = value / lastScale
+                                                lastScale = value
+                                                
+                                                // Limit scale within bounds
+                                                let newScale = scale * delta
+                                                scale = min(maxScale, max(minScale, newScale))
+                                            }
+                                            .onEnded { _ in
+                                                lastScale = 1.0
+                                            },
+                                        DragGesture()
+                                            .onChanged { value in
+                                                let newOffset = CGSize(
+                                                    width: lastOffset.width + value.translation.width,
+                                                    height: lastOffset.height + value.translation.height
+                                                )
+                                                
+                                                // Limit movement based on scale
+                                                let maxOffset = (size * (scale - 1)) / 2
+                                                offset = CGSize(
+                                                    width: max(-maxOffset, min(maxOffset, newOffset.width)),
+                                                    height: max(-maxOffset, min(maxOffset, newOffset.height))
+                                                )
+                                            }
+                                            .onEnded { _ in
+                                                lastOffset = offset
+                                            }
+                                    )
+                                )
+                        }
+                        
+                        // Circular guide
+                        Circle()
+                            .strokeBorder(Color.white, lineWidth: 1)
+                            .frame(width: size, height: size)
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
+                
+                Spacer()
+                
+                HStack(spacing: 20) {
+                    Button(action: { isCropping = false }) {
+                        Text("Cancel")
+                            .font(.system(size: 18, weight: .semibold, design: .rounded))
+                            .foregroundColor(.white)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 16)
+                            .background(Color(white: 0.2))
+                            .cornerRadius(15)
+                    }
+                    
+                    Button(action: cropAndSave) {
+                        Text("Done")
+                            .font(.system(size: 18, weight: .semibold, design: .rounded))
+                            .foregroundColor(.black)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 16)
+                            .background(
+                                LinearGradient(
+                                    gradient: Gradient(colors: [Color.green, Color.green.opacity(0.8)]),
+                                    startPoint: .leading,
+                                    endPoint: .trailing
+                                )
+                            )
+                            .cornerRadius(15)
+                    }
+                }
+                .padding(.horizontal)
+                .padding(.bottom, 30)
             }
-            .stroke(Color.white.opacity(0.5), lineWidth: 1)
         }
+    }
+    
+    private func cropAndSave() {
+        guard let inputImage = originalImage else { return }
+        
+        // Create a renderer with a square size based on the shorter dimension
+        let size = min(inputImage.size.width, inputImage.size.height)
+        let format = UIGraphicsImageRendererFormat()
+        format.scale = 1
+        
+        let renderer = UIGraphicsImageRenderer(size: CGSize(width: size, height: size), format: format)
+        
+        let croppedImg = renderer.image { context in
+            // Create circular clipping path
+            let circlePath = UIBezierPath(ovalIn: CGRect(origin: .zero, size: CGSize(width: size, height: size)))
+            circlePath.addClip()
+            
+            // Calculate the drawing rect
+            let drawRect = CGRect(
+                x: (size - inputImage.size.width * scale) / 2 + offset.width,
+                y: (size - inputImage.size.height * scale) / 2 + offset.height,
+                width: inputImage.size.width * scale,
+                height: inputImage.size.height * scale
+            )
+            
+            // Draw the image
+            inputImage.draw(in: drawRect)
+        }
+        
+        croppedImage = croppedImg
+        isCropping = false
     }
 }
