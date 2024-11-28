@@ -42,9 +42,23 @@ struct AccountInfoView: View {
                                 )
                         }
                         
+                        // Edit Button Overlay
+                        NavigationLink(
+                            destination: ProfilePictureView(navigateToHomePage: .constant(false))
+                                .environmentObject(profileManager)
+                        ) {
+                            Image(systemName: "pencil.circle.fill")
+                                .font(.system(size: 25))
+                                .foregroundColor(.white)
+                                .background(Circle().fill(Color.green))
+                                .frame(width: 30, height: 30)
+                                .contentShape(Circle())
+                        }
+                        .offset(x: -25, y: -25)
                         Text(profile.name)
                             .font(.system(size: 24, weight: .semibold, design: .rounded))
                             .foregroundColor(.white)
+                            .offset(x: -25)
                     }
                     
                     Divider()
@@ -96,25 +110,6 @@ struct AccountInfoView: View {
                     )
                 }
                 .padding(.top, 10)
-                
-                NavigationLink(
-                    destination: ProfilePictureView( navigateToHomePage: .constant(false))
-                        .environmentObject(profileManager)
-                ) {
-                    HStack {
-                        Image(systemName: "camera.circle.fill")
-                            .font(.title2)
-                        Text("Set Profile Picture")
-                            .font(.system(size: 18, weight: .semibold, design: .rounded))
-                    }
-                    .foregroundColor(.blue)
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(
-                        RoundedRectangle(cornerRadius: 15)
-                            .fill(Color.blue.opacity(0.2))
-                    )
-                }
                 .padding(.top, 10)
                 
             } else {
@@ -170,5 +165,30 @@ struct InfoRow: View {
                     .foregroundColor(.white)
             }
         }
+    }
+}
+struct AccountInfoView_Previews: PreviewProvider {
+    static var previews: some View {
+        // Mock Profile
+        let mockProfile = Profile(
+            id: UUID(),
+            name: "John Doe",
+            dateOfBirth: Calendar.current.date(byAdding: .year, value: -25, to: Date())!,
+            favoriteGenres: ["Rock", "Jazz", "Hip-Hop"],
+            hasAgreedToTerms: true,
+            userPin: "1234",
+            personalSecurityQuestion: "What is your favorite color?",
+            securityQuestionAnswer: "Blue",
+            profilePicture: UIImage(named: "profile-placeholder")?.jpegData(compressionQuality: 0.8)
+        )
+        
+        // Mock ProfileManager
+        let mockProfileManager = ProfileManager()
+        mockProfileManager.profiles.append(mockProfile)
+        mockProfileManager.currentProfile = mockProfile
+        
+        return AccountInfoView()
+            .environmentObject(mockProfileManager)
+            .preferredColorScheme(.dark)
     }
 }
