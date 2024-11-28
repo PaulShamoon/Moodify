@@ -129,7 +129,13 @@ struct ProfilePictureView: View {
         .padding()
         .background(Color.black.edgesIgnoringSafeArea(.all))
         .sheet(isPresented: $showImagePicker) {
-            ImagePicker(sourceType: sourceType, selectedImage: $originalImage)
+            ImagePicker(sourceType: sourceType, selectedImage: Binding(
+                get: { originalImage },
+                set: { newImage in
+                    originalImage = newImage
+                    croppedImage = nil  // Clear the cropped image when selecting a new photo
+                }
+            ))
         }
         .sheet(isPresented: $isCropping) {
             CropView(
