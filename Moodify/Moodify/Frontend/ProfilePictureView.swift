@@ -21,7 +21,8 @@ struct ProfilePictureView: View {
     @State private var isCropping: Bool = false
     @State private var scale: CGFloat = 1.0 // Cropping scale adjustment
     @State private var offset: CGSize = .zero // Cropping offset adjustment
-    
+    var profile: Profile?
+
     @Environment(\.presentationMode) var presentationMode
     
     var body: some View {
@@ -127,13 +128,27 @@ struct ProfilePictureView: View {
             
             Spacer()
             
-            if selectedImage != nil || croppedImage != nil{
+            if selectedImage != nil || croppedImage != nil || profile?.profilePicture != nil{
                 Button(action: {
                     saveProfilePicture()
                     navigateToHomePage = true
                     presentationMode.wrappedValue.dismiss()
                 }) {
                     Text("Save Profile Picture")
+                        .font(.system(size: 18, weight: .semibold, design: .rounded))
+                        .padding()
+                        .frame(maxWidth: .infinity)
+                        .background(Color.green)
+                        .foregroundColor(.white)
+                        .cornerRadius(10)
+                }
+                .padding()
+            } else if profile?.profilePicture == nil{
+                Button(action: {
+                    navigateToHomePage = true
+                    presentationMode.wrappedValue.dismiss()
+                }) {
+                    Text("Skip")
                         .font(.system(size: 18, weight: .semibold, design: .rounded))
                         .padding()
                         .frame(maxWidth: .infinity)
