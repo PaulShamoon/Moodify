@@ -75,40 +75,23 @@ struct ProfilePictureView: View {
                 }
             }
             .padding(.vertical, 20)
-            VStack {
-                HStack(spacing: 16) {
-                    Button(action: {
-                        sourceType = .photoLibrary
-                        showImagePicker = true
-                    }) {
-                        HStack {
-                            Image(systemName: "photo.on.rectangle")
-                            Text("Choose from Library")
-                        }
-                        .font(.system(size: 18, weight: .bold, design: .rounded))
-                        .foregroundColor(.black)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 7)
-                        .background(Color.green)
-                        .cornerRadius(12)
+            HStack(spacing: 16) {
+                Button(action: {
+                    sourceType = .photoLibrary
+                    showImagePicker = true
+                }) {
+                    HStack {
+                        Image(systemName: "photo.on.rectangle")
+                        Text("Choose from Library")
                     }
-                    
-                    Button(action: {
-                        sourceType = .camera
-                        showImagePicker = true
-                    }) {
-                        HStack {
-                            Image(systemName: "camera")
-                            Text("Take a Photo")
-                        }
-                        .font(.system(size: 18, weight: .bold, design: .rounded))
-                        .foregroundColor(.black)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 16)
-                        .background(Color.green)
-                        .cornerRadius(12)
-                    }
+                    .font(.system(size: 18, weight: .bold, design: .rounded))
+                    .foregroundColor(.black)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 16)
+                    .background(Color.green)
+                    .cornerRadius(12)
                 }
+                
                 Button(action: {
                     showIconPicker = true  // Add this state variable
                 }) {
@@ -124,6 +107,7 @@ struct ProfilePictureView: View {
                     .cornerRadius(12)
                 }
             }
+            
             .padding(.horizontal)
             
             Spacer()
@@ -137,11 +121,11 @@ struct ProfilePictureView: View {
                         Image(systemName: "arrow.right.circle.fill")
                             .font(.system(size: 20))
                     }
-                        .foregroundColor(.black)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 16)
-                        .background(Color.green)
-                        .cornerRadius(12)
+                    .foregroundColor(.black)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 16)
+                    .background(Color.green)
+                    .cornerRadius(12)
                 }
                 .padding(.horizontal)
                 .padding(.bottom, 30)
@@ -158,12 +142,12 @@ struct ProfilePictureView: View {
                         Image(systemName: "arrow.right.circle.fill")
                             .font(.system(size: 20))
                     }
-                        .font(.system(size: 18, weight: .semibold, design: .rounded))
-                        .foregroundColor(.black)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 16)
-                        .background(Color.gray.opacity(0.5))
-                        .cornerRadius(12)
+                    .font(.system(size: 18, weight: .semibold, design: .rounded))
+                    .foregroundColor(.black)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 16)
+                    .background(Color.gray.opacity(0.5))
+                    .cornerRadius(12)
                 }
                 .padding(.horizontal)
                 .padding(.bottom, 30)
