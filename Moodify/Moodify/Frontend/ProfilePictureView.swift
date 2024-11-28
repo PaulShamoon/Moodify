@@ -75,7 +75,7 @@ struct ProfilePictureView: View {
             }
             .padding(.vertical, 20)
             
-            VStack(spacing: 16) {
+            HStack(spacing: 16) {
                 Button(action: {
                     sourceType = .photoLibrary
                     showImagePicker = true
@@ -85,9 +85,9 @@ struct ProfilePictureView: View {
                         Text("Choose from Library")
                     }
                     .font(.system(size: 18, weight: .medium, design: .rounded))
-                    .foregroundColor(.white)
+                    .foregroundColor(.black)
                     .frame(maxWidth: .infinity)
-                    .padding(.vertical, 16)
+                    .padding(.vertical, 7)
                     .background(Color.green)
                     .cornerRadius(12)
                 }
@@ -101,10 +101,10 @@ struct ProfilePictureView: View {
                         Text("Take a Photo")
                     }
                     .font(.system(size: 18, weight: .medium, design: .rounded))
-                    .foregroundColor(.white)
+                    .foregroundColor(.black)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 16)
-                    .background(Color.blue)
+                    .background(Color.green)
                     .cornerRadius(12)
                 }
             }
@@ -114,12 +114,35 @@ struct ProfilePictureView: View {
             
             if currentImage != nil {
                 Button(action: saveAndDismiss) {
-                    Text("Save Profile Picture")
-                        .font(.system(size: 18, weight: .semibold, design: .rounded))
-                        .foregroundColor(.white)
+                    HStack{
+                        Text("Save Profile Picture")
+                            .font(.system(size: 18, weight: .bold, design: .rounded))
+                        
+                        Image(systemName: "arrow.right.circle.fill")
+                            .font(.system(size: 20))
+                    }
+                        .foregroundColor(.black)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 16)
                         .background(Color.green)
+                        .cornerRadius(12)
+                }
+                .padding(.horizontal)
+                .padding(.bottom, 30)
+            } else {
+                Button(action: saveAndDismiss) {
+                    HStack{
+                        Text("Skip")
+                            .font(.system(size: 18, weight: .bold, design: .rounded))
+                        
+                        Image(systemName: "arrow.right.circle.fill")
+                            .font(.system(size: 20))
+                    }
+                        .font(.system(size: 18, weight: .semibold, design: .rounded))
+                        .foregroundColor(.black)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 16)
+                        .background(Color.gray.opacity(0.5))
                         .cornerRadius(12)
                 }
                 .padding(.horizontal)
