@@ -84,7 +84,7 @@ struct ProfilePictureView: View {
                         Image(systemName: "photo.on.rectangle")
                         Text("Choose from Library")
                     }
-                    .font(.system(size: 18, weight: .medium, design: .rounded))
+                    .font(.system(size: 18, weight: .bold, design: .rounded))
                     .foregroundColor(.black)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 7)
@@ -100,7 +100,7 @@ struct ProfilePictureView: View {
                         Image(systemName: "camera")
                         Text("Take a Photo")
                     }
-                    .font(.system(size: 18, weight: .medium, design: .rounded))
+                    .font(.system(size: 18, weight: .bold, design: .rounded))
                     .foregroundColor(.black)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 16)
