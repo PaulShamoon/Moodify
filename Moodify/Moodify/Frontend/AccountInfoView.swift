@@ -17,8 +17,8 @@ struct AccountInfoView: View {
             if let profile = profileManager.currentProfile {
                 VStack(alignment: .leading, spacing: 20) {
                     HStack {
-                        if let imagePath = String(data: profile.profilePicture ?? Data(), encoding: .utf8),
-                           let uiImage = UIImage(contentsOfFile: imagePath) {
+                        if let profilePictureData = profile.profilePicture,
+                           let uiImage = UIImage(data: profilePictureData) {
                             // Display the profile picture
                             Image(uiImage: uiImage)
                                 .resizable()

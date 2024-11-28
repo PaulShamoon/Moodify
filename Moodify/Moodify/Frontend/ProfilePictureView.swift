@@ -11,17 +11,14 @@ import PhotosUI
 
 struct ProfilePictureView: View {
     @EnvironmentObject var profileManager: ProfileManager
-    @State private var selectedImage: UIImage? = nil
-    @State private var originalImage: UIImage? = nil // Preserve the original image
-    @State private var croppedImage: UIImage? = nil // Reflect cropping adjustments
-    
     @Binding var navigateToHomePage: Bool
     @State private var showImagePicker: Bool = false
     @State private var sourceType: UIImagePickerController.SourceType = .photoLibrary
     @State private var isCropping: Bool = false
+    @State private var originalImage: UIImage? = nil // Preserve the original image
+    @State private var croppedImage: UIImage? = nil // Reflect cropping adjustments
     @State private var scale: CGFloat = 1.0 // Cropping scale adjustment
     @State private var offset: CGSize = .zero // Cropping offset adjustment
-    var profile: Profile?
 
     @Environment(\.presentationMode) var presentationMode
     
@@ -40,10 +37,7 @@ struct ProfilePictureView: View {
                         .scaledToFill()
                         .frame(width: 150, height: 150)
                         .clipShape(Circle())
-                        .overlay(
-                            Circle()
-                                .stroke(Color.green, lineWidth: 4)
-                        )
+                        .overlay(Circle().stroke(Color.green, lineWidth: 4))
                         .shadow(radius: 10)
                 } else if let image = originalImage {
                     Image(uiImage: image)
@@ -51,23 +45,18 @@ struct ProfilePictureView: View {
                         .scaledToFill()
                         .frame(width: 150, height: 150)
                         .clipShape(Circle())
-                        .overlay(
-                            Circle()
-                                .stroke(Color.green, lineWidth: 4)
-                        )
+                        .overlay(Circle().stroke(Color.green, lineWidth: 4))
                         .shadow(radius: 10)
                 } else if let profile = profileManager.currentProfile,
-                          let imagePath = String(data: profile.profilePicture ?? Data(), encoding: .utf8),
-                          let savedImage = UIImage(contentsOfFile: imagePath) {
-                    Image(uiImage: savedImage)
+                          let profilePictureData = profile.profilePicture,
+                          let profileImage = UIImage(data: profilePictureData) {
+                    // Load and display saved profile picture
+                    Image(uiImage: profileImage)
                         .resizable()
                         .scaledToFill()
                         .frame(width: 150, height: 150)
                         .clipShape(Circle())
-                        .overlay(
-                            Circle()
-                                .stroke(Color.green, lineWidth: 4)
-                        )
+                        .overlay(Circle().stroke(Color.green, lineWidth: 4))
                         .shadow(radius: 10)
                 } else {
                     // Placeholder for when no image is selected
@@ -128,53 +117,25 @@ struct ProfilePictureView: View {
             
             Spacer()
             
-            if selectedImage != nil || croppedImage != nil || profile?.profilePicture != nil{
-                Button(action: {
-                    saveProfilePicture()
-                    navigateToHomePage = true
-                    presentationMode.wrappedValue.dismiss()
-                }) {
-                    Text("Save Profile Picture")
-                        .font(.system(size: 18, weight: .semibold, design: .rounded))
-                        .padding()
-                        .frame(maxWidth: .infinity)
-                        .background(Color.green)
-                        .foregroundColor(.white)
-                        .cornerRadius(10)
-                }
-                .padding()
-            } else if profile?.profilePicture == nil{
-                Button(action: {
-                    navigateToHomePage = true
-                    presentationMode.wrappedValue.dismiss()
-                }) {
-                    Text("Skip")
-                        .font(.system(size: 18, weight: .semibold, design: .rounded))
-                        .padding()
-                        .frame(maxWidth: .infinity)
-                        .background(Color.green)
-                        .foregroundColor(.white)
-                        .cornerRadius(10)
-                }
-                .padding()
+            Button(action: {
+                saveProfilePicture()
+                navigateToHomePage = true
+                presentationMode.wrappedValue.dismiss()
+            }) {
+                Text("Save Profile Picture")
+                    .font(.system(size: 18, weight: .semibold, design: .rounded))
+                    .padding()
+                    .frame(maxWidth: .infinity)
+                    .background(Color.green)
+                    .foregroundColor(.white)
+                    .cornerRadius(10)
             }
+            .padding()
         }
         .padding()
         .background(Color.black.edgesIgnoringSafeArea(.all))
-        .onChange(of: sourceType) { newSourceType in
-            // Reset the picker to force re-creation
-            showImagePicker = false
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                showImagePicker = true
-            }
-        }
         .sheet(isPresented: $showImagePicker) {
-            ImagePicker(sourceType: sourceType, selectedImage: $selectedImage)
-                .onDisappear {
-                    if let selectedImage = selectedImage {
-                        originalImage = selectedImage // Save original image
-                    }
-                }
+            ImagePicker(sourceType: sourceType, selectedImage: $originalImage)
         }
         .sheet(isPresented: $isCropping) {
             CropView(
@@ -188,53 +149,25 @@ struct ProfilePictureView: View {
     }
     
     func saveProfilePicture() {
-        guard let profile = profileManager.currentProfile else { return }
-        guard let imageToSave = croppedImage ?? originalImage else { return } // Save cropped or original image
-        
-        // Convert the UIImage to Data
-        guard let imageData = imageToSave.jpegData(compressionQuality: 0.8) else {
-            print("Failed to convert image to data")
-            return
-        }
-        
-        // Create a unique file name for the image using the profile ID
-        let fileName = "\(profile.id.uuidString).jpg"
-        
-        // Get the file URL for saving the image in the app's documents directory
-        let fileURL = getDocumentsDirectory().appendingPathComponent(fileName)
-        
-        do {
-            // Save the image data to the file
-            try imageData.write(to: fileURL)
-            
-            // Add the file path as the profile picture to the profile first
-            if let index = profileManager.profiles.firstIndex(where: { $0.id == profile.id }) {
-                profileManager.profiles[index].profilePicture = fileURL.path.data(using: .utf8)
-            }
-            
+        guard let currentProfile = profileManager.currentProfile else { return }
+        guard let imageToSave = croppedImage ?? originalImage else { return } // Use cropped or original image
+
+        // Convert the image to Data
+        if let imageData = imageToSave.jpegData(compressionQuality: 0.8) {
             // Update the profile using ProfileManager's updateProfile method
             profileManager.updateProfile(
-                profile: profile,
-                name: profile.name,
-                dateOfBirth: profile.dateOfBirth,
-                favoriteGenres: profile.favoriteGenres,
-                hasAgreedToTerms: profile.hasAgreedToTerms,
-                userPin: profile.userPin,
-                personalSecurityQuestion: profile.personalSecurityQuestion,
-                securityQuestionAnswer: profile.securityQuestionAnswer
+                profile: currentProfile,
+                name: currentProfile.name,
+                dateOfBirth: currentProfile.dateOfBirth,
+                favoriteGenres: currentProfile.favoriteGenres,
+                hasAgreedToTerms: currentProfile.hasAgreedToTerms,
+                userPin: currentProfile.userPin,
+                personalSecurityQuestion: currentProfile.personalSecurityQuestion,
+                securityQuestionAnswer: currentProfile.securityQuestionAnswer,
+                profilePicture: imageData // Pass the updated profile picture data
             )
-            
-            // Navigate to the home page
             navigateToHomePage = true
-            print("Profile picture saved for \(profile.name) at \(fileURL.path)")
-        } catch {
-            print("Failed to save profile picture: \(error.localizedDescription)")
         }
-    }
-    
-    // Helper function to get the app's documents directory
-    func getDocumentsDirectory() -> URL {
-        FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
     }
 }
 

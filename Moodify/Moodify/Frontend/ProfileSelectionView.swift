@@ -157,10 +157,10 @@ struct ProfileCard: View {
     var body: some View {
         Button(action: action) {
             VStack(spacing: 16) {
-                if let imagePath = String(data: profile.profilePicture ?? Data(), encoding: .utf8),
-                   let savedImage = UIImage(contentsOfFile: imagePath) {
+                if let profilePictureData = profile.profilePicture,
+                   let uiImage = UIImage(data: profilePictureData) {
                     // Display the saved profile picture
-                    Image(uiImage: savedImage)
+                    Image(uiImage: uiImage)
                         .resizable()
                         .scaledToFill()
                         .frame(width: 100, height: 100)
