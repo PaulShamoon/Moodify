@@ -56,7 +56,13 @@ struct ProfilePictureView: View {
                 }
                 
                 if currentImage != nil {
-                    Button(action: { isCropping = true }) {
+                    Button(action: {
+                        // Load the current image into originalImage before cropping
+                        if originalImage == nil {
+                            originalImage = currentImage
+                        }
+                        isCropping = true
+                    }) {
                         Image(systemName: "crop")
                             .font(.system(size: 20))
                             .padding(12)
@@ -131,6 +137,15 @@ struct ProfilePictureView: View {
                 croppedImage: $croppedImage,
                 isCropping: $isCropping
             )
+        }
+        .onAppear {
+            // Load saved profile picture if it exists
+            if originalImage == nil,
+               let profile = profileManager.currentProfile,
+               let imageData = profile.profilePicture,
+               let savedImage = UIImage(data: imageData) {
+                originalImage = savedImage
+            }
         }
     }
     
