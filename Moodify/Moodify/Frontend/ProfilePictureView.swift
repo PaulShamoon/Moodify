@@ -17,6 +17,7 @@ struct ProfilePictureView: View {
     @State private var isCropping = false
     @State private var originalImage: UIImage?
     @State private var croppedImage: UIImage?
+    @State private var showIconPicker = false
     @Environment(\.presentationMode) var presentationMode
     
     var currentImage: UIImage? {
@@ -74,31 +75,46 @@ struct ProfilePictureView: View {
                 }
             }
             .padding(.vertical, 20)
-            
-            HStack(spacing: 16) {
-                Button(action: {
-                    sourceType = .photoLibrary
-                    showImagePicker = true
-                }) {
-                    HStack {
-                        Image(systemName: "photo.on.rectangle")
-                        Text("Choose from Library")
+            VStack {
+                HStack(spacing: 16) {
+                    Button(action: {
+                        sourceType = .photoLibrary
+                        showImagePicker = true
+                    }) {
+                        HStack {
+                            Image(systemName: "photo.on.rectangle")
+                            Text("Choose from Library")
+                        }
+                        .font(.system(size: 18, weight: .bold, design: .rounded))
+                        .foregroundColor(.black)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 7)
+                        .background(Color.green)
+                        .cornerRadius(12)
                     }
-                    .font(.system(size: 18, weight: .bold, design: .rounded))
-                    .foregroundColor(.black)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 7)
-                    .background(Color.green)
-                    .cornerRadius(12)
+                    
+                    Button(action: {
+                        sourceType = .camera
+                        showImagePicker = true
+                    }) {
+                        HStack {
+                            Image(systemName: "camera")
+                            Text("Take a Photo")
+                        }
+                        .font(.system(size: 18, weight: .bold, design: .rounded))
+                        .foregroundColor(.black)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 16)
+                        .background(Color.green)
+                        .cornerRadius(12)
+                    }
                 }
-                
                 Button(action: {
-                    sourceType = .camera
-                    showImagePicker = true
+                    showIconPicker = true  // Add this state variable
                 }) {
                     HStack {
-                        Image(systemName: "camera")
-                        Text("Take a Photo")
+                        Image(systemName: "person.circle.fill")
+                        Text("Choose an Icon Instead")
                     }
                     .font(.system(size: 18, weight: .bold, design: .rounded))
                     .foregroundColor(.black)
@@ -179,6 +195,13 @@ struct ProfilePictureView: View {
                let savedImage = UIImage(data: imageData) {
                 originalImage = savedImage
             }
+        }
+        .sheet(isPresented: $showIconPicker) {
+            CustomProfileIconView(
+                isCropping: $isCropping,
+                originalImage: $originalImage,
+                croppedImage: $croppedImage
+            )
         }
     }
     
