@@ -130,7 +130,11 @@ struct ProfilePictureView: View {
                 .padding(.horizontal)
                 .padding(.bottom, 30)
             } else {
-                Button(action: saveAndDismiss) {
+                Button(action:{
+                    navigateToHomePage = true
+                    presentationMode.wrappedValue.dismiss()
+                }
+                ) {
                     HStack{
                         Text("Skip")
                             .font(.system(size: 18, weight: .bold, design: .rounded))
