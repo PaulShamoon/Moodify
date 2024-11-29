@@ -170,6 +170,7 @@ struct ProfilePictureView: View {
                 croppedImage: $croppedImage,
                 isCropping: $isCropping
             )
+            .interactiveDismissDisabled()
         }
         .onAppear {
             // Load saved profile picture if it exists

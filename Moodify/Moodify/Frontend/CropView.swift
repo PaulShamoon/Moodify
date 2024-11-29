@@ -1,5 +1,4 @@
 import SwiftUI
-
 struct CropView: View {
     @Binding var originalImage: UIImage?
     @Binding var croppedImage: UIImage?
@@ -10,7 +9,8 @@ struct CropView: View {
     @State private var offset: CGSize = .zero
     @State private var lastOffset: CGSize = .zero
     
-    private let minScale: CGFloat = 1.0
+    // Adjust scale limits
+    private let minScale: CGFloat = 0.5  // Allow zoom out like WhatsApp
     private let maxScale: CGFloat = 4.0
     
     var body: some View {
@@ -28,28 +28,41 @@ struct CropView: View {
                     let size = min(geo.size.width, geo.size.height) - 40
                     
                     ZStack {
-                        Color.black.opacity(0.8)
+                        Color.black
                         
-                        if let image = originalImage{
+                        if let image = originalImage {
+                            // Background dimmed image
+                            Image(uiImage: image)
+                                .resizable()
+                                .scaledToFit()
+                                .scaleEffect(scale)
+                                .offset(offset)
+                                .opacity(0.3)  // Dimmed version
+                            
+                            // Main image
                             Image(uiImage: image)
                                 .resizable()
                                 .scaledToFit()
                                 .scaleEffect(scale)
                                 .offset(offset)
                                 .clipShape(Circle())
+                                .frame(width: size, height: size)
                                 .gesture(
                                     SimultaneousGesture(
                                         MagnificationGesture()
                                             .onChanged { value in
                                                 let delta = value / lastScale
                                                 lastScale = value
-                                                
-                                                // Limit scale within bounds
-                                                let newScale = scale * delta
-                                                scale = min(maxScale, max(minScale, newScale))
+                                                scale = min(maxScale, max(minScale, scale * delta))
                                             }
                                             .onEnded { _ in
                                                 lastScale = 1.0
+                                                // Snap back if needed
+                                                if scale < minScale {
+                                                    withAnimation { scale = minScale }
+                                                } else if scale > maxScale {
+                                                    withAnimation { scale = maxScale }
+                                                }
                                             },
                                         DragGesture()
                                             .onChanged { value in
@@ -57,22 +70,17 @@ struct CropView: View {
                                                     width: lastOffset.width + value.translation.width,
                                                     height: lastOffset.height + value.translation.height
                                                 )
-                                                
-                                                // Limit movement based on scale
-                                                let maxOffset = (size * (scale - 1)) / 2
-                                                offset = CGSize(
-                                                    width: max(-maxOffset, min(maxOffset, newOffset.width)),
-                                                    height: max(-maxOffset, min(maxOffset, newOffset.height))
-                                                )
+                                                offset = newOffset
                                             }
                                             .onEnded { _ in
                                                 lastOffset = offset
+                                                // Here you could add bounds checking if needed
                                             }
                                     )
                                 )
                         }
                         
-                        // Circular guide
+                        // Circle outline
                         Circle()
                             .strokeBorder(Color.white, lineWidth: 1)
                             .frame(width: size, height: size)
@@ -118,28 +126,31 @@ struct CropView: View {
     private func cropAndSave() {
         guard let inputImage = originalImage else { return }
         
-        // Create a renderer with a square size based on the shorter dimension
-        let size = min(inputImage.size.width, inputImage.size.height)
-        let format = UIGraphicsImageRendererFormat()
-        format.scale = 1
-        
-        let renderer = UIGraphicsImageRenderer(size: CGSize(width: size, height: size), format: format)
+        let outputSize = CGSize(width: 800, height: 800) // Fixed output size
+        let renderer = UIGraphicsImageRenderer(size: outputSize)
         
         let croppedImg = renderer.image { context in
             // Create circular clipping path
-            let circlePath = UIBezierPath(ovalIn: CGRect(origin: .zero, size: CGSize(width: size, height: size)))
-            circlePath.addClip()
+            context.cgContext.addEllipse(in: CGRect(origin: .zero, size: outputSize))
+            context.cgContext.clip()
             
-            // Calculate the drawing rect
-            let drawRect = CGRect(
-                x: (size - inputImage.size.width * scale) / 2 + offset.width,
-                y: (size - inputImage.size.height * scale) / 2 + offset.height,
-                width: inputImage.size.width * scale,
-                height: inputImage.size.height * scale
-            )
+            // Calculate the drawing rect based on scale and offset
+            let aspectRatio = inputImage.size.width / inputImage.size.height
+            let drawWidth: CGFloat
+            let drawHeight: CGFloat
             
-            // Draw the image
-            inputImage.draw(in: drawRect)
+            if aspectRatio > 1 {
+                drawHeight = outputSize.height * scale
+                drawWidth = drawHeight * aspectRatio
+            } else {
+                drawWidth = outputSize.width * scale
+                drawHeight = drawWidth / aspectRatio
+            }
+            
+            let x = (outputSize.width - drawWidth) / 2 + offset.width * scale
+            let y = (outputSize.height - drawHeight) / 2 + offset.height * scale
+            
+            inputImage.draw(in: CGRect(x: x, y: y, width: drawWidth, height: drawHeight))
         }
         
         croppedImage = croppedImg
