@@ -61,7 +61,6 @@ struct CustomProfileIconView: View {
                                             .aspectRatio(contentMode: .fit)
                                             .padding(15)
                                             .foregroundColor(iconColor)
-                                    .overlay(Circle().stroke(Color.green, lineWidth: 4))
 
                                     )
                                     .overlay(
@@ -107,7 +106,7 @@ struct CustomProfileIconView: View {
                                     .frame(width: 50, height: 50)
                                     .overlay(
                                         Circle()
-                                            .stroke(iconColor == .white ? Color.white : Color.gray, lineWidth: 5)
+                                            .stroke(iconColor == .white ? Color.green : Color.gray, lineWidth: 5)
                                     )
                             }
                             
