@@ -26,7 +26,7 @@ struct homePageView: View {
     
     
     // NOTE - this URL is temporary and needs to be updated each time from the backend side to detect mood properly
-    let backendURL = "https://3ff9-2601-406-4d00-7af0-3024-4646-c0e0-48d8.ngrok-free.app/analyze"
+    let backendURL = "https://2cd3-50-218-129-6.ngrok-free.app/analyze"
     
     // Add this property to manage background color
     @State private var backgroundColors: [Color] = [
@@ -100,6 +100,61 @@ struct homePageView: View {
                     
                     Spacer()
                     
+                    // Spotify Connection Button
+                    if showConnectToSpotifyButton {
+                        Button(action: {
+                            navigateToSpotify = true
+                        }) {
+                            HStack(spacing: 8) {
+                                Image(systemName: "music.note") // Replace with Spotify logo from assets
+                                    .font(.system(size: 16))
+                                Text("Connect")
+                                    .font(.system(size: 14, weight: .medium))
+                            }
+                            .foregroundColor(.white)
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 8)
+                            .background(
+                                Capsule()
+                                    .fill(Color(hex: "#1DB954")) // Spotify green
+                                    .opacity(0.9)
+                            )
+                            .overlay(
+                                Capsule()
+                                    .stroke(Color.white.opacity(0.2), lineWidth: 1)
+                            )
+                        }
+                        .shadow(color: .black.opacity(0.2), radius: 5, x: 0, y: 2)
+                    }
+                    
+                    if showResyncSpotifyButton {
+                        Button(action: {
+                            spotifyController.resetFirstConnectionAttempt()
+                            spotifyController.refreshPlayerState()
+                            showResyncSpotifyButton = false
+                        }) {
+                            HStack(spacing: 8) {
+                                Image(systemName: "music.note") // Replace with Spotify logo from assets
+                                    .font(.system(size: 16))
+                                Text("Resync")
+                                    .font(.system(size: 14, weight: .medium))
+                            }
+                            .foregroundColor(.white)
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 8)
+                            .background(
+                                Capsule()
+                                    .fill(Color(hex: "#1DB954")) // Spotify green
+                                    .opacity(0.7)
+                            )
+                            .overlay(
+                                Capsule()
+                                    .stroke(Color.white.opacity(0.2), lineWidth: 1)
+                            )
+                        }
+                        .shadow(color: .black.opacity(0.2), radius: 5, x: 0, y: 2)
+                    }
+                    
                     Button(action: {
                         withAnimation { showMenu.toggle() }
                     }) {
@@ -115,60 +170,66 @@ struct homePageView: View {
                 
                 // Mood Display
                 VStack(spacing: 0) {
+                    // Header with mood name
                     HStack {
-                        Text("Your Current Mood")
-                            .font(.system(size: 20, weight: .bold))
-                            .foregroundColor(.white.opacity(0.9))
-                        
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("Current Mood")
+                                .font(.system(size: 16, weight: .regular))
+                                .foregroundColor(.white.opacity(0.6))
+                            Text(currentMoodText.capitalized)
+                                .font(.system(size: 28, weight: .semibold))
+                                .foregroundColor(.white)
+                        }
                         Spacer()
                         
                         Button(action: {
                             showMoodSelector = true
                         }) {
-                            Image(systemName: "pencil.circle.fill")
-                                .font(.system(size: 30))
-                                .foregroundColor(.white)
+                            Image(systemName: "chevron.down")
+                                .font(.system(size: 16))
+                                .foregroundColor(.white.opacity(0.6))
                         }
                     }
-                    .padding(.horizontal, 16)
+                    .padding(.horizontal, 24)
+                    .padding(.top, 16)
+                    .padding(.bottom, 40)
                     
+                    // Gradient Blob - smaller size
                     ZStack {
-                        RoundedRectangle(cornerRadius: 30)
-                            .fill(.ultraThinMaterial)
-                            .frame(width: 150, height: 150)
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 30)
-                                    .stroke(.white.opacity(0.2), lineWidth: 1)
+                        // Main gradient blob
+                        Circle()
+                            .fill(
+                                LinearGradient(
+                                    colors: getMoodGradient(for: currentMoodText),
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                )
                             )
+                            .frame(width: 160, height: 160)  // Reduced size
+                            .blur(radius: 25)  // Slightly reduced blur
+                            .offset(y: -15)
                         
-                        if isDetectingMood {
-                            /* Loading Animation for when the user's mood is being generated */
-                            VStack(spacing: 10) {
-                                ProgressView()
-                                    .scaleEffect(1.5)
-                                    .tint(.white)
-                                
-                                Text("Detecting Mood...")
-                                    .font(.system(size: 16))
-                                    .foregroundColor(.white)
-                            }
-                        } else {
-                            Text(currentMood)
-                                .font(.system(size: 70))
-                        }
+                        // Secondary blob for layered effect
+                        Circle()
+                            .fill(
+                                LinearGradient(
+                                    colors: getMoodGradient(for: currentMoodText).reversed(),
+                                    startPoint: .topTrailing,
+                                    endPoint: .bottomLeading
+                                )
+                            )
+                            .frame(width: 120, height: 120)  // Reduced size
+                            .blur(radius: 20)  // Slightly reduced blur
+                            .offset(x: 15, y: 15)  // Adjusted offset
                     }
-                    .padding(.vertical, 6)
-                    
-                    Text(currentMoodText)
-                        .font(.system(size: 16, weight: .regular))
-                        .foregroundColor(.white.opacity(0.8))
-                        .multilineTextAlignment(.center)
+                    .frame(height: 200)  // Reduced frame height
+                    .padding(.bottom, 40)
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.horizontal)
                 .padding(.bottom, 10)
                 
-                // Detect Mood Button - Moved here
+                // Detect Mood Button - Moved up
                 Button(action: {
                     checkCameraPermission()
                 }) {
@@ -204,44 +265,33 @@ struct homePageView: View {
                                 endRadius: 120
                             )
                         }
-                        .clipShape(Capsule())
-                        .overlay(
-                            Capsule()
-                                .stroke(
-                                    LinearGradient(
-                                        gradient: Gradient(colors: [
-                                            Color(red: 0.2, green: 0.4, blue: 0.3),
-                                            Color(red: 0.4, green: 0.3, blue: 0.2)
-                                        ]),
-                                        startPoint: .topLeading,
-                                        endPoint: .bottomTrailing
-                                    ),
-                                    lineWidth: 2
-                                )
-                                .opacity(isMoodButtonAnimating ? 0.8 : 0.4)
-                        )
-                        .shadow(
-                            color: Color(red: 0.2, green: 0.4, blue: 0.3).opacity(0.5),
-                            radius: 10,
-                            x: 0,
-                            y: 5
-                        )
+                            .clipShape(Capsule())
+                            .overlay(
+                                Capsule()
+                                    .stroke(
+                                        LinearGradient(
+                                            gradient: Gradient(colors: [
+                                                Color(red: 0.2, green: 0.4, blue: 0.3),
+                                                Color(red: 0.4, green: 0.3, blue: 0.2)
+                                            ]),
+                                            startPoint: .topLeading,
+                                            endPoint: .bottomTrailing
+                                        ),
+                                        lineWidth: 2
+                                    )
+                                    .opacity(isMoodButtonAnimating ? 0.8 : 0.4)
+                            )
+                            .shadow(
+                                color: Color(red: 0.2, green: 0.4, blue: 0.3).opacity(0.5),
+                                radius: 10,
+                                x: 0,
+                                y: 5
+                            )
                     )
                     .padding(.vertical, 10)
                 }
-//                .scaleEffect(isMoodButtonAnimating ? 1.02 : 1.0)
-//                .onAppear {
-//                    withAnimation(
-//                        Animation
-//                            .easeInOut(duration: 1.5)
-//                            .repeatForever(autoreverses: true)
-//                    ) {
-//                        isMoodButtonAnimating = true
-//                    }
-//                }
-//                .padding(.vertical, 30) // Reduced vertical padding
                 
-                // Player View
+                // Player View - Moved up
                 PlayerView(spotifyController: spotifyController)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .background(
@@ -253,64 +303,6 @@ struct homePageView: View {
                             )
                     )
                     .padding(.horizontal)
-                
-                // Spotify Connection Buttons
-                HStack(spacing: 20) {
-                    // Connect to Spotify Button
-                    if showConnectToSpotifyButton {
-                        Button(action: {
-                            navigateToSpotify = true
-                        }) {
-                            HStack {
-                                Image(systemName: "music.note")
-                                    .font(.system(size: 16))
-                                Text("Connect to Spotify")
-                                    .font(.system(size: 16, weight: .medium))
-                            }
-                            .foregroundColor(.white)
-                            .padding(.horizontal, 20)
-                            .padding(.vertical, 12)
-                            .background(
-                                Capsule()
-                                    .fill(Color(red: 0.4, green: 0.3, blue: 0.2).opacity(0.3))
-                                    .overlay(
-                                        Capsule()
-                                            .stroke(Color(red: 0.2, green: 0.4, blue: 0.3), lineWidth: 1.5)
-                                    )
-                            )
-                        }
-                    }
-                    
-                    // Resync Spotify Button
-                    if showResyncSpotifyButton {
-                        Button(action: {
-                            spotifyController.resetFirstConnectionAttempt()
-                            spotifyController.refreshPlayerState()
-                            showResyncSpotifyButton = false
-                        }) {
-                            HStack {
-                                Image(systemName: "music.note")
-                                    .font(.system(size: 16))
-                                Text("Resync Spotify")
-                                    .font(.system(size: 16, weight: .medium))
-                            }
-                            .foregroundColor(.white)
-                            .padding(.horizontal, 20)
-                            .padding(.vertical, 12)
-                            .background(
-                                Capsule()
-                                    .fill(Color(red: 0.4, green: 0.3, blue: 0.2).opacity(0.3))
-                                    .overlay(
-                                        Capsule()
-                                            .stroke(Color(red: 0.2, green: 0.4, blue: 0.3), lineWidth: 1.5)
-                                    )
-                            )
-                        }
-                    }
-                }
-                .padding(.top, 20) // Reduced top padding
-                
-                Spacer()
             }
             .padding(.top, 60)
             
@@ -392,7 +384,8 @@ struct homePageView: View {
                 spotifyController: spotifyController,
                 profile: profile,
                 detectedMood: detectedMood,
-                isPresented: $showMoodPreferenceSheet
+                isPresented: $showMoodPreferenceSheet,
+                manualMoodSelectorPresented: $showMoodSelector
             )
         }
         .sheet(isPresented: $showMoodSelector) {
@@ -546,6 +539,68 @@ struct homePageView: View {
         default: return "😶"
         }
     }
+    
+    // Helper functions for the modern mood display
+    private func getMoodGradient(for mood: String) -> [Color] {
+        switch mood.lowercased() {
+        case "happy":
+            return [
+                Color(hex: "#FFD700"),  // Gold
+                Color(hex: "#FFA500"),  // Orange
+                Color(hex: "#FFFF00")   // Yellow
+            ]
+        case "sad":
+            return [
+                Color(hex: "#4F74FF"),  // Blue
+                Color(hex: "#8270FF"),  // Purple-Blue
+                Color(hex: "#B6B4FF")   // Light Purple
+            ]
+        case "angry":
+            return [
+                Color(hex: "#FF0000"),  // Pure Red
+                Color(hex: "#FF4444"),  // Bright Red
+                Color(hex: "#FF6666")   // Light Red
+            ]
+        case "chill":
+            return [
+                Color(hex: "#00CED1"),  // Turquoise
+                Color(hex: "#40E0D0"),  // Light Turquoise
+                Color(hex: "#48D1CC")   // Medium Turquoise
+            ]
+        default:
+            return [
+                Color(hex: "#808080"),
+                Color(hex: "#A0A0A0"),
+                Color(hex: "#C0C0C0")
+            ]
+        }
+    }
+    
+    private func getMoodIcon(for mood: String) -> String {
+        // Parse the mood text to extract the actual mood
+        let moodText = mood.lowercased()
+        if moodText.contains("happy") {
+            return "sun.max.fill"
+        } else if moodText.contains("sad") {
+            return "cloud.rain.fill"
+        } else if moodText.contains("angry") {
+            return "flame.fill"
+        } else if moodText.contains("chill") {
+            return "leaf.fill"
+        } else {
+            return "circle.fill"
+        }
+    }
+    
+    private func getMoodDescription(for mood: String) -> String {
+        switch mood.lowercased() {
+        case "happy": return "High energy, upbeat vibes"
+        case "sad": return "Reflective, melancholic state"
+        case "angry": return "Intense, powerful energy"
+        case "chill": return "Relaxed, peaceful mindset"
+        default: return "Neutral state"
+        }
+    }
 }
 
 struct MoodPreferenceView: View {
@@ -553,6 +608,7 @@ struct MoodPreferenceView: View {
     let profile: Profile
     let detectedMood: String
     @Binding var isPresented: Bool
+    @Binding var manualMoodSelectorPresented: Bool
     
     var body: some View {
         VStack(spacing: 30) {
@@ -578,6 +634,7 @@ struct MoodPreferenceView: View {
                 Button(action: {
                     spotifyController.fetchRecommendations(mood: detectedMood, profile: profile, userGenres: profile.favoriteGenres)
                     isPresented = false
+                    manualMoodSelectorPresented = false
                 }) {
                     HStack {
                         Image(systemName: "cloud.rain")
@@ -602,6 +659,7 @@ struct MoodPreferenceView: View {
                 Button(action: {
                     spotifyController.fetchRecommendations(mood: "happy", profile: profile, userGenres: profile.favoriteGenres)
                     isPresented = false
+                    manualMoodSelectorPresented = false
                 }) {
                     HStack {
                         Image(systemName: "sun.max.fill")
@@ -644,11 +702,27 @@ struct ManualMoodSelector: View {
     @Binding var currentMoodText: String
     let updateBackgroundColors: (String) -> Void
     
-    private let moods: [(name: String, emoji: String, color: Color, icon: String)] = [
-        ("Happy", "😄", .yellow, "sun.max.fill"),
-        ("Sad", "😢", .blue, "cloud.rain"),
-        ("Angry", "😡", .red, "flame.fill"),
-        ("Chill", "😌", .mint, "leaf.fill")
+    private let moods: [(name: String, description: String, gradient: [Color])] = [
+        ("Happy", "Energetic & Upbeat", [
+            Color(hex: "#FFD700"),
+            Color(hex: "#FFA500"),
+            Color(hex: "#FFFF00")
+        ]),
+        ("Sad", "Melancholic & Reflective", [
+            Color(hex: "#4F74FF"),
+            Color(hex: "#8270FF"),
+            Color(hex: "#B6B4FF")
+        ]),
+        ("Angry", "Intense & Powerful", [
+            Color(hex: "#FF0000"),
+            Color(hex: "#FF4444"),
+            Color(hex: "#FF6666")
+        ]),
+        ("Chill", "Calm & Peaceful", [
+            Color(hex: "#00CED1"),
+            Color(hex: "#40E0D0"),
+            Color(hex: "#48D1CC")
+        ])
     ]
     
     @State private var selectedMood: String = ""
@@ -660,87 +734,93 @@ struct ManualMoodSelector: View {
     var body: some View {
         NavigationView {
             ScrollView {
-                VStack(spacing: 25) {
-                    Text("How are you feeling?")
-                        .font(.title2)
-                        .fontWeight(.bold)
-                        .padding(.top)
-                    
-                    // First row - 2 items
-                    HStack(spacing: 15) {
-                        MoodCard(
-                            mood: moods[0], // Happy
-                            isSelected: selectedMood == moods[0].name,
-                            action: { selectedMood = moods[0].name; updateMood(mood: moods[0].name.lowercased()) }
-                        )
-                        MoodCard(
-                            mood: moods[1], // Sad
-                            isSelected: selectedMood == moods[1].name,
-                            action: { selectedMood = moods[1].name; updateMood(mood: moods[1].name.lowercased()) }
-                        )
+                VStack(spacing: 20) {
+                    ForEach(moods, id: \.name) { mood in
+                        Button(action: {
+                            selectedMood = mood.name
+                            updateMood(mood: mood.name.lowercased())
+                        }) {
+                            HStack {
+                                // Gradient blob indicator
+                                ZStack {
+                                    Circle()
+                                        .fill(
+                                            LinearGradient(
+                                                colors: mood.gradient,
+                                                startPoint: .topLeading,
+                                                endPoint: .bottomTrailing
+                                            )
+                                        )
+                                        .frame(width: 60, height: 60)
+                                        .blur(radius: 15)
+                                }
+                                .frame(width: 60, height: 60)
+                                
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text(mood.name)
+                                        .font(.system(size: 18, weight: .semibold))
+                                        .foregroundColor(.white)
+                                    
+                                    Text(mood.description)
+                                        .font(.system(size: 14))
+                                        .foregroundColor(.white.opacity(0.7))
+                                }
+                                
+                                Spacer()
+                                
+                                if selectedMood == mood.name {
+                                    Image(systemName: "checkmark.circle.fill")
+                                        .foregroundColor(.white)
+                                        .font(.system(size: 22))
+                                }
+                            }
+                            .padding(20)
+                            .background(
+                                RoundedRectangle(cornerRadius: 16)
+                                    .fill(Color.black.opacity(0.3))
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 16)
+                                            .stroke(
+                                                LinearGradient(
+                                                    colors: mood.gradient,
+                                                    startPoint: .leading,
+                                                    endPoint: .trailing
+                                                ),
+                                                lineWidth: selectedMood == mood.name ? 2 : 0
+                                            )
+                                    )
+                            )
+                        }
+                        .scaleEffect(selectedMood == mood.name ? 1.02 : 1.0)
+                        .animation(.spring(response: 0.3), value: selectedMood == mood.name)
                     }
-                    .padding(.horizontal)
-                    
-                    // Second row - 2 items
-                    HStack(spacing: 15) {
-                        MoodCard(
-                            mood: moods[2], // Angry
-                            isSelected: selectedMood == moods[2].name,
-                            action: { selectedMood = moods[2].name; updateMood(mood: moods[2].name.lowercased()) }
-                        )
-                        MoodCard(
-                            mood: moods[3], // Chill
-                            isSelected: selectedMood == moods[3].name,
-                            action: { selectedMood = moods[3].name; updateMood(mood: moods[3].name.lowercased()) }
-                        )
-                    }
-                    .padding(.horizontal)
                 }
-                .padding(.vertical)
+                .padding()
             }
-            .background(colorScheme == .dark ? Color.black : Color.white)
-            .navigationBarItems(
-                trailing: Button("Done") {
-                    isPresented = false
-                }
-            )
+            .background(Color.black.opacity(0.9))
+            .navigationTitle("How are you feeling?")
+            .navigationBarTitleDisplayMode(.inline)
         }
         .sheet(isPresented: $showMoodPreferenceSheet) {
             MoodPreferenceView(
                 spotifyController: spotifyController,
                 profile: profile,
                 detectedMood: detectedMood,
-                isPresented: $showMoodPreferenceSheet
+                isPresented: $showMoodPreferenceSheet,
+                manualMoodSelectorPresented: $isPresented
             )
-            /**
-             Closes manual selector after preference selection
-             Created by: Nazanin Mahmoudi
-             */
-            .onDisappear {
-                isPresented = false
-            }
         }
     }
     
-    /**
-     Updates UI and handles music recommendations based on selected mood.
-     Displays preference options if user selects 'sad'.
-     
-     @param mood: String representing the selected mood
-     Created by: Nazanin Mahmoudi
-     */
     private func updateMood(mood: String) {
-        // Update UI
-        currentMood = moods.first(where: { $0.name.lowercased() == mood.lowercased() })?.emoji ?? "😶"
-        currentMoodText = "You're feeling \(mood.capitalized)"
+        currentMood = getMoodIcon(for: mood)
+        currentMoodText = mood.capitalized
         updateBackgroundColors(mood)
         
         if mood.lowercased() == "sad" {
-            /** Show preference options for sad mood */
             detectedMood = mood
             showMoodPreferenceSheet = true
         } else {
-            /** Direct music recommendations for other moods */
             let recommendationMood = mapMoodToRecommendation(mood)
             spotifyController.fetchRecommendations(
                 mood: recommendationMood,
@@ -751,14 +831,20 @@ struct ManualMoodSelector: View {
         }
     }
     
-    /**
-     Maps mood selections to appropriate music categories
-     Created by: Nazanin Mahmoudi
-     */
     private func mapMoodToRecommendation(_ mood: String) -> String {
         switch mood.lowercased() {
         case "anxious": return "chill"
         default: return mood
+        }
+    }
+    
+    private func getMoodIcon(for mood: String) -> String {
+        switch mood.lowercased() {
+        case "happy": return "sun.max.fill"
+        case "sad": return "cloud.rain.fill"
+        case "angry": return "flame.fill"
+        case "chill": return "leaf.fill"
+        default: return "circle.fill"
         }
     }
 }
