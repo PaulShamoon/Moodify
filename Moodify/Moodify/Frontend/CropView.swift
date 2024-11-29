@@ -25,10 +25,10 @@ struct CropView: View {
                 Spacer()
                 
                 GeometryReader { geo in
-                    let size = min(geo.size.width, geo.size.height) - 40
+                    let size = min(geo.size.width, geo.size.height)
                     
                     ZStack {
-                        Color.black
+                        Color.black.opacity(0.8)
                         
                         if let image = originalImage {
                             // Background dimmed image
@@ -37,32 +37,38 @@ struct CropView: View {
                                 .scaledToFit()
                                 .scaleEffect(scale)
                                 .offset(offset)
-                                .opacity(0.3)  // Dimmed version
+                                .opacity(0.3)
                             
-                            // Main image
+                            // Main image with circle clip
                             Image(uiImage: image)
                                 .resizable()
                                 .scaledToFit()
                                 .scaleEffect(scale)
                                 .offset(offset)
                                 .clipShape(Circle())
-                                .frame(width: size, height: size)
                                 .gesture(
                                     SimultaneousGesture(
                                         MagnificationGesture()
                                             .onChanged { value in
                                                 let delta = value / lastScale
                                                 lastScale = value
-                                                scale = min(maxScale, max(minScale, scale * delta))
+                                                
+                                                // Calculate limits based on image and view size
+                                                let imageSize = image.size
+                                                let viewSize = geo.size
+                                                let aspectRatio = imageSize.width / imageSize.height
+                                                
+                                                // Calculate minimum scale to fill circle
+                                                let minScaleWidth = size / (viewSize.width * aspectRatio)
+                                                let minScaleHeight = size / viewSize.height
+                                                let dynamicMinScale = max(minScaleWidth, minScaleHeight)
+                                                
+                                                // Apply scale with proper bounds
+                                                let newScale = scale * delta
+                                                scale = min(maxScale, max(dynamicMinScale, newScale))
                                             }
                                             .onEnded { _ in
                                                 lastScale = 1.0
-                                                // Snap back if needed
-                                                if scale < minScale {
-                                                    withAnimation { scale = minScale }
-                                                } else if scale > maxScale {
-                                                    withAnimation { scale = maxScale }
-                                                }
                                             },
                                         DragGesture()
                                             .onChanged { value in
@@ -70,11 +76,21 @@ struct CropView: View {
                                                     width: lastOffset.width + value.translation.width,
                                                     height: lastOffset.height + value.translation.height
                                                 )
-                                                offset = newOffset
+                                                
+                                                // Horizontal bounds stay the same (constrained by circle)
+                                                let maxHorizontalOffset = (size * (scale - 1)) / 2
+                                                
+                                                // Vertical bounds based on actual image height
+                                                let scaledImageHeight = geo.size.height * scale
+                                                let maxVerticalOffset = (scaledImageHeight - size) / 2
+                                                
+                                                offset = CGSize(
+                                                    width: max(-maxHorizontalOffset, min(maxHorizontalOffset, newOffset.width)),
+                                                    height: max(-maxVerticalOffset, min(maxVerticalOffset, newOffset.height))
+                                                )
                                             }
                                             .onEnded { _ in
                                                 lastOffset = offset
-                                                // Here you could add bounds checking if needed
                                             }
                                     )
                                 )
