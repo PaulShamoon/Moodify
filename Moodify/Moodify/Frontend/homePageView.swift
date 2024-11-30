@@ -26,7 +26,7 @@ struct homePageView: View {
     
     
     // NOTE - this URL is temporary and needs to be updated each time from the backend side to detect mood properly
-    let backendURL = "https://2cd3-50-218-129-6.ngrok-free.app/analyze"
+    let backendURL = "/analyze"
     
     // Add this property to manage background color
     @State private var backgroundColors: [Color] = [
@@ -40,28 +40,28 @@ struct homePageView: View {
             switch emotion.lowercased() {
             case "happy":
                 backgroundColors = [
-                    Color(red: 0.1, green: 0.1, blue: 0.1),
-                    Color(red: 0.2, green: 0.15, blue: 0.05)  // Subtle warm dark
+                    Color(hex: "#2C2620"),  // Deep warm brown
+                    Color(hex: "#1C1915")   // Rich dark brown
                 ]
             case "sad":
                 backgroundColors = [
-                    Color(red: 0.1, green: 0.1, blue: 0.1),
-                    Color(red: 0.05, green: 0.1, blue: 0.2)   // Subtle cool dark
+                    Color(hex: "#1A1B2E"),  // Deep midnight blue
+                    Color(hex: "#15162B")   // Dark navy
                 ]
             case "angry":
                 backgroundColors = [
-                    Color(red: 0.1, green: 0.1, blue: 0.1),
-                    Color(red: 0.2, green: 0.05, blue: 0.05)  // Subtle red dark
+                    Color(hex: "#2A1517"),  // Deep maroon
+                    Color(hex: "#1C1314")   // Dark burgundy
                 ]
             case "chill":
                 backgroundColors = [
-                    Color(red: 0.1, green: 0.1, blue: 0.1),
-                    Color(red: 0.05, green: 0.15, blue: 0.15) // Subtle teal dark
+                    Color(hex: "#162226"),  // Deep teal
+                    Color(hex: "#131B1D")   // Dark aqua
                 ]
             default:
                 backgroundColors = [
-                    Color(red: 0.075, green: 0.075, blue: 0.075),
-                    Color(red: 0.1, green: 0.1, blue: 0.1)
+                    Color(hex: "#1A1A1A"),
+                    Color(hex: "#141414")
                 ]
             }
         }
@@ -75,6 +75,14 @@ struct homePageView: View {
     @State private var showMoodSelector = false
     @State private var selectedManualMood = "chill"
     
+    // Add these state variables
+    @State private var showMoodConfirmation = false
+    @State private var detectedEmotion = ""
+    @State private var detectedConfidence: Double = 0.0
+    
+    // Define a constant for the milky beige color at the top of the struct
+    let milkyBeige = Color(hex: "#F5E6D3")
+    
     var body: some View {
         ZStack {
             LinearGradient(
@@ -84,16 +92,22 @@ struct homePageView: View {
             )
             .edgesIgnoringSafeArea(.all)
             
+            // Inside your main ZStack, right after the background gradient
+            // Add particle overlay for the current mood
+            particleEffect(for: currentMoodText)
+                .edgesIgnoringSafeArea(.all)
+                .allowsHitTesting(false) // Ensures particles don't interfere with UI interaction
+            
             VStack {
                 // Header with profile and settings
                 HStack {
                     VStack(alignment: .leading, spacing: 4) {
                         Text("Welcome")
                             .font(.system(size: 28, weight: .light))
-                            .foregroundColor(.white.opacity(0.9))
+                            .foregroundColor(milkyBeige.opacity(0.9))
                         Text(profile.name)
                             .font(.system(size: 34, weight: .bold))
-                            .foregroundColor(.white)
+                            .foregroundColor(milkyBeige)
                     }
                     .shadow(color: .black.opacity(0.2), radius: 3, x: 0, y: 2)
                     .padding(.leading, 35)
@@ -106,12 +120,16 @@ struct homePageView: View {
                             navigateToSpotify = true
                         }) {
                             HStack(spacing: 8) {
-                                Image(systemName: "music.note") // Replace with Spotify logo from assets
-                                    .font(.system(size: 16))
+                                Image("spotify-logo")
+                                    .resizable()
+                                    .renderingMode(.original)
+                                    .aspectRatio(contentMode: .fit)
+                                    .frame(width: 22, height: 22)
+                                    .clipShape(Circle())
                                 Text("Connect")
                                     .font(.system(size: 14, weight: .medium))
                             }
-                            .foregroundColor(.white)
+                            .foregroundColor(milkyBeige)
                             .padding(.horizontal, 12)
                             .padding(.vertical, 8)
                             .background(
@@ -121,7 +139,7 @@ struct homePageView: View {
                             )
                             .overlay(
                                 Capsule()
-                                    .stroke(Color.white.opacity(0.2), lineWidth: 1)
+                                    .stroke(milkyBeige.opacity(0.2), lineWidth: 1)
                             )
                         }
                         .shadow(color: .black.opacity(0.2), radius: 5, x: 0, y: 2)
@@ -139,7 +157,7 @@ struct homePageView: View {
                                 Text("Resync")
                                     .font(.system(size: 14, weight: .medium))
                             }
-                            .foregroundColor(.white)
+                            .foregroundColor(milkyBeige)
                             .padding(.horizontal, 12)
                             .padding(.vertical, 8)
                             .background(
@@ -149,7 +167,7 @@ struct homePageView: View {
                             )
                             .overlay(
                                 Capsule()
-                                    .stroke(Color.white.opacity(0.2), lineWidth: 1)
+                                    .stroke(milkyBeige.opacity(0.2), lineWidth: 1)
                             )
                         }
                         .shadow(color: .black.opacity(0.2), radius: 5, x: 0, y: 2)
@@ -160,7 +178,7 @@ struct homePageView: View {
                     }) {
                         Image(systemName: "line.3.horizontal")
                             .font(.title)
-                            .foregroundColor(.white)
+                            .foregroundColor(milkyBeige)
                             .padding()
                             .background(Circle().fill(Color.black.opacity(0.3)))
                             .shadow(radius: 10)
@@ -173,22 +191,38 @@ struct homePageView: View {
                     // Header with mood name
                     HStack {
                         VStack(alignment: .leading, spacing: 8) {
-                            Text("Current Mood")
-                                .font(.system(size: 16, weight: .regular))
-                                .foregroundColor(.white.opacity(0.6))
+                            Text("You're Feeling")
+                                .font(.system(size: 18, weight: .light))
+                                .foregroundColor(milkyBeige.opacity(0.8))
                             Text(currentMoodText.capitalized)
-                                .font(.system(size: 28, weight: .semibold))
-                                .foregroundColor(.white)
+                                .font(.system(size: 34, weight: .bold))
+                                .foregroundColor(milkyBeige)
                         }
                         Spacer()
                         
+                        // More prominent mood selector button with dark green
                         Button(action: {
                             showMoodSelector = true
                         }) {
-                            Image(systemName: "chevron.down")
-                                .font(.system(size: 16))
-                                .foregroundColor(.white.opacity(0.6))
+                            HStack(spacing: 8) {
+                                Image(systemName: "paintpalette.fill")
+                                    .font(.system(size: 16))
+                                Text("Select Mood")
+                                    .font(.system(size: 16, weight: .medium))
+                            }
+                            .foregroundColor(milkyBeige)
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 10)
+                            .background(
+                                RoundedRectangle(cornerRadius: 20)
+                                    .fill(Color(hex: "#1A2F2A")) // Dark green background
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 20)
+                                            .stroke(Color.white.opacity(0.1), lineWidth: 1)
+                                    )
+                            )
                         }
+                        .shadow(color: Color.black.opacity(0.3), radius: 5, x: 0, y: 2)
                     }
                     .padding(.horizontal, 24)
                     .padding(.top, 16)
@@ -229,7 +263,7 @@ struct homePageView: View {
                 .padding(.horizontal)
                 .padding(.bottom, 10)
                 
-                // Detect Mood Button - Moved up
+                // Detect Mood Button
                 Button(action: {
                     checkCameraPermission()
                 }) {
@@ -239,70 +273,99 @@ struct homePageView: View {
                         Text(isDetectingMood ? "Detecting..." : "Detect Mood")
                             .font(.system(size: 24, weight: .medium))
                     }
-                    .foregroundColor(.white)
+                    .foregroundColor(milkyBeige)
                     .padding(.horizontal, 40)
                     .padding(.vertical, 15)
                     .background(
                         ZStack {
-                            // Gradient background
-                            LinearGradient(
-                                gradient: Gradient(colors: [
-                                    Color(red: 0.4, green: 0.3, blue: 0.2).opacity(0.6),
-                                    Color(red: 0.2, green: 0.4, blue: 0.3).opacity(0.6)
-                                ]),
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            )
+                            // Main background
+                            RoundedRectangle(cornerRadius: 15)
+                                .fill(LinearGradient(
+                                    colors: [
+                                        Color(hex: "#2C2C2C"),
+                                        Color(hex: "#1A1A1A")
+                                    ],
+                                    startPoint: .leading,
+                                    endPoint: .trailing
+                                ))
                             
-                            // Subtle glow effect
-                            RadialGradient(
-                                gradient: Gradient(colors: [
-                                    Color.white.opacity(0.2),
-                                    Color.clear
-                                ]),
-                                center: .center,
-                                startRadius: 50,
-                                endRadius: 120
-                            )
+                            // Shimmering border
+                            RoundedRectangle(cornerRadius: 15)
+                                .stroke(
+                                    LinearGradient(
+                                        colors: [
+                                            milkyBeige.opacity(0.2),
+                                            milkyBeige.opacity(0.5),
+                                            milkyBeige.opacity(0.2)
+                                        ],
+                                        startPoint: .leading,
+                                        endPoint: .trailing
+                                    ),
+                                    lineWidth: 1.5
+                                )
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 15)
+                                        .stroke(
+                                            LinearGradient(
+                                                colors: [
+                                                    Color(hex: "#FF6B6B").opacity(0.3),
+                                                    Color(hex: "#4ECDC4").opacity(0.3),
+                                                    Color(hex: "#FF6B6B").opacity(0.3)
+                                                ],
+                                                startPoint: .leading,
+                                                endPoint: .trailing
+                                            ),
+                                            lineWidth: 1
+                                        )
+                                )
                         }
-                            .clipShape(Capsule())
-                            .overlay(
-                                Capsule()
-                                    .stroke(
-                                        LinearGradient(
-                                            gradient: Gradient(colors: [
-                                                Color(red: 0.2, green: 0.4, blue: 0.3),
-                                                Color(red: 0.4, green: 0.3, blue: 0.2)
-                                            ]),
-                                            startPoint: .topLeading,
-                                            endPoint: .bottomTrailing
-                                        ),
-                                        lineWidth: 2
-                                    )
-                                    .opacity(isMoodButtonAnimating ? 0.8 : 0.4)
-                            )
-                            .shadow(
-                                color: Color(red: 0.2, green: 0.4, blue: 0.3).opacity(0.5),
-                                radius: 10,
-                                x: 0,
-                                y: 5
-                            )
                     )
-                    .padding(.vertical, 10)
+                    .shadow(color: Color.black.opacity(0.3), radius: 10, x: 0, y: 5)
+                }
+                .padding(.horizontal)
+                .padding(.vertical, 10)
+                .onAppear {
+                    isMoodButtonAnimating = true
                 }
                 
                 // Player View - Moved up
                 PlayerView(spotifyController: spotifyController)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .background(
-                        RoundedRectangle(cornerRadius: 20)
-                            .fill(Color(red: 0.2, green: 0.4, blue: 0.3))
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 20)
-                                    .stroke(Color(red: 0.4, green: 0.3, blue: 0.2), lineWidth: 3.0)
-                            )
+                        Group {
+                            // Main background
+                            RoundedRectangle(cornerRadius: 20)
+                                .fill(Color(hex: "#1A2F2A"))  // Darker green
+                                .shadow(color: Color.black.opacity(0.3), radius: 10, x: 5, y: 5) // Dark shadow
+                                .shadow(color: Color(hex: "#243B35").opacity(0.3), radius: 10, x: -5, y: -5) // Light shadow
+                            
+                            // Inner highlight
+                            RoundedRectangle(cornerRadius: 20)
+                                .stroke(
+                                    LinearGradient(
+                                        colors: [
+                                            Color.white.opacity(0.1),  // Subtle highlight
+                                            Color.clear,
+                                            Color.black.opacity(0.1)   // Subtle shadow
+                                        ],
+                                        startPoint: .topLeading,
+                                        endPoint: .bottomTrailing
+                                    ),
+                                    lineWidth: 2
+                                )
+                            
+                            // Subtle inner glow
+                            RoundedRectangle(cornerRadius: 20)
+                                .stroke(
+                                    Color(hex: "#243B35").opacity(0.2),
+                                    lineWidth: 1
+                                )
+                                .blur(radius: 1)
+                                .padding(1)
+                        }
                     )
                     .padding(.horizontal)
+                    .padding(.bottom)
             }
             .padding(.top, 60)
             
@@ -347,9 +410,9 @@ struct homePageView: View {
                                 navigateToSpotify = false
                             }) {
                                 Image(systemName: "chevron.backward")
-                                    .foregroundColor(.white)
+                                    .foregroundColor(milkyBeige)
                                 Text("Back")
-                                    .foregroundColor(.white)
+                                    .foregroundColor(milkyBeige)
                             }
                         }
                     }
@@ -397,6 +460,35 @@ struct homePageView: View {
                 currentMoodText: $currentMoodText,
                 updateBackgroundColors: updateBackgroundColors
             )
+        }
+        .sheet(isPresented: $showMoodConfirmation) {
+            MoodConfirmationSheet(
+                detectedMood: detectedEmotion,
+                confidence: detectedConfidence,
+                isPresented: $showMoodConfirmation,
+                onConfirm: {
+                    currentMood = moodEmoji(for: detectedEmotion)
+                    currentMoodText = detectedEmotion.capitalized
+                    updateBackgroundColors(for: detectedEmotion)
+                    
+                    if detectedEmotion.lowercased() == "sad" {
+                        detectedMood = detectedEmotion
+                        showMoodPreferenceSheet = true
+                    } else {
+                        spotifyController.fetchRecommendations(
+                            mood: detectedEmotion,
+                            profile: profile,
+                            userGenres: profile.favoriteGenres
+                        )
+                    }
+                },
+                onRetake: {
+                    checkCameraPermission()
+                }
+            )
+            .presentationDetents([.height(400)])
+            .presentationDragIndicator(.visible)
+            .presentationBackground(.clear)
         }
     }
     
@@ -500,17 +592,18 @@ struct homePageView: View {
                 let sortedProbabilities = probabilitiesDict.sorted { $0.value > $1.value }
                 DispatchQueue.main.async {
                     probabilities = sortedProbabilities.map { ($0.key, $0.value) }
-                    currentMood = moodEmoji(for: emotion)
-                    currentMoodText = "You seem to be \(emotion.capitalized)."
-                    updateBackgroundColors(for: emotion)
-                    
-                    // Check if mood is sad and show preference sheet
-                    if emotion.lowercased() == "sad" {
-                        detectedMood = emotion
-                        showMoodPreferenceSheet = true
-                    } else {
-                        // For non-sad moods, proceed as normal
-                        spotifyController.fetchRecommendations(mood: emotion, profile: profile, userGenres: profile.favoriteGenres)
+                    if let emotion = probabilitiesDict.max(by: { $0.value < $1.value })?.key {
+                        DispatchQueue.main.async {
+                            let mappedEmotion = mapDetectedEmotion(emotion)
+                            detectedEmotion = mappedEmotion
+                            detectedConfidence = probabilitiesDict[emotion] ?? 0.0
+                            showMoodConfirmation = true
+                            
+                            // Update UI elements
+                            currentMood = getMoodIcon(for: mappedEmotion)
+                            currentMoodText = mappedEmotion.capitalized
+                            updateBackgroundColors(for: mappedEmotion)
+                        }
                     }
                 }
             } else {
@@ -545,33 +638,33 @@ struct homePageView: View {
         switch mood.lowercased() {
         case "happy":
             return [
-                Color(hex: "#FFD700"),  // Gold
-                Color(hex: "#FFA500"),  // Orange
-                Color(hex: "#FFFF00")   // Yellow
+                Color(hex: "#DAA520"),  // Golden rod
+                Color(hex: "#B8860B"),  // Dark golden rod
+                Color(hex: "#CD853F")   // Peru gold
             ]
         case "sad":
             return [
-                Color(hex: "#4F74FF"),  // Blue
-                Color(hex: "#8270FF"),  // Purple-Blue
-                Color(hex: "#B6B4FF")   // Light Purple
+                Color(hex: "#4B0082"),  // Indigo
+                Color(hex: "#483D8B"),  // Dark slate blue
+                Color(hex: "#6A5ACD")   // Slate blue
             ]
         case "angry":
             return [
-                Color(hex: "#FF0000"),  // Pure Red
-                Color(hex: "#FF4444"),  // Bright Red
-                Color(hex: "#FF6666")   // Light Red
+                Color(hex: "#800000"),  // Maroon
+                Color(hex: "#8B0000"),  // Dark red
+                Color(hex: "#A52A2A")   // Brown red
             ]
         case "chill":
             return [
-                Color(hex: "#00CED1"),  // Turquoise
-                Color(hex: "#40E0D0"),  // Light Turquoise
-                Color(hex: "#48D1CC")   // Medium Turquoise
+                Color(hex: "#008B8B"),  // Dark cyan
+                Color(hex: "#20B2AA"),  // Light sea green
+                Color(hex: "#5F9EA0")   // Cadet blue
             ]
         default:
             return [
-                Color(hex: "#808080"),
-                Color(hex: "#A0A0A0"),
-                Color(hex: "#C0C0C0")
+                Color(hex: "#696969"),  // Dim gray
+                Color(hex: "#808080"),  // Gray
+                Color(hex: "#A9A9A9")   // Dark gray
             ]
         }
     }
@@ -599,6 +692,67 @@ struct homePageView: View {
         case "angry": return "Intense, powerful energy"
         case "chill": return "Relaxed, peaceful mindset"
         default: return "Neutral state"
+        }
+    }
+    
+    // Add these methods to your homePageView struct
+    @ViewBuilder
+    private func particleEffect(for mood: String) -> some View {
+        switch mood.lowercased() {
+        case let m where m.contains("happy"):
+            ParticleEmitterView(
+                particleImage: UIImage(systemName: "sparkle")?.withTintColor(.yellow) ?? UIImage(),
+                birthRate: 4,
+                lifetime: 8,
+                velocity: 100,
+                scale: 0.15,
+                color: UIColor(Color(hex: "#FFD700").opacity(0.8))
+            )
+        case let m where m.contains("sad"):
+            ParticleEmitterView(
+                particleImage: UIImage(systemName: "drop.fill")?.withTintColor(.blue) ?? UIImage(),
+                birthRate: 6,
+                lifetime: 10,
+                velocity: 150,
+                scale: 0.12,
+                color: UIColor(Color(hex: "#4F74FF").opacity(0.6))
+            )
+        case let m where m.contains("chill"):
+            ParticleEmitterView(
+                particleImage: UIImage(systemName: "leaf.fill")?.withTintColor(.green) ?? UIImage(),
+                birthRate: 3,
+                lifetime: 12,
+                velocity: 80,
+                scale: 0.18,
+                color: UIColor(Color(hex: "#40E0D0").opacity(0.7))
+            )
+        case let m where m.contains("angry"):
+            ParticleEmitterView(
+                particleImage: UIImage(systemName: "flame.fill")?.withTintColor(.red) ?? UIImage(),
+                birthRate: 8,
+                lifetime: 6,
+                velocity: 120,
+                scale: 0.15,
+                color: UIColor(Color(hex: "#FF4444").opacity(0.7))
+            )
+        default:
+            EmptyView()
+        }
+    }
+    
+    // Add this function to map detected emotions to our 4 moods
+    private func mapDetectedEmotion(_ emotion: String) -> String {
+        switch emotion.lowercased() {
+        case "happy", "joy", "excited", "content":
+            return "happy"
+        case "sad", "depressed", "melancholy":
+            return "sad"
+        case "angry", "rage", "frustrated":
+            return "angry"
+        case "chill", "calm", "relaxed", "neutral", "peaceful":
+            return "chill"
+        default:
+            return "chill"  // Default to chill if unknown emotion detected
         }
     }
 }
@@ -694,6 +848,69 @@ struct MoodPreferenceView: View {
     }
 }
 
+// Add this new struct above ManualMoodSelector
+struct MoodButton: View {
+    let mood: (name: String, description: String, gradient: [Color])
+    let isSelected: Bool
+    let action: () -> Void
+    
+    var body: some View {
+        Button(action: action) {
+            HStack {
+                // Gradient blob indicator
+                ZStack {
+                    Circle()
+                        .fill(
+                            LinearGradient(
+                                colors: mood.gradient,
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
+                        .frame(width: 60, height: 60)
+                        .blur(radius: 15)
+                }
+                .frame(width: 60, height: 60)
+                
+                Spacer()
+                    .frame(width: 20)
+                
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(mood.name)
+                        .font(.system(size: 18, weight: .semibold))
+                        .foregroundColor(Color(hex: "#F5E6D3"))
+                    
+                    Text(mood.description)
+                        .font(.system(size: 14))
+                        .foregroundColor(Color(hex: "#F5E6D3").opacity(0.7))
+                }
+                
+                Spacer()
+                
+                if isSelected {
+                    Image(systemName: "checkmark.circle.fill")
+                        .foregroundColor(Color(hex: "#F5E6D3"))
+                        .font(.system(size: 22))
+                }
+            }
+            .padding(20)
+            .background(
+                RoundedRectangle(cornerRadius: 16)
+                    .stroke(
+                        LinearGradient(
+                            colors: isSelected ? mood.gradient : [Color.clear],
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        ),
+                        lineWidth: isSelected ? 2 : 0
+                    )
+            )
+        }
+        .scaleEffect(isSelected ? 1.02 : 1.0)
+        .animation(.spring(response: 0.3), value: isSelected)
+    }
+}
+
 struct ManualMoodSelector: View {
     @Binding var isPresented: Bool
     let spotifyController: SpotifyController
@@ -735,71 +952,38 @@ struct ManualMoodSelector: View {
         NavigationView {
             ScrollView {
                 VStack(spacing: 20) {
+                    // Replace the navigation title with a custom title
+                    Text("How are you feeling?")
+                        .font(.system(size: 32, weight: .bold))
+                        .foregroundColor(Color(hex: "#F5E6D3")) // Same green as player
+                        .shadow(color: Color(hex: "#243B35").opacity(0.3), radius: 8, x: 0, y: 0) // Subtle glow
+                        .multilineTextAlignment(.center)
+                        .padding(.top, 30)
+                        .padding(.bottom, 10)
+                    
+                    Text("Select Your Mood")
+                        .font(.system(size: 22, weight: .bold))
+                        .foregroundColor(Color(hex: "#F5E6D3"))
+                        .padding(.top, 10)
+                    
                     ForEach(moods, id: \.name) { mood in
-                        Button(action: {
-                            selectedMood = mood.name
-                            updateMood(mood: mood.name.lowercased())
-                        }) {
-                            HStack {
-                                // Gradient blob indicator
-                                ZStack {
-                                    Circle()
-                                        .fill(
-                                            LinearGradient(
-                                                colors: mood.gradient,
-                                                startPoint: .topLeading,
-                                                endPoint: .bottomTrailing
-                                            )
-                                        )
-                                        .frame(width: 60, height: 60)
-                                        .blur(radius: 15)
-                                }
-                                .frame(width: 60, height: 60)
-                                
-                                VStack(alignment: .leading, spacing: 4) {
-                                    Text(mood.name)
-                                        .font(.system(size: 18, weight: .semibold))
-                                        .foregroundColor(.white)
-                                    
-                                    Text(mood.description)
-                                        .font(.system(size: 14))
-                                        .foregroundColor(.white.opacity(0.7))
-                                }
-                                
-                                Spacer()
-                                
-                                if selectedMood == mood.name {
-                                    Image(systemName: "checkmark.circle.fill")
-                                        .foregroundColor(.white)
-                                        .font(.system(size: 22))
-                                }
+                        MoodButton(
+                            mood: mood,
+                            isSelected: selectedMood == mood.name,
+                            action: {
+                                selectedMood = mood.name
+                                updateMood(mood: mood.name.lowercased())
                             }
-                            .padding(20)
-                            .background(
-                                RoundedRectangle(cornerRadius: 16)
-                                    .fill(Color.black.opacity(0.3))
-                                    .overlay(
-                                        RoundedRectangle(cornerRadius: 16)
-                                            .stroke(
-                                                LinearGradient(
-                                                    colors: mood.gradient,
-                                                    startPoint: .leading,
-                                                    endPoint: .trailing
-                                                ),
-                                                lineWidth: selectedMood == mood.name ? 2 : 0
-                                            )
-                                    )
-                            )
-                        }
-                        .scaleEffect(selectedMood == mood.name ? 1.02 : 1.0)
-                        .animation(.spring(response: 0.3), value: selectedMood == mood.name)
+                        )
                     }
                 }
                 .padding()
             }
-            .background(Color.black.opacity(0.9))
-            .navigationTitle("How are you feeling?")
-            .navigationBarTitleDisplayMode(.inline)
+            .background(
+                Color(hex: "#1A2F2A") // Dark green background
+                    .edgesIgnoringSafeArea(.all)
+            )
+            .navigationBarHidden(true)
         }
         .sheet(isPresented: $showMoodPreferenceSheet) {
             MoodPreferenceView(
@@ -903,5 +1087,14 @@ struct ContentView_Previews: PreviewProvider {
             isCreatingNewProfile: .constant(false),
             navigateToMusicPreferences: .constant(false), isCreatingProfile: .constant(false)
         )
+    }
+}
+
+// Add this extension to modify the navigation title color
+extension View {
+    func navigationBarTitleTextColor(_ color: Color) -> some View {
+        UINavigationBar.appearance().largeTitleTextAttributes = [.foregroundColor: UIColor(color)]
+        UINavigationBar.appearance().titleTextAttributes = [.foregroundColor: UIColor(color)]
+        return self
     }
 }
