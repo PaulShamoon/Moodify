@@ -981,7 +981,7 @@ struct ManualMoodSelector: View {
                 .padding()
             }
             .background(
-                Color(hex: "#1A2F2A") // Dark green background
+                Color(hex: "#2C2620")  // Dark brown color
                     .edgesIgnoringSafeArea(.all)
             )
             .navigationBarHidden(true)
