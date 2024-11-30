@@ -192,8 +192,9 @@ struct homePageView: View {
                     HStack {
                         VStack(alignment: .leading, spacing: 8) {
                             Text("You're Feeling")
-                                .font(.system(size: 18, weight: .light))
-                                .foregroundColor(milkyBeige.opacity(0.8))
+                                .font(.system(size: 20, weight: .light))
+                                .foregroundColor(milkyBeige.opacity(0.9))
+                                .shadow(color: .black.opacity(0.1), radius: 2, x: 0, y: 1)
                             Text(currentMoodText.capitalized)
                                 .font(.system(size: 34, weight: .bold))
                                 .foregroundColor(milkyBeige)
