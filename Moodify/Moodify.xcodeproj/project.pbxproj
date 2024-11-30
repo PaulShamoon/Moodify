@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		69221DC02CFB9EA600BA7BDD /* ParticleSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69221DBF2CFB9E9800BA7BDD /* ParticleSystem.swift */; };
+		69221DC22CFBA24E00BA7BDD /* MoodConfirmation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69221DC12CFBA24800BA7BDD /* MoodConfirmation.swift */; };
 		6934A10D2C8FDA840086CC91 /* MoodifyApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6934A10C2C8FDA840086CC91 /* MoodifyApp.swift */; };
 		6934A10F2C8FDA840086CC91 /* ConnectToSpotify.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6934A10E2C8FDA840086CC91 /* ConnectToSpotify.swift */; };
 		6934A1112C8FDA840086CC91 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6934A1102C8FDA840086CC91 /* Assets.xcassets */; };
@@ -87,6 +89,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		69221DBF2CFB9E9800BA7BDD /* ParticleSystem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParticleSystem.swift; sourceTree = "<group>"; };
+		69221DC12CFBA24800BA7BDD /* MoodConfirmation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodConfirmation.swift; sourceTree = "<group>"; };
 		6934A1092C8FDA840086CC91 /* Moodify.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Moodify.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6934A10C2C8FDA840086CC91 /* MoodifyApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodifyApp.swift; sourceTree = "<group>"; };
 		6934A10E2C8FDA840086CC91 /* ConnectToSpotify.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectToSpotify.swift; sourceTree = "<group>"; };
@@ -241,9 +245,11 @@
 		694B6C002C9A4431002F0931 /* Frontend */ = {
 			isa = PBXGroup;
 			children = (
+				69221DC12CFBA24800BA7BDD /* MoodConfirmation.swift */,
 				6EE6C3302CE3B6330026D489 /* OnBoardingFolder */,
 				6EE6C32F2CE3B55C0026D489 /* PinFolder */,
 				6EA2E3BC2CDC8DDC00B4E6C8 /*  PlaylistsView.swift */,
+				69221DBF2CFB9E9800BA7BDD /* ParticleSystem.swift */,
 				89C558392CDC11CB00F67E99 /* TermsOfServiceView.swift */,
 				6E9DDAFA2CD2B57900C17DCB /* QueueView.swift */,
 				6E728B942CD1CD9800017EA4 /* PlayerView.swift */,
@@ -461,7 +467,9 @@
 				6EA47A702C9E5199006FB5C6 /* SpotifyController.swift in Sources */,
 				6E728B912CD1B95700017EA4 /* Song.swift in Sources */,
 				6982AB7E2CDD9BB1005F9750 /* GetStartedCardView.swift in Sources */,
+				69221DC22CFBA24E00BA7BDD /* MoodConfirmation.swift in Sources */,
 				6982AB762CDD964B005F9750 /* ColorExtension.swift in Sources */,
+				69221DC02CFB9EA600BA7BDD /* ParticleSystem.swift in Sources */,
 				6E728B912CD1B95700017EA4 /* Song.swift in Sources */,
 				6E728B952CD1CD9B00017EA4 /* PlayerView.swift in Sources */,
 				69EA65922CE1BBB500723081 /* CameraView.swift in Sources */,
