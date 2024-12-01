@@ -247,8 +247,8 @@
 			children = (
 				6EE6C3302CE3B6330026D489 /* OnBoardingFolder */,
 				6EE6C32F2CE3B55C0026D489 /* PinFolder */,
-				6EA2E3BC2CDC8DDC00B4E6C8 /*  PlaylistsView.swift */,
 				89AF8CBE2CFCFE0A00E3BFCE /* ProfilePictureFolder */,
+				6EA2E3BC2CDC8DDC00B4E6C8 /*  PlaylistsView.swift */,
 				89C558392CDC11CB00F67E99 /* TermsOfServiceView.swift */,
 				6E9DDAFA2CD2B57900C17DCB /* QueueView.swift */,
 				6E728B942CD1CD9800017EA4 /* PlayerView.swift */,
