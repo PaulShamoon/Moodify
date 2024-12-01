@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 60;
+	objectVersion = 70;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -43,10 +43,7 @@
 		8917A3D92CA4D11400253254 /* MenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8917A3D82CA4D10F00253254 /* MenuView.swift */; };
 		8917A3DB2CA4D87400253254 /* AccountInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8917A3DA2CA4D86100253254 /* AccountInfoView.swift */; };
 		892C8B3D2CD806AA000C2CE4 /* MoodQueueHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 892C8B3C2CD806AA000C2CE4 /* MoodQueueHandler.swift */; };
-		89634FE32CF8E65900DECFC2 /* CustomProfileIconView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89634FE22CF8E65900DECFC2 /* CustomProfileIconView.swift */; };
 		8966A3A32CC3304F00FA58DE /* PinSetupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8966A3A22CC3304500FA58DE /* PinSetupView.swift */; };
-		898836272CF52FC6007FAE4D /* ProfilePictureView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 898836262CF52FC6007FAE4D /* ProfilePictureView.swift */; };
-		898836292CF7C5B9007FAE4D /* CropView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 898836282CF7C5B9007FAE4D /* CropView.swift */; };
 		89AD05632CB083B8004D8FAD /* Profile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89AD05622CB083B3004D8FAD /* Profile.swift */; };
 		89AD05652CB08452004D8FAD /* ProfileManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89AD05642CB08439004D8FAD /* ProfileManager.swift */; };
 		89AD05672CB0847D004D8FAD /* ProfileSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89AD05662CB08474004D8FAD /* ProfileSelectionView.swift */; };
@@ -129,10 +126,7 @@
 		8917A3D82CA4D10F00253254 /* MenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuView.swift; sourceTree = "<group>"; };
 		8917A3DA2CA4D86100253254 /* AccountInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountInfoView.swift; sourceTree = "<group>"; };
 		892C8B3C2CD806AA000C2CE4 /* MoodQueueHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodQueueHandler.swift; sourceTree = "<group>"; };
-		89634FE22CF8E65900DECFC2 /* CustomProfileIconView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomProfileIconView.swift; sourceTree = "<group>"; };
 		8966A3A22CC3304500FA58DE /* PinSetupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PinSetupView.swift; sourceTree = "<group>"; };
-		898836262CF52FC6007FAE4D /* ProfilePictureView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfilePictureView.swift; sourceTree = "<group>"; };
-		898836282CF7C5B9007FAE4D /* CropView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CropView.swift; sourceTree = "<group>"; };
 		89AD05622CB083B3004D8FAD /* Profile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Profile.swift; sourceTree = "<group>"; };
 		89AD05642CB08439004D8FAD /* ProfileManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileManager.swift; sourceTree = "<group>"; };
 		89AD05662CB08474004D8FAD /* ProfileSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileSelectionView.swift; sourceTree = "<group>"; };
@@ -143,6 +137,10 @@
 		89FA8A442C9A6F40005480D8 /* Questionnaire.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Questionnaire.swift; sourceTree = "<group>"; };
 		89FA8A462C9A6F4D005480D8 /* homePageView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = homePageView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		89AF8CBE2CFCFE0A00E3BFCE /* ProfilePictureFolder */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = ProfilePictureFolder; sourceTree = "<group>"; };
+/* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		6934A1062C8FDA840086CC91 /* Frameworks */ = {
@@ -250,11 +248,9 @@
 				6EE6C3302CE3B6330026D489 /* OnBoardingFolder */,
 				6EE6C32F2CE3B55C0026D489 /* PinFolder */,
 				6EA2E3BC2CDC8DDC00B4E6C8 /*  PlaylistsView.swift */,
-				898836262CF52FC6007FAE4D /* ProfilePictureView.swift */,
-				89634FE22CF8E65900DECFC2 /* CustomProfileIconView.swift */,
+				89AF8CBE2CFCFE0A00E3BFCE /* ProfilePictureFolder */,
 				89C558392CDC11CB00F67E99 /* TermsOfServiceView.swift */,
 				6E9DDAFA2CD2B57900C17DCB /* QueueView.swift */,
-				898836282CF7C5B9007FAE4D /* CropView.swift */,
 				6E728B942CD1CD9800017EA4 /* PlayerView.swift */,
 				8917A3DA2CA4D86100253254 /* AccountInfoView.swift */,
 				89AD05662CB08474004D8FAD /* ProfileSelectionView.swift */,
@@ -347,6 +343,9 @@
 			buildRules = (
 			);
 			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				89AF8CBE2CFCFE0A00E3BFCE /* ProfilePictureFolder */,
 			);
 			name = Moodify;
 			productName = Moodify;
@@ -468,14 +467,12 @@
 				8966A3A32CC3304F00FA58DE /* PinSetupView.swift in Sources */,
 				89B1EC102CC9C1CC0041F9EE /* ForgotPinView.swift in Sources */,
 				6EA47A702C9E5199006FB5C6 /* SpotifyController.swift in Sources */,
-				89634FE32CF8E65900DECFC2 /* CustomProfileIconView.swift in Sources */,
 				6E728B912CD1B95700017EA4 /* Song.swift in Sources */,
 				6982AB7E2CDD9BB1005F9750 /* GetStartedCardView.swift in Sources */,
 				6982AB762CDD964B005F9750 /* ColorExtension.swift in Sources */,
 				6E728B912CD1B95700017EA4 /* Song.swift in Sources */,
 				6E728B952CD1CD9B00017EA4 /* PlayerView.swift in Sources */,
 				69EA65922CE1BBB500723081 /* CameraView.swift in Sources */,
-				898836272CF52FC6007FAE4D /* ProfilePictureView.swift in Sources */,
 				8917A3D92CA4D11400253254 /* MenuView.swift in Sources */,
 				89C5583A2CDC11CB00F67E99 /* TermsOfServiceView.swift in Sources */,
 				6E728B932CD1B98600017EA4 /* QueueManager.swift in Sources */,
@@ -490,7 +487,6 @@
 				89FA8A432C9A6F39005480D8 /* generalMusicPreferences.swift in Sources */,
 				6982AB7C2CDD9B89005F9750 /* MoodCardOnboardingView.swift in Sources */,
 				6E52B85A2CC9A9F30049BF08 /* Constants.swift in Sources */,
-				898836292CF7C5B9007FAE4D /* CropView.swift in Sources */,
 				6E9DDAFB2CD2B57E00C17DCB /* QueueView.swift in Sources */,
 				8917A3DB2CA4D87400253254 /* AccountInfoView.swift in Sources */,
 				89FA8A472C9A6F4D005480D8 /* homePageView.swift in Sources */,
@@ -672,7 +668,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Moodify/Preview Content\"";
-				DEVELOPMENT_TEAM = 9RU82Q2W86;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Moodify/Info.plist;
@@ -690,7 +686,6 @@
 				);
 				MARKETING_VERSION = 1.0;
 				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_BUNDLE_IDENTIFIER = MoodifyCapstone1234;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -711,7 +706,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Moodify/Preview Content\"";
-				DEVELOPMENT_TEAM = 9RU82Q2W86;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Moodify/Info.plist;
@@ -729,7 +724,6 @@
 				);
 				MARKETING_VERSION = 1.0;
 				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_BUNDLE_IDENTIFIER = MoodifyCapstone123;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
