@@ -272,6 +272,14 @@ struct homePageView: View {
             .padding(.top, 60)
             
             .onAppear {
+                
+                spotifyController.showAlert = { message in
+                    DispatchQueue.main.async {
+                        alertMessage = message
+                        showingAlert = true
+                    }
+                }
+
                 // Check if the access token is available and not expired
                 if spotifyController.accessToken != nil, !spotifyController.isAccessTokenExpired() {
                     if !spotifyController.isConnected {

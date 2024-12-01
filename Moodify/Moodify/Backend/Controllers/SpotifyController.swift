@@ -29,6 +29,8 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
         }
     }
     
+    var showAlert: ((String) -> Void)?
+
     // Reset retry counter
     var retryCount = 0
     
@@ -375,7 +377,16 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
     }
     
     func reconnectAndExecute(_ action: @escaping () -> Void, delay: TimeInterval = 2.0) {
-        // Check if already connected; if so, execute the action immediately
+        // Check if access token is nil or expired
+        if accessToken == nil || isAccessTokenExpired() {
+            print("Access token is expired or missing. Unable to reconnect.")
+            DispatchQueue.main.async {
+                self.showAlert?("Please reconnect to Spotify and try again.")
+            }
+            resetFirstConnectionAttempt()
+            return
+        }
+
         guard !appRemote.isConnected else {
             print("Spotify is already connected.")
             action() // Execute the action immediately since we're already connected
