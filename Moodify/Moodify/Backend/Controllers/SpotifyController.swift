@@ -381,7 +381,7 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
         if accessToken == nil || isAccessTokenExpired() {
             print("Access token is expired or missing. Unable to reconnect.")
             DispatchQueue.main.async {
-                self.showAlert?("Please reconnect to Spotify and try again.")
+                self.showAlert?("Please connect to Spotify and try again.")
             }
             resetFirstConnectionAttempt()
             return

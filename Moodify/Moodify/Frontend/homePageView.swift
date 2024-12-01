@@ -263,6 +263,25 @@ struct homePageView: View {
                                     )
                             )
                         }
+                        Button(action: {
+                            spotifyController.accessToken = nil
+                            spotifyController.tokenExpirationDate = nil
+                            print("Access token has been set to nil for testing.")
+                        }) {
+                            Text("Invalidate Token")
+                                .font(.system(size: 16))
+                                .foregroundColor(.white)
+                                .padding(.horizontal, 20)
+                                .padding(.vertical, 12)
+                                .background(
+                                    Capsule()
+                                        .fill(Color.red.opacity(0.8))
+                                        .overlay(
+                                            Capsule()
+                                                .stroke(Color.white, lineWidth: 1.5)
+                                        )
+                                )
+                        }
                     }
                 }
                 .padding(.top, 20)
