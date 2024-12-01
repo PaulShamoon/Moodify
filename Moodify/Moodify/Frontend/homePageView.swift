@@ -1,12 +1,17 @@
+/*
+ This is the main view that the user sees when they open the app.
+ NOTE: All team members have contributed to this file.
+ */
+
 import SwiftUI
 import AVFoundation
 
 struct homePageView: View {
-    let profile: Profile  // Profile passed from ProfileSelectionView
+    let profile: Profile
     @Binding var navigateToHomePage: Bool
     @Binding var isCreatingNewProfile: Bool
     @Binding var navigateToMusicPreferences: Bool
-    @State private var navigateToSpotify = false // State for navigation
+    @State private var navigateToSpotify = false
     @AppStorage("hasConnectedSpotify") private var hasConnectedSpotify = false
     @State private var showingCamera = false
     @State private var showingAlert = false
@@ -26,7 +31,7 @@ struct homePageView: View {
     
     
     // NOTE - this URL is temporary and needs to be updated each time from the backend side to detect mood properly
-    let backendURL = "/analyze"
+    let backendURL = "https://306a-50-218-129-6.ngrok-free.app/analyze"
     
     // Add this property to manage background color
     @State private var backgroundColors: [Color] = [
@@ -435,12 +440,17 @@ struct homePageView: View {
         .sheet(isPresented: $showingCamera) {
             CameraView(image: $capturedImage, isCameraDismissed: $isCameraDismissed)
                 .onDisappear {
+                    /*
+                     If user took a photo, analyze it
+                     If they didn't take a photo, reset everything to default state
+                     This prevents showing old mood when camera is closed
+                     */
                     if let image = capturedImage {
                         analyzeImage(image: image)
                     } else {
-                        alertMessage = "Image capture failed. Please try again."
-                        showingAlert = true
+                        resetToDefaultState()
                     }
+                    capturedImage = nil
                 }
         }
         .sheet(isPresented: $showMoodPreferenceSheet) {
@@ -499,8 +509,15 @@ struct homePageView: View {
         showResyncSpotifyButton = hasConnectedSpotify && !spotifyController.isConnected && !showConnectToSpotifyButton
     }
     
-    // Check camera permissions
+    /*
+     Check camera permissions and handle different cases
+     Reset everything if permission is denied or there's an error
+     */
     private func checkCameraPermission() {
+        capturedImage = nil
+        isDetectingMood = false
+        showMoodConfirmation = false
+        
         switch AVCaptureDevice.authorizationStatus(for: .video) {
         case .authorized:
             showingCamera = true
@@ -511,14 +528,17 @@ struct homePageView: View {
                 } else {
                     alertMessage = "Camera access is required to detect mood."
                     showingAlert = true
+                    resetToDefaultState()
                 }
             }
         case .denied, .restricted:
             alertMessage = "Enable camera access in Settings."
             showingAlert = true
+            resetToDefaultState()
         @unknown default:
             alertMessage = "Unexpected error occurred."
             showingAlert = true
+            resetToDefaultState()
         }
     }
     
@@ -528,6 +548,7 @@ struct homePageView: View {
         DispatchQueue.main.async {
             isDetectingMood = true
             currentMoodText = ""  // Clear current mood text while detecting
+            showMoodConfirmation = false // Reset confirmation sheet
         }
         
         guard let imageData = image.jpegData(compressionQuality: 0.8) else {
@@ -755,6 +776,23 @@ struct homePageView: View {
         default:
             return "chill"  // Default to chill if unknown emotion detected
         }
+    }
+    
+    /*
+     Reset function that returns the app to its initial state
+     Called when user cancels mood detection or closes camera without taking photo
+     */
+    private func resetToDefaultState() {
+        isDetectingMood = false
+        showMoodConfirmation = false
+        currentMood = "😶"
+        currentMoodText = ""
+        detectedEmotion = ""
+        detectedConfidence = 0.0
+        backgroundColors = [
+            Color(hex: "#1A1A1A"),
+            Color(hex: "#141414")
+        ]
     }
 }
 
