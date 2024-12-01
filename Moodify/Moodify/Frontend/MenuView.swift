@@ -470,13 +470,6 @@ struct ProfileSection: View {
         }
         .padding()
     }
-    private var fallbackImage: some View {
-        Image(systemName: "person.circle.fill")
-            .resizable()
-            .scaledToFit()
-            .frame(width: 100, height: 100)
-            .foregroundColor(Color(hex: "94A3B8"))
-    }
 }
 
 struct MenuButton: View {
