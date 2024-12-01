@@ -131,8 +131,7 @@ struct ProfilePictureView: View {
                 .padding(.bottom, 30)
             } else {
                 Button(action:{
-                    navigateToHomePage = true
-                    presentationMode.wrappedValue.dismiss()
+                    skipWithRandomIcon()
                 }
                 ) {
                     HStack{
@@ -210,6 +209,57 @@ struct ProfilePictureView: View {
             navigateToHomePage = true
             presentationMode.wrappedValue.dismiss()
         }
+    }
+    
+    private func skipWithRandomIcon() {
+        // Get random icon and color excluding white and black
+        let icons = ["headphones", "guitars", "music.microphone", "bolt",
+                     "music.quarternote.3", "music.note", "music.mic",
+                     "music.note.list", "guitars.fill", "music.note.tv",
+                     "cloud.fill", "music.note.house", "film.fill", "globe"]
+        
+        let colors: [Color] = [.blue, .green, .red, .purple, .orange,
+                              .pink, .yellow, .indigo, .mint, .cyan]
+        
+        let randomIcon = icons.randomElement() ?? "music.note"
+        let randomColor = colors.randomElement() ?? .green
+        
+        // Create icon image the same way as CustomProfileIconView
+        let renderer = UIGraphicsImageRenderer(size: CGSize(width: 400, height: 400))
+        let customImage = renderer.image { context in
+            // Draw background
+            let bounds = context.format.bounds
+            randomColor.toUIColor().setFill()
+            UIBezierPath(ovalIn: bounds).fill()
+            
+            // Draw icon in white
+            if let iconImage = UIImage(systemName: randomIcon) {
+                let iconSize: CGFloat = bounds.width * 0.4
+                let x = (bounds.width - iconSize) / 2
+                let y = (bounds.height - iconSize) / 2
+                let iconRect = CGRect(x: x, y: y, width: iconSize, height: iconSize)
+                iconImage.withTintColor(.white).draw(in: iconRect)
+            }
+        }
+        
+        // Save the generated icon
+        if let profile = profileManager.currentProfile,
+           let imageData = customImage.jpegData(compressionQuality: 0.8) {
+            profileManager.updateProfile(
+                profile: profile,
+                name: profile.name,
+                dateOfBirth: profile.dateOfBirth,
+                favoriteGenres: profile.favoriteGenres,
+                hasAgreedToTerms: profile.hasAgreedToTerms,
+                userPin: profile.userPin,
+                personalSecurityQuestion: profile.personalSecurityQuestion,
+                securityQuestionAnswer: profile.securityQuestionAnswer,
+                profilePicture: imageData
+            )
+        }
+        
+        navigateToHomePage = true
+        presentationMode.wrappedValue.dismiss()
     }
 }
 
