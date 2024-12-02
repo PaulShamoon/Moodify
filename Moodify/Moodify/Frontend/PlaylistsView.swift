@@ -204,83 +204,109 @@ struct SongRowWithSwipeActions: View {
     @State private var messageText = ""
     @State private var messageColor = Color.green
     @State private var messageAlignment: Alignment = .trailing
+    @State private var actionType: ActionType = .remove
+    
+    private let swipeThreshold: CGFloat = 100
     
     var body: some View {
-        ZStack(alignment: .center) {
-            // Main content
-            HStack {
-                VStack(alignment: .leading) {
-                    Text(song.trackName)
-                        .font(.headline)
-                    Text(song.artistName)
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
+        GeometryReader { geometry in
+            ZStack {
+                // Background Action View
+                HStack {
+                    // Action Background (dynamically changes based on swipe direction)
+                    VStack {
+                        HStack {
+                            if actionType == .remove {
+                                Spacer()
+                                Image(systemName: "trash.fill")
+                                    .foregroundColor(.white)
+                                    .padding()
+                            } else {
+                                Image(systemName: "star.fill")
+                                    .foregroundColor(.white)
+                                    .padding()
+                                Spacer()
+                            }
+                        }
+                    }
+                    .frame(width: geometry.size.width, height: 60)
+                    .background(actionType == .remove ? Color.red : Color.green)
                 }
                 
-                Spacer()
-            }
-            .padding()
-            .background(Color.gray.opacity(0.1))
-            .cornerRadius(10)
-            .offset(x: offset)
-            .zIndex(1)
-            .gesture(
-                DragGesture()
-                    .onChanged { value in
-                        offset = value.translation.width
+                // Foreground Content with Gesture
+                HStack {
+                    VStack(alignment: .leading) {
+                        Text(song.trackName)
+                            .font(.headline)
+                        Text(song.artistName)
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
                     }
-                    .onEnded { value in
-                        if value.translation.width < -100 {
-                            // Swipe right to left (favorite)
-                            withAnimation(.spring()) {
-                                offset = -300
-                                messageAlignment = .trailing
-                                performAction(type: .favorite)
+                    
+                    Spacer()
+                }
+                .padding(.leading, 10)
+                .frame(width: geometry.size.width, height: 60)
+                .background(Color.black)
+                .offset(x: offset)
+                .gesture(
+                    DragGesture()
+                        .onChanged { gesture in
+                            let translation = gesture.translation.width
+                            
+                            // Determine action type based on swipe direction
+                            actionType = translation < 0 ? .remove : .favorite
+                            
+                            // Limit horizontal movement
+                            if abs(translation) <= swipeThreshold {
+                                offset = translation
                             }
-                        } else if value.translation.width > 100 {
-                            // Swipe left to right (remove)
-                            withAnimation(.spring()) {
-                                offset = 300
-                                messageAlignment = .leading
-                                performAction(type: .remove)
+                        }
+                        .onEnded { gesture in
+                            let translation = gesture.translation.width
+                            
+                            // Trigger action if swiped past threshold
+                            if abs(translation) >= swipeThreshold {
+                                performAction(type: actionType)
                             }
-                        } else {
-                            // Snap back if not swiped far enough
-                            withAnimation(.spring()) {
+                            
+                            // Always reset offset
+                            withAnimation {
                                 offset = 0
                             }
                         }
-                    }
-            )
-            
-            // Message overlay
-            if showMessage {
-                GeometryReader { geometry in
-                    HStack {
-                        if messageAlignment == .leading {
-                            Text(messageText)
-                                .foregroundColor(.white)
-                                .padding()
-                                .background(messageColor)
-                                .cornerRadius(10)
+                )
+                
+                // Message overlay
+                if showMessage {
+                    GeometryReader { geometry in
+                        HStack {
+                            if messageAlignment == .leading {
+                                Image(systemName: messageText)
+                                    .foregroundColor(.white)
+                                    .padding()
+                                    .background(messageColor)
+                                    .cornerRadius(10)
+                            }
+                            
+                            Spacer()
+                            
+                            if messageAlignment == .trailing {
+                                Image(systemName: messageText)
+                                    .foregroundColor(.white)
+                                    .padding()
+                                    .background(messageColor)
+                                    .cornerRadius(10)
+                            }
                         }
-                        
-                        Spacer()
-                        
-                        if messageAlignment == .trailing {
-                            Text(messageText)
-                                .foregroundColor(.white)
-                                .padding()
-                                .background(messageColor)
-                                .cornerRadius(10)
-                        }
+                        .frame(width: geometry.size.width)
                     }
-                    .frame(width: geometry.size.width)
+                    .transition(.move(edge: messageAlignment == .leading ? .leading : .trailing))
+                    .zIndex(0)
                 }
-                .transition(.move(edge: messageAlignment == .leading ? .leading : .trailing))
-                .zIndex(0)
             }
         }
+        .frame(height: 60)
         .animation(.default, value: showMessage)
     }
     
@@ -293,17 +319,8 @@ struct SongRowWithSwipeActions: View {
         switch type {
         case .favorite:
             let success = spotifyController.playlistManager.toggleFavorite(playlist: &playlist, song: song)
-            messageText = "Song Favorited!"
-            messageColor = .green
         case .remove:
             let success = spotifyController.playlistManager.removeSongFromPlaylist(playlist: &playlist, song: song)
-            messageText = "Song Removed"
-            messageColor = .red
-        }
-        
-        // Show message
-        withAnimation {
-            showMessage = true
         }
         
         // Hide message after 2 seconds
