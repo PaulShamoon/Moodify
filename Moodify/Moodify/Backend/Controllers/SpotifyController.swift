@@ -47,9 +47,6 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
     // Initialize the MoodHandler
     private let moodQueueHandler = MoodQueueHandler()
     
-    // Scopes for Spotify access
-    private let spotifyScopes = "user-read-private user-read-email playlist-modify-public playlist-modify-private"
-    
     // Published properties to hold info about the current track
     @Published var currentTrackName: String = "No track playing"
     @Published var currentTrackURI: String = ""
