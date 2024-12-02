@@ -22,7 +22,7 @@ struct MenuView: View {
     @ObservedObject var spotifyController: SpotifyController
     
     @Namespace private var menuAnimation
-
+    
     private var hasPin: Bool {
         profileManager.currentProfile?.userPin != nil
     }
@@ -171,7 +171,7 @@ struct MenuView: View {
                                 }
                             }
                     }
-
+                    
                     // For GeneralMusicPreferencesView
                     .navigationDestination(isPresented: $showingMusicPreferences) {
                         GeneralMusicPreferencesView(navigateToHomePage: .constant(false), navigateToProfilePicture: .constant(false), navigateToMusicPreferences: .constant(false))
@@ -190,7 +190,7 @@ struct MenuView: View {
                                 }
                             }
                     }
-
+                    
                     // For PlaylistsView
                     .navigationDestination(isPresented: $showingPlaylists) {
                         PlaylistsView(spotifyController: spotifyController)
@@ -209,7 +209,7 @@ struct MenuView: View {
                                 }
                             }
                     }
-
+                    
                     // For PinSetupView (used twice)
                     .navigationDestination(isPresented: $showingPinSetup) {
                         PinSetupView(profile: profileManager.currentProfile)
@@ -245,7 +245,7 @@ struct MenuView: View {
                                 }
                             }
                     }
-
+                    
                     // For TermsOfServiceView
                     .navigationDestination(isPresented: $showingTOS) {
                         TermsOfServiceView(
@@ -269,7 +269,7 @@ struct MenuView: View {
                             }
                         }
                     }
-
+                    
                 }
                 .alert(isPresented: $showingAlert) {
                     switch activeAlert {
