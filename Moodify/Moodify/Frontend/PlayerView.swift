@@ -114,7 +114,7 @@ struct PlayerView: View {
                 object: nil,
                 queue: .main
             ) { _ in
-                if hasConnectedSpotify && !spotifyController.isConnected {
+                if hasConnectedSpotify, !spotifyController.isConnected, !spotifyController.isAccessTokenExpired() {
                     spotifyController.initializeSpotifyConnection()
                 }
             }

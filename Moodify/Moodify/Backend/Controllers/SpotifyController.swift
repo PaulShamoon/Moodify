@@ -167,6 +167,7 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
                     self.accessToken = nil // Set the token to nil to update the
                     print("Access token expired. Updating UI...")
                     self.isConnected = false // Force UI update
+                    self.disconnect()
                     self.showAlert?("Access token has expired. Please reconnect to Spotify.")
                     self.isAlertShown = true // Set flag to true after showing the alert
                     self.resetFirstConnectionAttempt()
