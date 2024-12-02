@@ -376,6 +376,14 @@ struct homePageView: View {
             .padding(.top, 60)
             
             .onAppear {
+                
+                spotifyController.showAlert = { message in
+                    DispatchQueue.main.async {
+                        alertMessage = message
+                        showingAlert = true
+                    }
+                }
+
                 // Check if the access token is available and not expired
                 if spotifyController.accessToken != nil, !spotifyController.isAccessTokenExpired() {
                     if !spotifyController.isConnected {
@@ -393,6 +401,14 @@ struct homePageView: View {
             .onChange(of: spotifyController.isConnected) { _ in
                 updateResyncButtonVisibility()
                 spotifyController.updatePlayerState() // Update player state if reconnected
+            }
+            
+            .onChange(of: spotifyController.accessToken) { _ in
+                if spotifyController.isAccessTokenExpired() {
+                    print("Access token has expired. Updating UI...")
+                    showConnectToSpotifyButton = true
+                    showResyncSpotifyButton = false
+                }
             }
             
             

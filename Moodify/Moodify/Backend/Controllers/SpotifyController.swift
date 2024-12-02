@@ -8,7 +8,11 @@ import Foundation
 import SpotifyiOS
 
 class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDelegate, SPTAppRemoteDelegate {
-    
+
+    private var tokenCheckTimer: Timer?
+
+    private var isAlertShown = false // Flag to prevent repeated alerts
+
     var isFirstConnectionAttempt = true
 
     // Tracks if reconnect was attempted
@@ -29,6 +33,8 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
         }
     }
     
+    var showAlert: ((String) -> Void)?
+
     // Reset retry counter
     var retryCount = 0
     
@@ -115,6 +121,11 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
     override init() {
         super.init()
         retrieveAccessToken()
+        startTokenMonitoring()
+    }
+    
+    deinit {
+        stopTokenMonitoring()
     }
     
     // Function to retrieve the access token from UserDefaults
@@ -135,6 +146,38 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
         return Date().addingTimeInterval(60) >= expirationDate
     }
     
+    // Start monitoring the token expiration
+    private func startTokenMonitoring() {
+        tokenCheckTimer = Timer.scheduledTimer(withTimeInterval: 5, repeats: true) { [weak self] _ in
+            self?.checkTokenExpiration()
+        }
+    }
+
+    // Stop monitoring the token expiration
+    private func stopTokenMonitoring() {
+        tokenCheckTimer?.invalidate()
+        tokenCheckTimer = nil
+    }
+
+    // Check if the token is expired and update the UI if needed
+    private func checkTokenExpiration() {
+        DispatchQueue.main.async {
+            if self.isAccessTokenExpired() {
+                if !self.isAlertShown { // Show alert only if it hasn't been shown
+                    self.accessToken = nil // Set the token to nil to update the
+                    print("Access token expired. Updating UI...")
+                    self.isConnected = false // Force UI update
+                    self.disconnect()
+                    self.showAlert?("Access token has expired. Please reconnect to Spotify.")
+                    self.isAlertShown = true // Set flag to true after showing the alert
+                    self.resetFirstConnectionAttempt()
+                }
+            } else {
+                // Reset the alert flag if the token becomes valid again (e.g., reconnected)
+                self.isAlertShown = false
+            }
+        }
+    }
     /*
      Method connects the application to Spotify and or authorizes Moodify
      */
@@ -375,7 +418,16 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
     }
     
     func reconnectAndExecute(_ action: @escaping () -> Void, delay: TimeInterval = 2.0) {
-        // Check if already connected; if so, execute the action immediately
+        // Check if access token is nil or expired
+        if accessToken == nil || isAccessTokenExpired() {
+            print("Access token is expired or missing. Unable to reconnect.")
+            DispatchQueue.main.async {
+                self.showAlert?("Please connect to Spotify and try again.")
+            }
+            resetFirstConnectionAttempt()
+            return
+        }
+
         guard !appRemote.isConnected else {
             print("Spotify is already connected.")
             action() // Execute the action immediately since we're already connected
