@@ -264,7 +264,6 @@ struct homePageView: View {
                             )
                         }
                         Button(action: {
-                            spotifyController.accessToken = nil
                             spotifyController.tokenExpirationDate = nil
                             print("Access token has been set to nil for testing.")
                         }) {
