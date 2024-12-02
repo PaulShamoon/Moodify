@@ -318,6 +318,14 @@ struct homePageView: View {
                 spotifyController.updatePlayerState() // Update player state if reconnected
             }
             
+            .onChange(of: spotifyController.accessToken) { _ in
+                if spotifyController.isAccessTokenExpired() {
+                    print("Access token has expired. Updating UI...")
+                    showConnectToSpotifyButton = true
+                    showResyncSpotifyButton = false
+                }
+            }
+            
             
             .alert(isPresented: $showingAlert) {
                 Alert(title: Text("Error"), message: Text(alertMessage), dismissButton: .default(Text("OK")))
