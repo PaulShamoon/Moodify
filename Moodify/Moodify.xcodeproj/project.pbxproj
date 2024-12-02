@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 60;
+	objectVersion = 70;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -142,6 +142,10 @@
 		89FA8A462C9A6F4D005480D8 /* homePageView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = homePageView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		89AF8CBE2CFCFE0A00E3BFCE /* ProfilePictureFolder */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = ProfilePictureFolder; sourceTree = "<group>"; };
+/* End PBXFileSystemSynchronizedRootGroup section */
+
 /* Begin PBXFrameworksBuildPhase section */
 		6934A1062C8FDA840086CC91 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
@@ -247,6 +251,7 @@
 			children = (
 				6EE6C3302CE3B6330026D489 /* OnBoardingFolder */,
 				6EE6C32F2CE3B55C0026D489 /* PinFolder */,
+				89AF8CBE2CFCFE0A00E3BFCE /* ProfilePictureFolder */,
 				6EA2E3BC2CDC8DDC00B4E6C8 /*  PlaylistsView.swift */,
 				69221DBF2CFB9E9800BA7BDD /* ParticleSystem.swift */,
 				69221DC12CFBA24800BA7BDD /* MoodConfirmation.swift */,
@@ -344,6 +349,9 @@
 			buildRules = (
 			);
 			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				89AF8CBE2CFCFE0A00E3BFCE /* ProfilePictureFolder */,
 			);
 			name = Moodify;
 			productName = Moodify;

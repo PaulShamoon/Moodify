@@ -4,6 +4,8 @@ struct GeneralMusicPreferencesView: View {
     @EnvironmentObject var profileManager: ProfileManager
     @State private var selectedGenres: Set<String> = []
     @Binding var navigateToHomePage: Bool
+    @Binding var navigateToProfilePicture: Bool
+    @Binding var navigateToMusicPreferences: Bool
     @State private var isPlaying = false
     @State private var isFirstTimeUser: Bool = true
     @State private var showError: Bool = false
@@ -182,7 +184,8 @@ struct GeneralMusicPreferencesView: View {
                             personalSecurityQuestion: currentProfile.personalSecurityQuestion,
                             securityQuestionAnswer: currentProfile.personalSecurityQuestion
                         )
-                        navigateToHomePage = true
+                        navigateToMusicPreferences = false
+                        navigateToProfilePicture = true
                         presentationMode.wrappedValue.dismiss()
                     }
                 }) {
@@ -241,7 +244,7 @@ extension Array {
 
 struct GeneralMusicPreferencesView_Previews: PreviewProvider {
     static var previews: some View {
-        GeneralMusicPreferencesView(navigateToHomePage: .constant(false))
+        GeneralMusicPreferencesView(navigateToHomePage: .constant(false), navigateToProfilePicture: .constant(false), navigateToMusicPreferences: .constant(true))
             .environmentObject(ProfileManager())
     }
 }

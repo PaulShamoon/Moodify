@@ -10,8 +10,10 @@ struct ProfileSelectionView: View {
     @State private var selectedProfile: Profile? = nil
     
     let defaultProfileImage = URL(string: "https://cdn.pixabay.com/photo/2016/11/08/15/21/user-1808597_1280.png")!
+    let maxProfiles = 6
     let columns = [
-        GridItem(.adaptive(minimum: 160, maximum: 180), spacing: 24)
+        GridItem(.flexible(), spacing: 16),
+        GridItem(.flexible(), spacing: 16)
     ]
     
     var body: some View {
@@ -53,7 +55,7 @@ struct ProfileSelectionView: View {
                 
                 // Profile Grid
                 ScrollView(showsIndicators: false) {
-                    LazyVGrid(columns: columns, spacing: 24) {
+                    LazyVGrid(columns: columns, spacing: 20) {
                         ForEach(profileManager.profiles, id: \.id) { profile in
                             ProfileCard(
                                 profile: profile,
@@ -72,34 +74,40 @@ struct ProfileSelectionView: View {
                     .padding(.horizontal)
                 }
                 .frame(maxHeight: UIScreen.main.bounds.height * 0.6)
+                .scrollDisabled(true)
                 
                 // Add New Profile Button
                 Button(action: {
                     withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
-                        resetProfileCreationState()
-                        showingQuestionnaire = true
+                        if profileManager.profiles.count < maxProfiles {
+                            resetProfileCreationState()
+                            showingQuestionnaire = true
+                        }
                     }
                 }) {
                     HStack(spacing: 8) {
-                        Image(systemName: "plus.circle.fill")
+                        Image(systemName: profileManager.profiles.count < maxProfiles ?  "plus.circle.fill" :  "x.circle.fill")
                             .font(.title3)
-                        Text("Add New Profile")
+                        Text(profileManager.profiles.count < maxProfiles ?
+                             "Add New Profile" :
+                             "Max Profile Limit (6)")
                             .font(.headline)
+                            .lineLimit(1)
                     }
                     .foregroundColor(.black)
                     .frame(width: 220, height: 50)
                     .background(
                         LinearGradient(
-                            colors: [
-                                Color(hex: "4ADE80"),
-                                Color(hex: "22C55E")
-                            ],
+                            colors: profileManager.profiles.count < maxProfiles ?
+                                [Color(hex: "4ADE80"), Color(hex: "22C55E")] :
+                                [Color(hex: "94A3B8"), Color(hex: "64748B")],
                             startPoint: .leading,
                             endPoint: .trailing
                         )
                     )
                     .clipShape(Capsule())
                     .shadow(color: Color(hex: "4ADE80").opacity(0.3), radius: 8, x: 0, y: 4)
+                    .disabled(profileManager.profiles.count >= maxProfiles)
                 }
                 .padding(.bottom, 32)
             }
@@ -148,7 +156,6 @@ struct ProfileSelectionView: View {
     }
 }
 
-// ProfileCard View remains unchanged
 struct ProfileCard: View {
     let profile: Profile
     let defaultProfileImage: URL
@@ -158,36 +165,62 @@ struct ProfileCard: View {
     var body: some View {
         Button(action: action) {
             VStack(spacing: 16) {
-                AsyncImage(url: defaultProfileImage) { phase in
-                    switch phase {
-                    case .empty:
-                        ProgressView()
-                            .frame(width: 100, height: 100)
-                    case .success(let image):
-                        image
-                            .resizable()
-                            .scaledToFill()
-                            .frame(width: 100, height: 100)
-                            .clipShape(Circle())
-                            .overlay(
-                                Circle()
-                                    .stroke(
-                                        LinearGradient(
-                                            colors: [
-                                                Color(hex: "4ADE80"),
-                                                Color(hex: "22C55E")
-                                            ],
-                                            startPoint: .topLeading,
-                                            endPoint: .bottomTrailing
-                                        ),
-                                        lineWidth: 3
-                                    )
-                            )
-                            .shadow(color: Color(hex: "4ADE80").opacity(0.2), radius: 8, x: 0, y: 4)
-                    case .failure:
-                        fallbackImage
-                    @unknown default:
-                        fallbackImage
+                if let profilePictureData = profile.profilePicture,
+                   let uiImage = UIImage(data: profilePictureData) {
+                    // Display the saved profile picture
+                    Image(uiImage: uiImage)
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: 90, height: 90)
+                        .clipShape(Circle())
+                        .overlay(
+                            Circle()
+                                .stroke(
+                                    LinearGradient(
+                                        colors: [
+                                            Color(hex: "4ADE80"),
+                                            Color(hex: "22C55E")
+                                        ],
+                                        startPoint: .topLeading,
+                                        endPoint: .bottomTrailing
+                                    ),
+                                    lineWidth: 3
+                                )
+                        )
+                        .shadow(color: Color(hex: "4ADE80").opacity(0.2), radius: 8, x: 0, y: 4)
+                } else {
+                    // Fallback to default image
+                    AsyncImage(url: defaultProfileImage) { phase in
+                        switch phase {
+                        case .empty:
+                            ProgressView()
+                                .frame(width: 90, height: 90)
+                        case .success(let image):
+                            image
+                                .resizable()
+                                .scaledToFill()
+                                .frame(width: 100, height: 100)
+                                .clipShape(Circle())
+                                .overlay(
+                                    Circle()
+                                        .stroke(
+                                            LinearGradient(
+                                                colors: [
+                                                    Color(hex: "4ADE80"),
+                                                    Color(hex: "22C55E")
+                                                ],
+                                                startPoint: .topLeading,
+                                                endPoint: .bottomTrailing
+                                            ),
+                                            lineWidth: 3
+                                        )
+                                )
+                                .shadow(color: Color(hex: "4ADE80").opacity(0.2), radius: 8, x: 0, y: 4)
+                        case .failure:
+                            fallbackImage
+                        @unknown default:
+                            fallbackImage
+                        }
                     }
                 }
                 
@@ -196,7 +229,7 @@ struct ProfileCard: View {
                     .foregroundColor(.white)
                     .lineLimit(1)
             }
-            .frame(width: 160, height: 180)
+            .frame(width: 160, height: 170)
             .background(
                 RoundedRectangle(cornerRadius: 20)
                     .fill(Color(hex: "1C1C1E"))
@@ -224,6 +257,7 @@ struct ProfileCard: View {
             .foregroundColor(Color(hex: "94A3B8"))
     }
 }
+
 
 // Color extension remains unchanged
 extension Color {

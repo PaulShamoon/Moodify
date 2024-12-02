@@ -19,7 +19,7 @@ class ProfileManager: ObservableObject {
     }
     
     // Update an existing profile
-    func updateProfile(profile: Profile, name: String, dateOfBirth: Date, favoriteGenres: [String], hasAgreedToTerms: Bool, userPin: String?, personalSecurityQuestion: String?, securityQuestionAnswer: String?) -> Void {
+    func updateProfile(profile: Profile, name: String, dateOfBirth: Date, favoriteGenres: [String], hasAgreedToTerms: Bool, userPin: String?, personalSecurityQuestion: String?, securityQuestionAnswer: String?, profilePicture: Data? = nil) -> Void {
         if let index = profiles.firstIndex(where: { $0.id == profile.id }) {
             profiles[index].name = name
             profiles[index].dateOfBirth = dateOfBirth
@@ -28,6 +28,11 @@ class ProfileManager: ObservableObject {
             profiles[index].userPin = userPin
             profiles[index].personalSecurityQuestion = personalSecurityQuestion
             profiles[index].securityQuestionAnswer = securityQuestionAnswer
+
+            // Update the profile picture only if it's provided
+            if let pictureData = profilePicture {
+                profiles[index].profilePicture = pictureData
+            }
             saveProfiles()
             selectProfile(profiles[index])
             loadProfiles() 
