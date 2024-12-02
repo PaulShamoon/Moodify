@@ -8,30 +8,25 @@ import Foundation
 class MoodQueueHandler {
     
     // Function to get mood parameters
-    func getMoodParameters(for mood: String) -> (Double, Double, Double, Double, Double?, Double?, Double?, Double?, Double?, Double?) {
-        var minValence: Double = 0.5
-        var maxValence: Double = 0.5
-        var minEnergy: Double = 0.5
-        var maxEnergy: Double = 0.5
+    func getMoodParameters(for mood: String, genresSelected: [String]) -> (Double, Double, Double, Double, Double?, Double?, Double?, Double?) {
+        // Default values set to broad coverage
+        var minValence: Double = 0.4
+        var maxValence: Double = 0.7
+        var minEnergy: Double = 0.4
+        var maxEnergy: Double = 0.7
         var minLoudness: Double? = nil
         var maxLoudness: Double? = nil
         var minAcousticness: Double? = nil
         var maxAcousticness: Double? = nil
-        var minDanceability: Double? = nil
-        var maxDanceability: Double? = nil
 
         switch mood.lowercased() {
-        case "happy", "surprise":
+        case "happy":
             minValence = 0.7
             maxValence = 1.0
             minEnergy = 0.6
             maxEnergy = 0.9
-            /*
-             minDanceability = 0.7
-             maxDanceability = 1.0 // Danceable, upbeat tracks
-             */
             
-        case "sad", "disgust", "fear":
+        case "sad":
             minValence = 0.0
             maxValence = 0.3
             minEnergy = 0.3
@@ -39,32 +34,43 @@ class MoodQueueHandler {
             minAcousticness = 0.6
             maxAcousticness = 1.0
         case "angry":
-            minValence = 0.0
-            maxValence = 0.3
+            minValence = 0.1
+            maxValence = 0.4
             minEnergy = 0.8
             maxEnergy = 1.0
-            minLoudness = -5.0
+            minLoudness = -6.0
             
         case "chill":
-            minValence = 0.4
+            minValence = 0.3
             maxValence = 0.6
             minEnergy = 0.4
             maxEnergy = 0.6
             minAcousticness = 0.3
-            maxAcousticness = 0.6
+            maxAcousticness = 0.7
+
         default:
             break
         }
         
-        return (minValence, maxValence, minEnergy, maxEnergy, minLoudness, maxLoudness, minAcousticness, maxAcousticness, minDanceability, maxDanceability)
+        // Adjust ranges dynamically based on selected genres
+        if genresSelected.count <= 2 {
+            minValence = max(0.0, minValence - 0.1)
+            maxValence = min(1.0, maxValence + 0.1)
+            minEnergy = max(0.0, minEnergy - 0.1)
+            maxEnergy = min(1.0, maxEnergy + 0.1)
+        }
+
+        return (minValence, maxValence, minEnergy, maxEnergy, minLoudness, maxLoudness, minAcousticness, maxAcousticness)
     }
+
+
 
     /*
      Function that constructs the Spotify API recommendation URL using the provided genres and audio feature ranges. It dynamically includes each feature parameter in the URL if it’s not nil.
      
      Created by: Mohammad Sulaiman
      */
-    func buildRecommendationURL(userGenres: [String], limit: Int, minValence: Double, maxValence: Double, minEnergy: Double, maxEnergy: Double, minLoudness: Double?, maxLoudness: Double?, minAcousticness: Double?, maxAcousticness: Double?, minDanceability: Double?, maxDanceability: Double?) -> URL? {
+    func buildRecommendationURL(userGenres: [String], limit: Int, minValence: Double, maxValence: Double, minEnergy: Double, maxEnergy: Double, minLoudness: Double?, maxLoudness: Double?, minAcousticness: Double?, maxAcousticness: Double?) -> URL? {
         // Shuffle the genres if more than 5 are selected
         let shuffledGenres = userGenres.count > 5 ? userGenres.shuffled() : userGenres
         // Convert user selected genres to compatible genres and limit to 5 for the API
@@ -78,8 +84,7 @@ class MoodQueueHandler {
             "max_loudness": maxLoudness,
             "min_acousticness": minAcousticness,
             "max_acousticness": maxAcousticness,
-            "min_danceability": minDanceability,
-            "max_danceability": maxDanceability
+
         ]
         
         // Iterate over optional parameters and append if non-nil

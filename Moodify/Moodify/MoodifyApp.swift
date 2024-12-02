@@ -10,18 +10,18 @@ struct MoodifyApp: App {
     @AppStorage("hasCompletedQuestionnaire") var hasCompletedQuestionnaire: Bool = false
     @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding = false
     @State private var navigateToMusicPreferences = false
+    @State private var navigateToProfilePicture = false
     @State private var navigateToHomePage = false
     @State private var showSplash = true
     @State private var isCreatingNewProfile = false
     @State private var isCreatingProfile = false
     @State private var isEditingProfile = false
+
     var body: some Scene {
         WindowGroup {
             NavigationStack {
                 if showSplash {
                     SplashPageView(showSplash: $showSplash)
-                    /* this is where the splash page is displayed and then the onboarding view is displayed
-                     */
                 } else if !hasCompletedOnboarding {
                     OnboardingView {
                         hasCompletedOnboarding = true
@@ -30,7 +30,12 @@ struct MoodifyApp: App {
                 } else {
                     if isCreatingNewProfile || !hasCompletedQuestionnaire {
                         if navigateToMusicPreferences {
-                            GeneralMusicPreferencesView(navigateToHomePage: $navigateToHomePage)
+                            GeneralMusicPreferencesView(navigateToHomePage: $navigateToHomePage, navigateToProfilePicture: $navigateToProfilePicture, navigateToMusicPreferences: $navigateToMusicPreferences)
+                            
+                                .environmentObject(profileManager)
+                            
+                        } else if navigateToProfilePicture {
+                            ProfilePictureView(navigateToHomePage: $navigateToHomePage)
                                 .onChange(of: navigateToHomePage) { _ in
                                     if navigateToHomePage {
                                         hasCompletedQuestionnaire = true
@@ -39,8 +44,12 @@ struct MoodifyApp: App {
                                 }
                                 .environmentObject(profileManager)
                         } else {
-                            QuestionnaireView(isEditingProfile: $isEditingProfile, navigateToMusicPreferences: $navigateToMusicPreferences, isCreatingNewProfile: $isCreatingNewProfile)
-                                .environmentObject(profileManager)
+                            QuestionnaireView(
+                                isEditingProfile: $isEditingProfile,
+                                navigateToMusicPreferences: $navigateToMusicPreferences,
+                                isCreatingNewProfile: $isCreatingNewProfile
+                            )
+                            .environmentObject(profileManager)
                         }
                     } else {
                         if navigateToHomePage, let currentProfile = profileManager.currentProfile {

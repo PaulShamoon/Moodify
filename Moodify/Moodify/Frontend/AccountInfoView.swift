@@ -3,103 +3,159 @@ import SwiftUI
 struct AccountInfoView: View {
     @EnvironmentObject var profileManager: ProfileManager
     @State private var isEditingProfile = false
+    @State private var navigateToProfilePictureView = false
+    @Environment(\.presentationMode) var presentationMode
+
     var body: some View {
-        VStack(alignment: .leading) {
-            Spacer()
-            
-            Text("Account Information")
-                .font(.system(size: 34, weight: .bold, design: .rounded))
-                .foregroundColor(.white)
-                .multilineTextAlignment(.center)
-                .frame(maxWidth: .infinity)
-            
-            if let profile = profileManager.currentProfile {
-                VStack(alignment: .leading, spacing: 20) {
-                    HStack {
-                        Circle()
-                            .fill(Color.green.opacity(0.2))
-                            .frame(width: 60, height: 60)
-                            .overlay(
-                                Image(systemName: "person.circle.fill")
-                                    .resizable()
-                                    .foregroundColor(.green)
-                                    .padding(12)
-                            )
-                        
-                        Text(profile.name)
-                            .font(.system(size: 24, weight: .semibold, design: .rounded))
-                            .foregroundColor(.white)
-                    }
-                    
-                    Divider()
-                        .background(Color.gray.opacity(0.3))
-                    
-                    VStack(alignment: .leading, spacing: 16) {
-                        InfoRow(
-                            icon: "calendar",
-                            title: "Age",
-                            value: "\(calculateAge(from: profile.dateOfBirth)) years old"
-                        )
-                        
-                        InfoRow(
-                            icon: "music.note.list",
-                            title: "Favorite Genres",
-                            value: profile.favoriteGenres.isEmpty ?
-                                "Not Set" :
-                                profile.favoriteGenres.joined(separator: ", ")
-                        )
-                    }
-                }
-                .padding(20)
-                .background(
-                    RoundedRectangle(cornerRadius: 20)
-                        .fill(Color(white: 0.15))
-                )
-                .shadow(color: .black.opacity(0.2), radius: 10, x: 0, y: 5)
+        NavigationStack {
+            VStack(alignment: .leading) {
+                Spacer()
                 
-                NavigationLink(
-                    destination: QuestionnaireView(
-                        isEditingProfile: .constant(true), navigateToMusicPreferences: .constant(true),
-                        isCreatingNewProfile: .constant(false)
+                Text("Account Information")
+                    .font(.system(size: 34, weight: .bold, design: .rounded))
+                    .foregroundColor(.white)
+                    .multilineTextAlignment(.center)
+                    .frame(maxWidth: .infinity)
+                
+                if let profile = profileManager.currentProfile {
+                    VStack(alignment: .leading, spacing: 20) {
+                        HStack {
+                            if let profilePictureData = profile.profilePicture,
+                               let uiImage = UIImage(data: profilePictureData) {
+                                // Display the profile picture
+                                Image(uiImage: uiImage)
+                                    .resizable()
+                                    .scaledToFill()
+                                    .frame(width: 60, height: 60)
+                                    .clipShape(Circle())
+                                    .overlay(
+                                        Circle()
+                                            .stroke(Color.green, lineWidth: 4)
+                                    )
+                            } else {
+                                // Fallback to default placeholder
+                                Circle()
+                                    .fill(Color.green.opacity(0.2))
+                                    .frame(width: 60, height: 60)
+                                    .overlay(
+                                        Image(systemName: "person.circle.fill")
+                                            .resizable()
+                                            .foregroundColor(.green)
+                                            .padding(12)
+                                    )
+                            }
+                            
+                            // Edit Button Overlay
+                            Button(action: {
+                                navigateToProfilePictureView = true
+                            }) {
+                                Image(systemName: "pencil.circle.fill")
+                                    .font(.system(size: 25))
+                                    .foregroundColor(.white)
+                                    .background(Circle().fill(Color.green))
+                                    .frame(width: 30, height: 30)
+                                    .contentShape(Circle())
+                            }
+                            .offset(x: -25, y: -25)
+                            
+                            Text(profile.name)
+                                .font(.system(size: 24, weight: .semibold, design: .rounded))
+                                .foregroundColor(.white)
+                                .offset(x: -25)
+                        }
+                        
+                        Divider()
+                            .background(Color.gray.opacity(0.3))
+                        
+                        VStack(alignment: .leading, spacing: 16) {
+                            InfoRow(
+                                icon: "calendar",
+                                title: "Age",
+                                value: "\(calculateAge(from: profile.dateOfBirth)) years old"
+                            )
+                            
+                            InfoRow(
+                                icon: "music.note.list",
+                                title: "Favorite Genres",
+                                value: profile.favoriteGenres.isEmpty ?
+                                    "Not Set" :
+                                    profile.favoriteGenres.joined(separator: ", ")
+                            )
+                        }
+                    }
+                    .padding(20)
+                    .background(
+                        RoundedRectangle(cornerRadius: 20)
+                            .fill(Color(white: 0.15))
                     )
+                    .shadow(color: .black.opacity(0.2), radius: 10, x: 0, y: 5)
+                    
+                    NavigationLink(
+                        destination: QuestionnaireView(
+                            isEditingProfile: .constant(true),
+                            navigateToMusicPreferences: .constant(true),
+                            isCreatingNewProfile: .constant(false)
+                        )
+                        .environmentObject(profileManager)
+                        .navigationBarBackButtonHidden(true)
+                    ) {
+                        HStack {
+                            Image(systemName: "pencil.circle.fill")
+                                .font(.title2)
+                            Text("Edit Profile")
+                                .font(.system(size: 18, weight: .semibold, design: .rounded))
+                        }
+                        .foregroundColor(.green)
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(
+                            RoundedRectangle(cornerRadius: 15)
+                                .fill(Color.green.opacity(0.2))
+                        )
+                    }
+                    .padding(.top, 10)
+                } else {
+                    VStack(spacing: 16) {
+                        Image(systemName: "person.crop.circle.badge.exclamationmark")
+                            .font(.system(size: 50))
+                            .foregroundColor(.red.opacity(0.8))
+                        
+                        Text("No Profile Selected")
+                            .font(.system(size: 20, weight: .medium))
+                            .foregroundColor(.red.opacity(0.8))
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(40)
+                    .background(
+                        RoundedRectangle(cornerRadius: 20)
+                            .fill(Color(white: 0.15))
+                    )
+                }
+                
+                Spacer()
+            }
+            .padding()
+            .background(Color.black.edgesIgnoringSafeArea(.all))
+            .navigationDestination(isPresented: $navigateToProfilePictureView) {
+                ProfilePictureView(navigateToHomePage: .constant(false))
                     .environmentObject(profileManager)
                     .navigationBarBackButtonHidden(true)
-                ) {
-                    HStack {
-                        Image(systemName: "pencil.circle.fill")
-                            .font(.title2)
-                        Text("Edit Profile")
-                            .font(.system(size: 18, weight: .semibold, design: .rounded))
+                    .toolbar {
+                        ToolbarItem(placement: .navigationBarLeading) {
+                            Button(action: {
+                                navigateToProfilePictureView = false
+                                presentationMode.wrappedValue.dismiss()
+                            }) {
+                                HStack {
+                                    Image(systemName: "chevron.backward")
+                                        .foregroundColor(.white)
+                                    Text("Back")
+                                        .foregroundColor(.white)
+                                }
+                            }
+                        }
                     }
-                    .foregroundColor(.green)
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(
-                        RoundedRectangle(cornerRadius: 15)
-                            .fill(Color.green.opacity(0.2))
-                    )
-                }
-                .padding(.top, 10)
-                
-            } else {
-                VStack(spacing: 16) {
-                    Image(systemName: "person.crop.circle.badge.exclamationmark")
-                        .font(.system(size: 50))
-                        .foregroundColor(.red.opacity(0.8))
-                    
-                    Text("No Profile Selected")
-                        .font(.system(size: 20, weight: .medium, design: .rounded))
-                        .foregroundColor(.red.opacity(0.8))
-                }
-                .frame(maxWidth: .infinity)
-                .padding(40)
-                .background(
-                    RoundedRectangle(cornerRadius: 20)
-                        .fill(Color(white: 0.15))
-                )
             }
-            
-            Spacer()
         }
         .padding()
         .background(Color.black.edgesIgnoringSafeArea(.all))

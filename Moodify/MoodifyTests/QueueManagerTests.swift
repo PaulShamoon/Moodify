@@ -14,7 +14,7 @@ import XCTest
  
  Created By: Paul Shamoon
  */
-class QueueManagerTests: XCTestCase {
+final class QueueManagerTests: XCTestCase {
     var queueManager: QueueManager!
     var originalQueue: [Song]!
     
@@ -59,7 +59,7 @@ class QueueManagerTests: XCTestCase {
     
     /*
      Method to test that the addSongToQueue method of the queueManager behaves
-     as expected and can propperly add a Song object to the queue
+     as expected and can properly add a Song object to the queue
      
      Created By: Paul Shamoon
      */
@@ -88,21 +88,21 @@ class QueueManagerTests: XCTestCase {
         // Remove song1 from the currentQueue
         var updatedQueue = queueManager.removeSongsFromQueue(trackURI: song1.songURI)
         
-        // Ensure that the updatedQueue contains 2 elements
+        // Ensure that the updatedQueue contains 1 elements
         XCTAssertEqual(updatedQueue.count, 1, "updatedQueue should only contain two elements")
         
         // Ensure that the first song in the queue is Song2
         XCTAssertEqual(updatedQueue.first, song2, "First song in the queue should be song2.")
-
+        
         // Add song3 to the currentQueue
         updatedQueue = queueManager.addSongToQueue(song: song3)
         
         // Remove song3 from the currentQueue
         updatedQueue = queueManager.removeSongsFromQueue(trackURI: song3.songURI)
-
+        
         // Ensure that the updatedQueue is empty since removing a song from the queue removes everything in front of it
         XCTAssertEqual(updatedQueue.count, 0, "The updatedQueue should be empty")
-
+        
         // Ensure that originalQueue and updatedQueue are NOT equal
         XCTAssertNotEqual(originalQueue, updatedQueue, "currentQueue should not be equal to updatedQueue.")
     }

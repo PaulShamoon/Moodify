@@ -4,6 +4,7 @@
 //
 //  Created by Paul Shamoon on 11/17/24.
 //
+
 import XCTest
 @testable import Moodify
 
@@ -13,20 +14,21 @@ import XCTest
 class SetupTestData {
     // This allows any testing class to access data defined in this class
     static let shared = SetupTestData()
-
-    var currentQueue: [Song] = []
-    var playlists: [Playlist] = []
     
     var profile1: Profile
     var profile2: Profile
     var profile3: Profile
-
+    
     var song1: Song
     var song2: Song
     var song3: Song
     
     var playlist1: Playlist
     var playlist2: Playlist
+    
+    var currentQueue: [Song] = []
+    var playlists: [Playlist] = []
+    var profiles: [Profile] = []
     
     init() {
         // Initialize profiles
@@ -39,7 +41,7 @@ class SetupTestData {
             personalSecurityQuestion: nil,
             securityQuestionAnswer: nil
         )
-
+        
         profile2 = Profile(
             name: "user2",
             dateOfBirth: Calendar.current.date(byAdding: .year, value: -20, to: Date())!,
@@ -107,5 +109,8 @@ class SetupTestData {
         
         // Initialize playlists
         playlists = [playlist1, playlist2]
+        
+        // Initialize profiles
+        profiles = [profile1, profile2, profile3]
     }
 }

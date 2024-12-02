@@ -1,6 +1,6 @@
 import Foundation
 
-struct Profile: Identifiable, Codable {
+struct Profile: Identifiable, Codable, Equatable {
     var id: UUID = UUID()
     var name: String
     var dateOfBirth: Date
@@ -9,5 +9,6 @@ struct Profile: Identifiable, Codable {
     var userPin: String?
     var personalSecurityQuestion: String?
     var securityQuestionAnswer: String?
+    var profilePicture: Data?
 }
 

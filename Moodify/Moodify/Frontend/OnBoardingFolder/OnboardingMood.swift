@@ -14,7 +14,7 @@ struct OnboardingMoodView: View {
         ZStack {
             if viewModel.currentIndex < viewModel.moods.count {
                 AnimatedGradientBackground(colors: viewModel.moods[viewModel.currentIndex].mood.colors,
-                   darkColors: viewModel.moods[viewModel.currentIndex].mood.darkColors)
+                                           darkColors: viewModel.moods[viewModel.currentIndex].mood.darkColors)
             } else {
                 AnimatedGradientBackground(
                     colors: [Color.black, Color.secondary],
@@ -28,7 +28,7 @@ struct OnboardingMoodView: View {
                 Spacer()
                 
                 cardStack
-
+                
                 Spacer()
                 
                 skipButton
@@ -89,47 +89,47 @@ struct OnboardingMoodView: View {
     }
     
     private var dragGesture: some Gesture {
-            DragGesture()
-                .onChanged { gesture in viewModel.dragOffset = gesture.translation }
-                .onEnded { gesture in
-                    viewModel.handleDragEnd(gesture: gesture, maxIndex: viewModel.moods.count)
-                }
-        }
+        DragGesture()
+            .onChanged { gesture in viewModel.dragOffset = gesture.translation }
+            .onEnded { gesture in
+                viewModel.handleDragEnd(gesture: gesture, maxIndex: viewModel.moods.count)
+            }
+    }
     
     private func cardOffset(for index: Int) -> CGFloat {
-            index == viewModel.currentIndex ? viewModel.dragOffset.width : (index < viewModel.currentIndex ? -UIScreen.main.bounds.width : UIScreen.main.bounds.width)
-        }
-        
-        private var skipButton: some View {
-            Button(action: {
-                hasCompletedOnboarding = true
-                onCompletion()
-            }) {
-                Text("Skip to Account Setup")
-                    .font(.system(size: 16, design: .rounded))
-                    .italic()
-                    .foregroundStyle(.white.opacity(0.8))
-                    .padding(.vertical, 12)
-                    .padding(.horizontal, 20)
-                    .background(
-                        Capsule()
-                            .fill(.ultraThinMaterial)
-                            .shadow(color: .black.opacity(0.2), radius: 4, x: 0, y: 2)
-                            .overlay(
-                                Capsule()
-                                    .strokeBorder(.white.opacity(0.4), lineWidth: 0.8)
-                            )
-                    )
-            }
-            .opacity(viewModel.currentIndex == viewModel.moods.count ? 0 : 1)
-            .animation(.easeInOut, value: viewModel.currentIndex)
-        }
+        index == viewModel.currentIndex ? viewModel.dragOffset.width : (index < viewModel.currentIndex ? -UIScreen.main.bounds.width : UIScreen.main.bounds.width)
     }
+    
+    private var skipButton: some View {
+        Button(action: {
+            hasCompletedOnboarding = true
+            onCompletion()
+        }) {
+            Text("Skip to Account Setup")
+                .font(.system(size: 16, design: .rounded))
+                .italic()
+                .foregroundStyle(.white.opacity(0.8))
+                .padding(.vertical, 12)
+                .padding(.horizontal, 20)
+                .background(
+                    Capsule()
+                        .fill(.ultraThinMaterial)
+                        .shadow(color: .black.opacity(0.2), radius: 4, x: 0, y: 2)
+                        .overlay(
+                            Capsule()
+                                .strokeBorder(.white.opacity(0.4), lineWidth: 0.8)
+                        )
+                )
+        }
+        .opacity(viewModel.currentIndex == viewModel.moods.count ? 0 : 1)
+        .animation(.easeInOut, value: viewModel.currentIndex)
+    }
+}
 
 #Preview {
     OnboardingMoodView(onCompletion: {
         print("Navigate to account setup")
         // This is just a preview placeholder
     })
-    .preferredColorScheme(.dark) 
+    .preferredColorScheme(.dark)
 }
