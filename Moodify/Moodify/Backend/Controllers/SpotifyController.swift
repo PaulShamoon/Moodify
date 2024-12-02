@@ -11,7 +11,11 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
 
     private var tokenCheckTimer: Timer?
 
-    private var isAlertShown = false // Flag to prevent repeated alerts
+    // Flag to prevent repeated alerts
+    private var isAlertShown = false 
+
+    // Tracks if the user has connected at least once
+    private var hasConnectedBefore = false // Tracks if the user has connected at least once
 
     var isFirstConnectionAttempt = true
 
@@ -121,7 +125,6 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
     override init() {
         super.init()
         retrieveAccessToken()
-        startTokenMonitoring()
     }
     
     deinit {
@@ -162,7 +165,12 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
     // Check if the token is expired and update the UI if needed
     private func checkTokenExpiration() {
         DispatchQueue.main.async {
+            guard self.hasConnectedBefore else {
+                print("Skipping token check: User has not connected yet.")
+                return
+            }
             if self.isAccessTokenExpired() {
+                
                 if !self.isAlertShown { // Show alert only if it hasn't been shown
                     self.accessToken = nil // Set the token to nil to update the
                     print("Access token expired. Updating UI...")
@@ -178,7 +186,8 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
             }
         }
     }
-    /*
+
+/*
      Method connects the application to Spotify and or authorizes Moodify
      */
     func connect() {
@@ -195,6 +204,11 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
             // No valid token - need new authorization
             disconnect()
             appRemote.authorizeAndPlayURI("")
+        }
+        // Mark first connection and start monitoring after successful connection
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+            self.hasConnectedBefore = true
+            self.startTokenMonitoring()
         }
     }
     
