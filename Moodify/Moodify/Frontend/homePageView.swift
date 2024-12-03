@@ -28,6 +28,7 @@ struct homePageView: View {
     @State private var showConnectToSpotifyButton = false // New state variable
     @State private var showResyncSpotifyButton = false // New state variable
     @State private var isMoodButtonAnimating = false
+    @State private var showTips = false
     
     
     // NOTE - this URL is temporary and needs to be updated each time from the backend side to detect mood properly
@@ -87,6 +88,19 @@ struct homePageView: View {
     
     // Define a constant for the milky beige color at the top of the struct
     let milkyBeige = Color(hex: "#F5E6D3")
+    
+    // Add these properties/methods near the top of the struct with other state variables
+    private var hasSeenMoodTips: Bool {
+        UserDefaults.standard.bool(forKey: "hasSeenMoodTips_\(profile.id)")
+    }
+    
+    // Replace the computed property with a method to update the tips state
+    private func updateHasSeenMoodTips(_ value: Bool) {
+        UserDefaults.standard.set(value, forKey: "hasSeenMoodTips_\(profile.id)")
+    }
+    
+    // Add these new state variables right after other @State variables
+    @State private var shouldRetakePhoto = false
     
     var body: some View {
         ZStack {
@@ -271,13 +285,31 @@ struct homePageView: View {
                 
                 // Detect Mood Button
                 Button(action: {
-                    checkCameraPermission()
+                    let impact = UIImpactFeedbackGenerator(style: .medium)
+                    impact.impactOccurred()
+                    
+                    if !hasSeenMoodTips {
+                        showTips = true
+                        updateHasSeenMoodTips(true)
+                    } else {
+                        checkCameraPermission()
+                    }
                 }) {
                     HStack {
                         Image(systemName: "camera")
                             .font(.system(size: 24))
                         Text(isDetectingMood ? "Detecting..." : "Detect Mood")
                             .font(.system(size: 24, weight: .medium))
+                        
+                        // Info icon
+                        Button(action: {
+                            showTips = true
+                        }) {
+                            Image(systemName: "info.circle")
+                                .font(.system(size: 16)) // Slightly smaller than the camera icon
+                                .foregroundColor(milkyBeige)
+                        }
+                        .offset(x: -5) // Adjust this value to position the icon closer to "Mood"
                     }
                     .foregroundColor(milkyBeige)
                     .padding(.horizontal, 40)
@@ -383,7 +415,7 @@ struct homePageView: View {
                         showingAlert = true
                     }
                 }
-
+                
                 // Check if the access token is available and not expired
                 if spotifyController.accessToken != nil, !spotifyController.isAccessTokenExpired() {
                     if !spotifyController.isConnected {
@@ -454,20 +486,26 @@ struct homePageView: View {
             }
         }
         .sheet(isPresented: $showingCamera) {
-            CameraView(image: $capturedImage, isCameraDismissed: $isCameraDismissed)
-                .onDisappear {
-                    /*
-                     If user took a photo, analyze it
-                     If they didn't take a photo, reset everything to default state
-                     This prevents showing old mood when camera is closed
-                     */
-                    if let image = capturedImage {
-                        analyzeImage(image: image)
-                    } else {
-                        resetToDefaultState()
-                    }
-                    capturedImage = nil
+            CameraView(
+                image: $capturedImage,
+                isCameraDismissed: $isCameraDismissed,
+                shouldRetakePhoto: $shouldRetakePhoto
+            )
+            .onDisappear {
+                if let image = capturedImage {
+                    analyzeImage(image: image)
+                } else {
+                    resetToDefaultState()
                 }
+                capturedImage = nil
+            }
+        }
+        .onChange(of: shouldRetakePhoto) { newValue in
+            if newValue {
+                // Present the camera again
+                showingCamera = true
+                shouldRetakePhoto = false
+            }
         }
         .sheet(isPresented: $showMoodPreferenceSheet) {
             MoodPreferenceView(
@@ -516,6 +554,13 @@ struct homePageView: View {
             .presentationDetents([.height(400)])
             .presentationDragIndicator(.visible)
             .presentationBackground(.clear)
+        }
+        .sheet(isPresented: $showTips) {
+            MoodDetectionTipsView(isPresented: $showTips) {
+                checkCameraPermission()
+            }
+            .presentationDetents([.height(320)])
+            .presentationDragIndicator(.visible)
         }
     }
     

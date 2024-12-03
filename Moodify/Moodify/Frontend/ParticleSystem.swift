@@ -1,13 +1,17 @@
-//
-//  ParticleSystem.swift
-//  Moodify
-//
-//  Created by Nazanin Mahmoudi on 11/30/24.
-//
+/*
+ ParticleSystem.swift
+ Moodify
+ 
+ Created by Nazanin Mahmoudi on 11/30/24.
+ A custom particle emitter system I created for visual effects
+ throughout the app.
+ */
 
 import SwiftUI
 import UIKit
 
+/* Generates customizable particle effects using Core Animation,
+ used for creating ambient motion in the UI */
 struct ParticleEmitterView: UIViewRepresentable {
     let particleImage: UIImage
     let birthRate: Float

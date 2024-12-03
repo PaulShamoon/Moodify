@@ -26,6 +26,9 @@
 		6982AB7C2CDD9B89005F9750 /* MoodCardOnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6982AB7B2CDD9B84005F9750 /* MoodCardOnboardingView.swift */; };
 		6982AB7E2CDD9BB1005F9750 /* GetStartedCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6982AB7D2CDD9BA6005F9750 /* GetStartedCardView.swift */; };
 		6982AB812CDD9C0C005F9750 /* OnboardingMoodViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6982AB802CDD9BFC005F9750 /* OnboardingMoodViewModel.swift */; };
+
+		698E01122CFE5DCC005AEE0C /* TipsSheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 698E01112CFE5DC2005AEE0C /* TipsSheetView.swift */; };
+
 		69EA65922CE1BBB500723081 /* CameraView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69EA65912CE1BBB500723081 /* CameraView.swift */; };
 		6E52B8542CC98F3E0049BF08 /* PlayBackController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E52B8532CC98F370049BF08 /* PlayBackController.swift */; };
 		6E52B85A2CC9A9F30049BF08 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E52B8592CC9A9EE0049BF08 /* Constants.swift */; };
@@ -110,6 +113,7 @@
 		6982AB7B2CDD9B84005F9750 /* MoodCardOnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodCardOnboardingView.swift; sourceTree = "<group>"; };
 		6982AB7D2CDD9BA6005F9750 /* GetStartedCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GetStartedCardView.swift; sourceTree = "<group>"; };
 		6982AB802CDD9BFC005F9750 /* OnboardingMoodViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingMoodViewModel.swift; sourceTree = "<group>"; };
+		698E01112CFE5DC2005AEE0C /* TipsSheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TipsSheetView.swift; sourceTree = "<group>"; };
 		69BD148D2CF517790060814E /* PlaylistManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistManagerTests.swift; sourceTree = "<group>"; };
 		69BD148F2CF518940060814E /* QueueManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueueManagerTests.swift; sourceTree = "<group>"; };
 		69BD14912CF518BE0060814E /* SetupTestData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetupTestData.swift; sourceTree = "<group>"; };
@@ -257,6 +261,7 @@
 				6EE6C32F2CE3B55C0026D489 /* PinFolder */,
 				89AF8CBE2CFCFE0A00E3BFCE /* ProfilePictureFolder */,
 				6EA2E3BC2CDC8DDC00B4E6C8 /*  PlaylistsView.swift */,
+				698E01112CFE5DC2005AEE0C /* TipsSheetView.swift */,
 				69221DBF2CFB9E9800BA7BDD /* ParticleSystem.swift */,
 				69221DC12CFBA24800BA7BDD /* MoodConfirmation.swift */,
 				89C558392CDC11CB00F67E99 /* TermsOfServiceView.swift */,
@@ -507,6 +512,7 @@
 				89AD05632CB083B8004D8FAD /* Profile.swift in Sources */,
 				6934A10D2C8FDA840086CC91 /* MoodifyApp.swift in Sources */,
 				89AD05652CB08452004D8FAD /* ProfileManager.swift in Sources */,
+				698E01122CFE5DCC005AEE0C /* TipsSheetView.swift in Sources */,
 				89AD05672CB0847D004D8FAD /* ProfileSelectionView.swift in Sources */,
 				89FA8A452C9A6F40005480D8 /* Questionnaire.swift in Sources */,
 				6EA2E3B82CDAF29E00B4E6C8 /* PlaylistManager.swift in Sources */,
@@ -752,11 +758,10 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 5RJHYK4MEZ;
+				DEVELOPMENT_TEAM = "";
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = MoodifyTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
@@ -772,11 +777,10 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 5RJHYK4MEZ;
+				DEVELOPMENT_TEAM = "";
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = MoodifyTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
@@ -791,10 +795,9 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 5RJHYK4MEZ;
+				DEVELOPMENT_TEAM = "";
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = MoodifyUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
@@ -809,10 +812,9 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 5RJHYK4MEZ;
+				DEVELOPMENT_TEAM = "";
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = MoodifyUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
