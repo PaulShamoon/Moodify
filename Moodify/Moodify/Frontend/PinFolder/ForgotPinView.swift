@@ -163,6 +163,7 @@ struct ForgotPinView: View {
             )
 
             print("PIN reset successfully for profile: \(profileManager.profiles[profileIndex].name)")
+            profileManager.currentProfile = nil
             navigateBackToSelection = true // Navigate back to the selection page
         } else {
             errorMessage = "Profile not found. Please try again."
