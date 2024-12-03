@@ -158,8 +158,8 @@ struct PinSetupView: View {
                         .background(
                             LinearGradient(
                                 colors: [Color(hex: "1A2F2A"), Color(hex: "243B35")],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
+                                startPoint: .leading,
+                                endPoint: .trailing
                             )
                         )
                         .cornerRadius(35)
@@ -180,14 +180,14 @@ struct PinSetupView: View {
                     .padding(.vertical, 16)
                     .background(
                         LinearGradient(
-                            colors: [Color(hex: "4ADE80"), Color(hex: "22C55E")],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
+                            colors: [Color(hex: "1A2F2A"), Color(hex: "243B35")],
+                            startPoint: .leading,
+                            endPoint: .trailing
                         )
                     )
                     .cornerRadius(35)
                     .shadow(
-                        color: Color(hex: "4ADE80").opacity(0.3),
+                        color: Color.black.opacity(0.2),
                         radius: 10,
                         x: 0,
                         y: 5

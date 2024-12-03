@@ -107,19 +107,19 @@ struct PinInputView: View {
                 }) {
                     Text("Forgot PIN?")
                         .font(.system(size: 18, weight: .bold, design: .rounded))
-                        .foregroundColor(.black)
+                        .foregroundColor(Color(hex: "#F5E6D3"))
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 16)
                         .background(
                             LinearGradient(
-                                colors: [Color(hex: "4ADE80"), Color(hex: "22C55E")],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
+                                colors: [Color(hex: "1A2F2A"), Color(hex: "243B35")],
+                                startPoint: .leading,
+                                endPoint: .trailing
                             )
                         )
                         .cornerRadius(35)
                         .shadow(
-                            color: Color(hex: "4ADE80").opacity(0.3),
+                            color: Color.black.opacity(0.2),
                             radius: 10,
                             x: 0,
                             y: 5

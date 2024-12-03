@@ -12,11 +12,22 @@ struct CustomProfileIconView: View {
                  "music.note.list", "guitars.fill", "music.note.tv",
                  "cloud.fill", "music.note.house", "film.fill", "globe"]
     
-    let colors: [Color] = [.blue, .green, .red, .purple, .orange,
-                          .pink, .yellow, .indigo, .mint, .cyan, .black, .white]
+    let colors: [Color] = [
+        Color(hex: "779885"),  // Medium sage
+        Color(hex: "4A6670"),  // Muted teal
+        Color(hex: "C85C37"),  // Terracotta
+        Color(hex: "796878"),  // Mauve
+        Color(hex: "D4B570"),  // Warm gold
+        Color(hex: "9B6B5D"),  // Warm brown
+        Color(hex: "A39B8B"),  // Warm gray
+        Color(hex: "687864"),  // Forest green
+        Color(hex: "8B4744"),  // Deep burgundy
+        .black,
+        .white
+    ]
     
     @State private var selectedIcon: String = "music.note"
-    @State private var selectedColor: Color = .green
+    @State private var selectedColor: Color = Color(hex: "779885")  // Default to medium sage
     @State private var iconColor: Color = .white
     
     var body: some View {

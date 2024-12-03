@@ -61,14 +61,29 @@ struct MenuView: View {
         
         var color: Color {
             switch self {
-            case .account: return .blue
-            case .music: return .purple
-            case .playlists: return .yellow
-            case .user: return .green
-            case .addPin, .managePin, .changePin: return .orange
+            case .account: return Color(hex: "4ADE80")
+            case .music: return Color(hex: "4ADE80").opacity(0.9)
+            case .playlists: return Color(hex: "4ADE80").opacity(0.8)
+            case .user: return Color(hex: "4ADE80").opacity(0.7)
+            case .addPin, .managePin, .changePin: return Color(hex: "4ADE80").opacity(0.6)
             case .deletePin: return .red
-            case .tos: return .gray
+            case .tos: return Color(hex: "94A3BB")
             case .delete: return .red
+            }
+        }
+        
+        var iconColor: Color {
+            switch self {
+            case .account: return Color(hex: "4A6670")
+            case .music: return Color(hex: "796878")
+            case .playlists: return Color(hex: "C85C37")
+            case .user: return Color(hex: "687864")
+            case .addPin: return Color(hex: "D4B570")
+            case .managePin: return Color(hex: "739E82")
+            case .changePin: return Color(hex: "9B6B5D")
+            case .deletePin: return Color(hex: "8B4744")
+            case .tos: return Color(hex: "A39B8B")
+            case .delete: return Color(hex: "8B4744")
             }
         }
     }
@@ -105,6 +120,7 @@ struct MenuView: View {
                             ScrollView {
                                 VStack(spacing: 8) {
                                     if isInPinManagement {
+                                        // PIN Management Options
                                         MenuButton(
                                             tab: .changePin,
                                             isSelected: selectedTab == .changePin,
@@ -117,18 +133,25 @@ struct MenuView: View {
                                             action: { handleTabSelection(.deletePin) }
                                         )
                                     } else {
+                                        // Regular Menu Options
                                         ForEach(MenuTab.allCases.filter { tab in
                                             switch tab {
-                                            case .addPin: return !hasPin
-                                            case .managePin: return hasPin
-                                            case .changePin, .deletePin: return false
-                                            default: return true
+                                            case .addPin:
+                                                return !hasPin
+                                            case .managePin:
+                                                return hasPin
+                                            case .changePin, .deletePin:
+                                                return false
+                                            default:
+                                                return true
                                             }
                                         }, id: \.self) { tab in
                                             MenuButton(
                                                 tab: tab,
                                                 isSelected: selectedTab == tab,
-                                                action: { handleTabSelection(tab) }
+                                                action: {
+                                                    handleTabSelection(tab)
+                                                }
                                             )
                                         }
                                     }
@@ -139,7 +162,7 @@ struct MenuView: View {
                         .frame(width: min(geometry.size.width * 0.85, 320))
                         .background(
                             RoundedRectangle(cornerRadius: 20)
-                                .fill(Color(hex: "#1A1A1A"))
+                                .fill(Color(red: 20/255, green: 20/255, blue: 20/255))
                                 .shadow(radius: 10)
                         )
                         .offset(x: showMenu ? 0 : geometry.size.width)
@@ -362,86 +385,6 @@ struct MenuView: View {
     }
 }
 
-struct MenuHeader: View {
-    @Binding var showMenu: Bool
-    
-    var body: some View {
-        HStack {
-            Text("Menu")
-                .font(.system(size: 34, weight: .bold))
-                .foregroundColor(Color(hex: "#F5E6D3"))
-            
-            Spacer()
-            
-            Button {
-                withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
-                    showMenu = false
-                }
-            } label: {
-                Image(systemName: "xmark.circle.fill")
-                    .font(.title2)
-                    .foregroundColor(Color(hex: "#F5E6D3").opacity(0.7))
-            }
-        }
-        .padding()
-    }
-}
-
-struct MenuButton: View {
-    let tab: MenuView.MenuTab
-    let isSelected: Bool
-    let action: () -> Void
-    
-    var body: some View {
-        Button(action: action) {
-            HStack(spacing: 12) {
-                Image(systemName: tab.icon)
-                    .font(.system(size: 22, weight: .semibold))
-                    .foregroundColor(Color(hex: "#F5E6D3"))
-                    .frame(width: 28)
-                
-                Text(tab.rawValue)
-                    .font(.system(size: 18, weight: .bold, design: .rounded))
-                    .foregroundColor(Color(hex: "#F5E6D3"))
-                
-                Spacer()
-                
-                if tab != .delete {
-                    Image(systemName: "chevron.right")
-                        .font(.system(size: 16, weight: .semibold))
-                        .foregroundColor(Color(hex: "#F5E6D3").opacity(0.8))
-                }
-            }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 14)
-            .background(
-                RoundedRectangle(cornerRadius: 12)
-                    .fill(
-                        isSelected ? 
-                        LinearGradient(
-                            colors: [Color(hex: "4ADE80"), Color(hex: "22C55E")],
-                            startPoint: .leading,
-                            endPoint: .trailing
-                        ) : LinearGradient(
-                            colors: [Color(hex: "1A2F2A"), Color(hex: "243B35")],
-                            startPoint: .leading,
-                            endPoint: .trailing
-                        )
-                    )
-            )
-            .shadow(
-                color: isSelected ? Color(hex: "4ADE80").opacity(0.3) : Color.black.opacity(0.1),
-                radius: 8,
-                x: 0,
-                y: 4
-            )
-            .contentShape(Rectangle())
-        }
-        .buttonStyle(PlainButtonStyle())
-        .padding(.horizontal)
-    }
-}
-
 struct PinManagementHeader: View {
     @Binding var showMenu: Bool
     @Binding var isInPinManagement: Bool
@@ -455,12 +398,11 @@ struct PinManagementHeader: View {
             } label: {
                 Image(systemName: "chevron.left")
                     .font(.title2)
-                    .foregroundColor(Color(hex: "#F5E6D3").opacity(0.7))
+                    .foregroundColor(.gray)
             }
             
             Text("Pin Management")
-                .font(.system(size: 34, weight: .bold))
-                .foregroundColor(Color(hex: "#F5E6D3"))
+                .font(.title.bold())
             
             Spacer()
             
@@ -472,7 +414,7 @@ struct PinManagementHeader: View {
             } label: {
                 Image(systemName: "xmark.circle.fill")
                     .font(.title2)
-                    .foregroundColor(Color(hex: "#F5E6D3").opacity(0.7))
+                    .foregroundColor(.gray)
             }
         }
         .padding()
@@ -480,6 +422,30 @@ struct PinManagementHeader: View {
 }
 
 // MARK: - Supporting Views
+struct MenuHeader: View {
+    @Binding var showMenu: Bool
+    
+    var body: some View {
+        HStack {
+            Text("Menu")
+                .font(.title.bold())
+            
+            Spacer()
+            
+            Button {
+                withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
+                    showMenu = false
+                }
+            } label: {
+                Image(systemName: "xmark.circle.fill")
+                    .font(.title2)
+                    .foregroundColor(.gray)
+            }
+        }
+        .padding()
+    }
+}
+
 struct ProfileSection: View {
     let profile: Profile
     
@@ -518,5 +484,47 @@ struct ProfileSection: View {
             }
         }
         .padding()
+    }
+}
+
+struct MenuButton: View {
+    let tab: MenuView.MenuTab
+    let isSelected: Bool
+    let action: () -> Void
+    
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: 16) {
+                Image(systemName: tab.icon)
+                    .font(.title3)
+                    .foregroundColor(tab.iconColor)
+                    .frame(width: 24)
+                
+                Text(tab.rawValue)
+                    .font(.body)
+                    .foregroundColor(.white)
+                
+                Spacer()
+                
+                if tab != .delete {
+                    Image(systemName: "chevron.right")
+                        .font(.caption)
+                        .foregroundColor(Color(hex: "94A3BB"))
+                }
+            }
+            .padding(.horizontal)
+            .padding(.vertical, 12)
+            .background(
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(isSelected ? tab.color.opacity(0.15) : Color.clear)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 12)
+                            .stroke(isSelected ? tab.color.opacity(0.3) : Color.clear, lineWidth: 1)
+                    )
+            )
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(PlainButtonStyle())
+        .padding(.horizontal)
     }
 }

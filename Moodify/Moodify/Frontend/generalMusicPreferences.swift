@@ -28,7 +28,7 @@ struct GeneralMusicPreferencesView: View {
     }
     
     @State private var currentPage = 0
-
+    
     func genreIcon(for genre: String) -> String {
         switch genre {
         case "Pop": return "star.fill"
@@ -55,7 +55,7 @@ struct GeneralMusicPreferencesView: View {
                 // Title Section
                 VStack(spacing: 12) {
                     Text("\(profileManager.currentProfile?.name ?? "User"),")
-                        .font(.system(size: 24, weight: .light))
+                        .font(.system(size: 24, weight: .bold))
                         .foregroundStyle(
                             LinearGradient(
                                 colors: [Color(hex: "4ADE80"), Color(hex: "22C55E")],
@@ -67,30 +67,31 @@ struct GeneralMusicPreferencesView: View {
                         .padding(.top, 80)
                     
                     Text("Select your favorite genres")
-                        .font(.system(size: 28, weight: .bold))
+                        .font(.system(size: 28, weight: .medium))
                         .foregroundColor(Color(hex: "#F5E6D3"))
                         .multilineTextAlignment(.center)
-                        .padding(.top, 4)
-                    
+                        .padding(.top, 20)
                     Text("The more genres you choose, the better your recommendations.")
-                        .font(.system(size: 14, weight: .medium))
+                        .font(.system(size: 18, weight: .regular, design: .rounded))
                         .foregroundStyle(
                             LinearGradient(
-                                colors: [Color(hex: "4ADE80"), Color(hex: "22C55E")],
+                                colors: [Color.green.opacity(0.9), Color.green.opacity(0.6)],
                                 startPoint: .leading,
                                 endPoint: .trailing
                             )
                         )
                         .multilineTextAlignment(.center)
+                        .lineLimit(nil)
+                        .fixedSize(horizontal: false, vertical: true)
                         .padding(.horizontal, 16)
                         .padding(.vertical, 10)
                         .background(
                             RoundedRectangle(cornerRadius: 12)
                                 .fill(Color.white.opacity(0.05))
                         )
-                        .padding(.top, 8)
+                        .frame(maxWidth: .infinity) // Ensures it adjusts to parent width
                 }
-                .padding(.horizontal)
+//                .padding(.horizontal)
                 
                 // Genre Pages
                 TabView(selection: $currentPage) {
@@ -194,7 +195,8 @@ struct GeneralMusicPreferencesView: View {
                             radius: 8, x: 0, y: 4)
                 }
                 .padding(.horizontal)
-                .padding(.bottom, 20)
+                .padding(.top, 16) // Move the button closer to the grid
+                .padding(.bottom, 100) // Adjust bottom padding if necessary
             }
         }
         .onAppear {
