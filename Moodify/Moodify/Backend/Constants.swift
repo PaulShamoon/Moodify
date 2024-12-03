@@ -531,7 +531,7 @@ let sadSongs: [String: [String]] = [
     "jazz": [
         // "Strange Fruit" by Billie Holiday
         "1CTex49P0iWwzUGsMNjgaV",
-        // "Lush Life" by John
+        // "Lush Life" by John Coltrane
         "0Srs2sPdZTfFvvfLP4DGa0",
         // "Round Midnight" by Thelonious Monk
         "1wl5b2lw3YagQtZiYZbQWP",
