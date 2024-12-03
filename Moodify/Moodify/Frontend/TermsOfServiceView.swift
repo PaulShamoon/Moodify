@@ -13,6 +13,22 @@ struct TermsOfServiceView: View {
     
     var body: some View {
         VStack(spacing: 1) {
+            // Add back button at the top
+            HStack {
+                Button(action: {
+                    presentationMode.wrappedValue.dismiss()
+                }) {
+                    HStack(spacing: 8) {
+                        Image(systemName: "chevron.left")
+                        Text("Back")
+                    }
+                    .foregroundColor(Color(hex: "#F5E6D3"))
+                    .font(.system(size: 16, weight: .medium))
+                }
+                Spacer()
+            }
+            .padding(.top, 20)
+            .padding(.leading, 10)
             
             ScrollView {
                 VStack(alignment: .leading, spacing: 15) {
