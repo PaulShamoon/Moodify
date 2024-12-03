@@ -13,7 +13,6 @@
 		6934A10F2C8FDA840086CC91 /* ConnectToSpotify.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6934A10E2C8FDA840086CC91 /* ConnectToSpotify.swift */; };
 		6934A1112C8FDA840086CC91 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6934A1102C8FDA840086CC91 /* Assets.xcassets */; };
 		6934A1142C8FDA840086CC91 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6934A1132C8FDA840086CC91 /* Preview Assets.xcassets */; };
-		6934A1282C8FDA850086CC91 /* MoodifyUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6934A1272C8FDA850086CC91 /* MoodifyUITests.swift */; };
 		6934A12A2C8FDA850086CC91 /* MoodifyUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6934A1292C8FDA850086CC91 /* MoodifyUITestsLaunchTests.swift */; };
 		693E71512CEB73FC00446CF7 /* OnboardingMoodTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 693E71502CEB73F000446CF7 /* OnboardingMoodTests.swift */; };
 		693E71552CEB791D00446CF7 /* onBoardingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 693E71542CEB791500446CF7 /* onBoardingTests.swift */; };
@@ -27,11 +26,7 @@
 		6982AB7C2CDD9B89005F9750 /* MoodCardOnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6982AB7B2CDD9B84005F9750 /* MoodCardOnboardingView.swift */; };
 		6982AB7E2CDD9BB1005F9750 /* GetStartedCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6982AB7D2CDD9BA6005F9750 /* GetStartedCardView.swift */; };
 		6982AB812CDD9C0C005F9750 /* OnboardingMoodViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6982AB802CDD9BFC005F9750 /* OnboardingMoodViewModel.swift */; };
-		69BD148E2CF5177A0060814E /* PlaylistManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69BD148D2CF517790060814E /* PlaylistManagerTests.swift */; };
-		69BD14902CF518A10060814E /* QueueManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69BD148F2CF518940060814E /* QueueManagerTests.swift */; };
-		69BD14922CF518D10060814E /* SetupTestData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69BD14912CF518BE0060814E /* SetupTestData.swift */; };
 		69EA65922CE1BBB500723081 /* CameraView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69EA65912CE1BBB500723081 /* CameraView.swift */; };
-		6E0106C52CEBFF4600F70B31 /* ProfileManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E0106C42CEBFF4000F70B31 /* ProfileManagerTests.swift */; };
 		6E52B8542CC98F3E0049BF08 /* PlayBackController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E52B8532CC98F370049BF08 /* PlayBackController.swift */; };
 		6E52B85A2CC9A9F30049BF08 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E52B8592CC9A9EE0049BF08 /* Constants.swift */; };
 		6E728B912CD1B95700017EA4 /* Song.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E728B902CD1B94F00017EA4 /* Song.swift */; };
@@ -527,12 +522,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				693E71552CEB791D00446CF7 /* onBoardingTests.swift in Sources */,
-				6934A11E2C8FDA850086CC91 /* MoodifyTests.swift in Sources */,
 				693E71512CEB73FC00446CF7 /* OnboardingMoodTests.swift in Sources */,
 				693E71592CEB7A8200446CF7 /* onBoardingViewModelTests.swift in Sources */,
-				6934A11E2C8FDA850086CC91 /* PlaylistManagerTests.swift in Sources */,
-				6E0106C12CEB011300F70B31 /* SetupTestData.swift in Sources */,
-				6E0106C32CEB015200F70B31 /* QueueManagerTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -689,8 +680,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Moodify/Preview Content\"";
-				DEVELOPMENT_TEAM = B2RSHDDNFF;
-
+				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Moodify/Info.plist;
@@ -708,8 +698,6 @@
 				);
 				MARKETING_VERSION = 1.0;
 				OTHER_LDFLAGS = "-ObjC";
-
-				PRODUCT_BUNDLE_IDENTIFIER = "Moodify-UI";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -730,7 +718,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Moodify/Preview Content\"";
-				DEVELOPMENT_TEAM = B2RSHDDNFF;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Moodify/Info.plist;
@@ -748,8 +736,6 @@
 				);
 				MARKETING_VERSION = 1.0;
 				OTHER_LDFLAGS = "-ObjC";
-
-				PRODUCT_BUNDLE_IDENTIFIER = "Moodify-UI";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
