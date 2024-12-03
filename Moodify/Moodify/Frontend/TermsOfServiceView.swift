@@ -121,20 +121,28 @@ struct TermsOfServiceView: View {
                 agreedToTerms = true
                 presentationMode.wrappedValue.dismiss()
             }) {
-                Text(agreedToTerms ? "Done" : "Agree and Continue")
-                    .font(.system(size: 18, weight: .bold, design: .rounded))
-                    .foregroundColor(Color(hex: "#F5E6D3"))
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 16)
-                    .background(
-                        LinearGradient(
-                            colors: [Color(hex: "4ADE80"), Color(hex: "22C55E")],
-                            startPoint: .leading,
-                            endPoint: .trailing
-                        )
+                HStack(spacing: 12) {
+                    Text(agreedToTerms ? "Done" : "Agree and Continue")
+                        .font(.system(size: 18, weight: .bold, design: .rounded))
+                        .lineLimit(1)
+                }
+                .foregroundColor(Color(hex: "#F5E6D3"))
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 16)
+                .background(
+                    LinearGradient(
+                        colors: [Color(hex: "#1A2F2A"), Color(hex: "#243B35")],
+                        startPoint: .leading,
+                        endPoint: .trailing
                     )
-                    .cornerRadius(12)
-                    .shadow(color: Color(hex: "4ADE80").opacity(0.3), radius: 8, x: 0, y: 4)
+                )
+                .cornerRadius(12)
+                .shadow(
+                    color: Color(hex: "#243B35").opacity(0.3),
+                    radius: 8,
+                    x: 0,
+                    y: 4
+                )
             }
             .padding(.horizontal)
             .padding(.bottom, 20)
