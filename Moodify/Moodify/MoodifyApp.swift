@@ -40,6 +40,7 @@ struct MoodifyApp: App {
                                     if navigateToHomePage {
                                         hasCompletedQuestionnaire = true
                                         isCreatingNewProfile = false
+                                        navigateToProfilePicture = false
                                     }
                                 }
                                 .environmentObject(profileManager)

@@ -11,7 +11,11 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
 
     private var tokenCheckTimer: Timer?
 
-    private var isAlertShown = false // Flag to prevent repeated alerts
+    // Flag to prevent repeated alerts
+    private var isAlertShown = false 
+
+    // Tracks if the user has connected at least once
+    private var hasConnectedBefore = false // Tracks if the user has connected at least once
 
     var isFirstConnectionAttempt = true
 
@@ -121,7 +125,6 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
     override init() {
         super.init()
         retrieveAccessToken()
-        startTokenMonitoring()
     }
     
     deinit {
@@ -162,7 +165,12 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
     // Check if the token is expired and update the UI if needed
     private func checkTokenExpiration() {
         DispatchQueue.main.async {
+            guard self.hasConnectedBefore else {
+                print("Skipping token check: User has not connected yet.")
+                return
+            }
             if self.isAccessTokenExpired() {
+                
                 if !self.isAlertShown { // Show alert only if it hasn't been shown
                     self.accessToken = nil // Set the token to nil to update the
                     print("Access token expired. Updating UI...")
@@ -178,7 +186,8 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
             }
         }
     }
-    /*
+
+/*
      Method connects the application to Spotify and or authorizes Moodify
      */
     func connect() {
@@ -195,6 +204,11 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
             // No valid token - need new authorization
             disconnect()
             appRemote.authorizeAndPlayURI("")
+        }
+        // Mark first connection and start monitoring after successful connection
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+            self.hasConnectedBefore = true
+            self.startTokenMonitoring()
         }
     }
     
@@ -495,52 +509,46 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
             return
         }
         
-        // Reset currentPlaylist to nil when queueing songs based off mood
         self.currentPlaylist = nil
         self.currentMood = mood
         
-        // Get feature parameters based on mood
-        let (minValence, maxValence, minEnergy, maxEnergy, minLoudness, maxLoudness, minAcousticness, maxAcousticness) = moodQueueHandler.getMoodParameters(for: mood, genresSelected: userGenres)
+        let trackURIs = moodQueueHandler.getRecommendations(mood: mood, genres: userGenres)
+        fetchTrackDetails(trackURIs: trackURIs) { tracks in
+            self.enqueueTracks(mood: mood, profile: profile, tracks: tracks)
+        }
+    }
+    
+    private func fetchTrackDetails(trackURIs: [String], completion: @escaping ([[String: Any]]) -> Void) {
+        var tracks: [[String: Any]] = []
+        let group = DispatchGroup()
         
-        // Build the recommendation URL
-        guard let url = moodQueueHandler.buildRecommendationURL(userGenres: userGenres, limit: 20, minValence: minValence, maxValence: maxValence, minEnergy: minEnergy, maxEnergy: maxEnergy, minLoudness: minLoudness, maxLoudness: maxLoudness, minAcousticness: minAcousticness, maxAcousticness: maxAcousticness),
-              let accessToken = self.accessToken else {
-            print("Invalid URL or missing access token")
-            return
+        for uri in trackURIs {
+            group.enter()
+            // Remove spotify:track: prefix to get just the ID
+            let trackID = uri.replacingOccurrences(of: "spotify:track:", with: "")
+            guard let url = URL(string: "https://api.spotify.com/v1/tracks/\(trackID)") else {
+                group.leave()
+                continue
+            }
+            
+            var request = URLRequest(url: url)
+            request.setValue("Bearer \(accessToken ?? "")", forHTTPHeaderField: "Authorization")
+            
+            URLSession.shared.dataTask(with: request) { data, response, error in
+                defer { group.leave() }
+                
+                if let data = data,
+                   var track = try? JSONSerialization.jsonObject(with: data) as? [String: Any] {
+                    // Add the URI to the track dictionary
+                    track["uri"] = uri
+                    tracks.append(track)
+                }
+            }.resume()
         }
         
-        var request = URLRequest(url: url)
-        request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
-        
-        URLSession.shared.dataTask(with: request) { data, response, error in
-            if let error = error {
-                print("Error fetching recommendations: \(error.localizedDescription)")
-                return
-            }
-            
-            guard let data = data else {
-                print("No data received from Spotify")
-                return
-            }
-            
-            do {
-                // Log the raw response data for debugging
-                if let jsonString = String(data: data, encoding: .utf8) {
-                    print("Raw JSON response: \(jsonString)")
-                }
-                
-                // Try parsing the JSON
-                if let json = try JSONSerialization.jsonObject(with: data) as? [String: Any],
-                   let tracks = json["tracks"] as? [[String: Any]] {
-                    
-                    self.enqueueTracks(mood: mood, profile: profile, tracks: tracks)
-                } else {
-                    print("Unexpected JSON structure")
-                }
-            } catch {
-                print("Error parsing recommendations response: \(error.localizedDescription)")
-            }
-        }.resume()
+        group.notify(queue: .main) {
+            completion(tracks)
+        }
     }
     
     /*
