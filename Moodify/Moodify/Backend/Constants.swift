@@ -546,7 +546,7 @@ let sadSongs: [String: [String]] = [
         // "Don't Explain" by Billie Holiday
         "6GLMwwNDbiiBe4D9JcSOwP",
         // "In a Sentimental Mood" by John Coltrane & Duke Ellington
-        "2hTVk5hOmvJJQUiTzi2I7m",
+        "0E8q2Fx2XuzXCO2NSAppkR",
         // "Autumn Leaves" by Miles Davis
         "0OWqCRUi7l27d3rv1WDtCq"
     ],
