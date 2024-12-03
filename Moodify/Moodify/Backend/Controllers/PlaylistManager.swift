@@ -65,63 +65,6 @@ class PlaylistManager: ObservableObject {
         return playlists.filter { $0.profileId == profile.id }
     }
     
-    func getMockUsersPlaylists() -> [Playlist] {
-        // Mock Profile ID
-        let mockProfileId = UUID()
-
-        // Create some mock Songs
-        let mockSongs = [
-            Song(
-                id: UUID(),
-                trackName: "Banana Pancakes",
-                albumName: "In a Day",
-                artistName: "Jack Johnson",
-                songURI: "spotify:track:1",
-                isFavorited: true
-            ),
-            Song(
-                id: UUID(),
-                trackName: "Waves",
-                albumName: "The Watershed",
-                artistName: "Jack Johnson",
-                songURI: "spotify:track:2",
-                isFavorited: false
-            )
-        ]
-        
-        // Create the mock Playlist
-        let sadMockPlaylist = Playlist(
-            mood: "Sad",
-            profileId: mockProfileId,
-            songs: mockSongs,
-            genres: ["Pop", "Acoustic"]
-        )
-
-        let happyMockPlaylist = Playlist(
-            mood: "Happy",
-            profileId: mockProfileId,
-            songs: mockSongs,
-            genres: ["Pop", "Acoustic"]
-        )
-        
-        let angryMockPlaylist = Playlist(
-            mood: "Angry",
-            profileId: mockProfileId,
-            songs: mockSongs,
-            genres: ["Pop", "Acoustic"]
-        )
-        
-        let chillMockPlaylist = Playlist(
-            mood: "Chill",
-            profileId: mockProfileId,
-            songs: mockSongs,
-            genres: ["Pop", "Acoustic"]
-        )
-        
-        // Return an array of playlists (just one in this case)
-        return [sadMockPlaylist, happyMockPlaylist, sadMockPlaylist, angryMockPlaylist, chillMockPlaylist]
-    }
-    
     /*
      Method to queue all songs in the passed in playlist
      
@@ -205,7 +148,6 @@ class PlaylistManager: ObservableObject {
         savePlaylists()
     }
 
-    
     /*
      Method to remove a song from a playlist
      

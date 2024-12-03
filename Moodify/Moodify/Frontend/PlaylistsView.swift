@@ -19,7 +19,7 @@ struct PlaylistsView: View {
     @State private var selectedMood: String? = nil
     
     private var groupedPlaylists: [String: [Playlist]] {
-        let allPlaylists = spotifyController.playlistManager.getMockUsersPlaylists()
+        let allPlaylists = spotifyController.playlistManager.getUsersPlaylists(profile: profileManager.currentProfile!)
     
         let filteredPlaylists = allPlaylists.filter { playlist in
             let matchesMood = selectedMood == nil || playlist.mood == selectedMood
@@ -36,7 +36,7 @@ struct PlaylistsView: View {
     }
     
     private var uniqueMoods: [String] {
-        Array(Set(spotifyController.playlistManager.getMockUsersPlaylists().map { $0.mood })).sorted()
+        Array(Set(spotifyController.playlistManager.getUsersPlaylists(profile: profileManager.currentProfile!).map { $0.mood })).sorted()
     }
     
     var body: some View {
@@ -141,12 +141,14 @@ struct PlaylistRowView: View {
 
 struct DetailedPlaylistView: View {
     @State private var playlist: Playlist
+    @State private var songs: [Song]
     var spotifyController: SpotifyController
     
     @Environment(\.presentationMode) var presentationMode
     
     init(playlist: Playlist, spotifyController: SpotifyController) {
         self.playlist = playlist
+        self._songs = State(initialValue: playlist.songs)
         self.spotifyController = spotifyController
     }
     
@@ -158,7 +160,7 @@ struct DetailedPlaylistView: View {
                         Text(playlist.mood.capitalized)
                             .font(.largeTitle)
                             .fontWeight(.bold)
-                        Text("\(playlist.songs.count) Songs")
+                        Text("\(songs.count) Songs")
                             .foregroundColor(.secondary)
                     }
                     
@@ -178,25 +180,37 @@ struct DetailedPlaylistView: View {
                 .padding()
         
                 LazyVStack(spacing: 15) {
-                    ForEach(playlist.songs) { song in
+                    ForEach(songs) { song in
                         SongRowWithSwipeActions(
                             song: song,
-                            playlist: playlist,
+                            playlist: $playlist,
+                            songs: $songs,
                             spotifyController: spotifyController
                         )
+                        .transition(.asymmetric(insertion: .move(edge: .trailing),
+                                                removal: .slide))
                     }
                 }
                 .padding(.horizontal)
+                .animation(.spring(), value: songs)
             }
         }
         .navigationTitle("Playlist Details")
         .navigationBarTitleDisplayMode(.inline)
+        .onChange(of: songs) { newSongs in
+            // Sync changes back to the original playlist
+            playlist.songs = newSongs
+            
+            // Optional: You might want to trigger a save or update here
+            // This depends on your exact requirements for syncing
+        }
     }
 }
 
 struct SongRowWithSwipeActions: View {
     let song: Song
-    @State var playlist: Playlist
+    @Binding var playlist: Playlist
+    @Binding var songs: [Song]
     var spotifyController: SpotifyController
     
     @State private var offset: CGFloat = 0
@@ -213,7 +227,6 @@ struct SongRowWithSwipeActions: View {
             ZStack {
                 // Background Action View
                 HStack {
-                    // Action Background (dynamically changes based on swipe direction)
                     VStack {
                         HStack {
                             if actionType == .remove {
@@ -222,7 +235,7 @@ struct SongRowWithSwipeActions: View {
                                     .foregroundColor(.white)
                                     .padding()
                             } else {
-                                Image(systemName: "star.fill")
+                                Image(systemName: song.isFavorited ? "star.slash.fill" : "star.fill")
                                     .foregroundColor(.white)
                                     .padding()
                                 Spacer()
@@ -244,6 +257,12 @@ struct SongRowWithSwipeActions: View {
                     }
                     
                     Spacer()
+                    
+                    // Favorite indicator
+                    if song.isFavorited {
+                        Image(systemName: "star.fill")
+                            .foregroundColor(.yellow)
+                    }
                 }
                 .padding(.leading, 10)
                 .frame(width: geometry.size.width, height: 60)
@@ -276,34 +295,6 @@ struct SongRowWithSwipeActions: View {
                             }
                         }
                 )
-                
-                // Message overlay
-                if showMessage {
-                    GeometryReader { geometry in
-                        HStack {
-                            if messageAlignment == .leading {
-                                Image(systemName: messageText)
-                                    .foregroundColor(.white)
-                                    .padding()
-                                    .background(messageColor)
-                                    .cornerRadius(10)
-                            }
-                            
-                            Spacer()
-                            
-                            if messageAlignment == .trailing {
-                                Image(systemName: messageText)
-                                    .foregroundColor(.white)
-                                    .padding()
-                                    .background(messageColor)
-                                    .cornerRadius(10)
-                            }
-                        }
-                        .frame(width: geometry.size.width)
-                    }
-                    .transition(.move(edge: messageAlignment == .leading ? .leading : .trailing))
-                    .zIndex(0)
-                }
             }
         }
         .frame(height: 60)
@@ -316,18 +307,58 @@ struct SongRowWithSwipeActions: View {
     }
     
     private func performAction(type: ActionType) {
-        switch type {
-        case .favorite:
-            let success = spotifyController.playlistManager.toggleFavorite(playlist: &playlist, song: song)
-        case .remove:
-            let success = spotifyController.playlistManager.removeSongFromPlaylist(playlist: &playlist, song: song)
+        withAnimation(.spring()) {
+            switch type {
+            case .favorite:
+                // Toggle favorite status using PlaylistManager's method
+                var mutablePlaylist = playlist
+                let success = spotifyController.playlistManager.toggleFavorite(playlist: &mutablePlaylist, song: song)
+                
+                // Update the local playlist and songs
+                playlist = mutablePlaylist
+                songs = mutablePlaylist.songs
+                
+                // Optionally show a message
+                showFavoriteMessage(isFavorite: song.isFavorited)
+
+            case .remove:
+                var mutablePlaylist = playlist
+                let success = spotifyController.playlistManager.removeSongFromPlaylist(playlist: &mutablePlaylist, song: song)
+                
+                // Update the local playlist and songs
+                playlist = mutablePlaylist
+                songs = mutablePlaylist.songs
+                
+                // Show removal message
+                showRemovalMessage()
+            }
         }
+    }
+    
+    private func showFavoriteMessage(isFavorite: Bool) {
+        messageText = isFavorite ? "star.fill" : "star.slash.fill"
+        messageColor = .green
+        messageAlignment = .trailing
+        showMessage = true
         
         // Hide message after 2 seconds
         DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
             withAnimation {
                 showMessage = false
-                offset = 0
+            }
+        }
+    }
+    
+    private func showRemovalMessage() {
+        messageText = "trash.fill"
+        messageColor = .red
+        messageAlignment = .trailing
+        showMessage = true
+        
+        // Hide message after 2 seconds
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+            withAnimation {
+                showMessage = false
             }
         }
     }
