@@ -67,12 +67,27 @@ struct ConnectToSpotifyView: View {
                     .padding(.vertical, 16)
                     .background(
                         LinearGradient(
-                            colors: [Color(hex: "#1A2F2A"), Color(hex: "#243B35")],
-                            startPoint: .leading,
-                            endPoint: .trailing
+                            gradient: Gradient(colors: [
+                                Color(hex: "#1A2F2A"),
+                                Color(hex: "#243B35"),
+                                Color.black.opacity(0.7) //darker shade for better blending
+                            ]),
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
                         )
                     )
                     .cornerRadius(12)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 12)
+                            .stroke(LinearGradient(
+                                gradient: Gradient(colors: [
+                                    Color(hex: "22C55E").opacity(0.4),
+                                    Color(hex: "0A2F23").opacity(0.8)
+                                ]),
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            ), lineWidth: 1.5)
+                    )
                     .shadow(
                         color: Color(hex: "#243B35").opacity(0.3),
                         radius: 8,

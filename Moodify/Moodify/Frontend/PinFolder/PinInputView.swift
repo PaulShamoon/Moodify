@@ -25,10 +25,10 @@ struct PinInputView: View {
                         presentationMode.wrappedValue.dismiss()
                     }) {
                         HStack(spacing: 8) {
-                            Image(systemName: "chevron.left")
+                            Image(systemName: "chevron.down")
                             Text("Back")
                         }
-                        .foregroundColor(.white)
+                        .foregroundColor(Color(hex: "#F5E6D3"))
                         .font(.system(size: 16, weight: .medium))
                     }
                     Spacer()

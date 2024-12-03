@@ -164,7 +164,7 @@ struct CustomHeader: View {
             // Back button
             Button(action: { dismiss() }) {
                 HStack(spacing: 8) {
-                    Image(systemName: "chevron.left")
+                    Image(systemName: "chevron.down")
                     Text("Back")
                 }
                 .font(.system(size: 18, weight: .bold, design: .rounded))
@@ -226,7 +226,7 @@ struct NowPlayingCard: View {
                         .frame(width: 60, height: 60)
                         .overlay(
                             Image(systemName: "music.note")
-                                .foregroundColor(.white)
+                                .foregroundColor(Color(hex: "#F5E6D3"))
                         )
                 }
                 
@@ -264,7 +264,7 @@ struct QueueSection: View {
         VStack(alignment: .leading, spacing: 16) {
             Text("COMING UP NEXT")
                 .font(.caption.bold())
-                .foregroundColor(.white.opacity(0.7))
+                .foregroundColor(Color(hex: "#F5E6D3").opacity(0.7))
                 .padding(.horizontal)
             
             if spotifyController.currentQueue.isEmpty {
@@ -287,13 +287,13 @@ struct EmptyQueueView: View {
         VStack(spacing: 12) {
             Image(systemName: "music.note.list")
                 .font(.system(size: 40))
-                .foregroundColor(.white.opacity(0.6))
+                .foregroundColor(Color(hex: "#F5E6D3").opacity(0.6))
             Text("Your queue is empty")
                 .font(.headline)
-                .foregroundColor(.white.opacity(0.8))
+                .foregroundColor(Color(hex: "#F5E6D3").opacity(0.8))
             Text("Add some songs to get the party started!")
                 .font(.subheadline)
-                .foregroundColor(.white.opacity(0.6))
+                .foregroundColor(Color(hex: "#F5E6D3").opacity(0.6))
         }
         .frame(maxWidth: .infinity)
         .padding(30)
@@ -328,7 +328,7 @@ struct QueueItemView: View {
             .padding(.horizontal, 16)
             .background(
                 RoundedRectangle(cornerRadius: 12)
-                    .fill(.white.opacity(isHovered ? 0.15 : 0.1))
+                    .fill(Color(hex: "#F5E6D3").opacity(isHovered ? 0.15 : 0.1))
             )
             .padding(.horizontal)
         }

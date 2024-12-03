@@ -87,7 +87,7 @@ struct GeneralMusicPreferencesView: View {
                         .padding(.vertical, 10)
                         .background(
                             RoundedRectangle(cornerRadius: 12)
-                                .fill(Color.white.opacity(0.05))
+                                .fill(Color(hex: "#F5E6D3").opacity(0.05))
                         )
                         .frame(maxWidth: .infinity) // Ensures it adjusts to parent width
                 }
@@ -108,7 +108,7 @@ struct GeneralMusicPreferencesView: View {
                                         RoundedRectangle(cornerRadius: 12)
                                             .fill(selectedGenres.contains(genre) ?
                                                   LinearGradient(gradient: Gradient(colors: [Color.green, Color.green.opacity(0.7)]), startPoint: .topLeading, endPoint: .bottomTrailing) :
-                                                    LinearGradient(gradient: Gradient(colors: [Color.white.opacity(0.1), Color.white.opacity(0.05)]), startPoint: .topLeading, endPoint: .bottomTrailing))
+                                                    LinearGradient(gradient: Gradient(colors: [Color(hex: "#F5E6D3").opacity(0.1), Color(hex: "#F5E6D3").opacity(0.05)]), startPoint: .topLeading, endPoint: .bottomTrailing))
                                             .shadow(color: selectedGenres.contains(genre) ? Color.green.opacity(0.3) : Color.black.opacity(0.2), radius: 6, x: 0, y: 3)
                                         
                                         VStack(spacing: 8) {
@@ -118,7 +118,7 @@ struct GeneralMusicPreferencesView: View {
                                             
                                             Text(genre)
                                                 .font(.system(size: 14, weight: .semibold, design: .rounded))
-                                                .foregroundColor(selectedGenres.contains(genre) ? .black : .white)
+                                                .foregroundColor(selectedGenres.contains(genre) ? .black : Color(hex: "#F5E6D3"))
                                             
                                             if selectedGenres.contains(genre) {
                                                 Image(systemName: "checkmark.circle.fill")

@@ -6,6 +6,7 @@ struct CustomProfileIconView: View {
     @Binding var originalImage: UIImage?
     @Binding var croppedImage: UIImage?
     @Environment(\.presentationMode) var presentationMode
+    @Environment(\.dismiss) var dismiss
     
     let icons = ["headphones", "guitars", "music.microphone", "bolt",
                  "music.quarternote.3", "music.note", "music.mic",
@@ -28,10 +29,24 @@ struct CustomProfileIconView: View {
     
     @State private var selectedIcon: String = "music.note"
     @State private var selectedColor: Color = Color(hex: "779885")  // Default to medium sage
-    @State private var iconColor: Color = .white
+    @State private var iconColor: Color = Color(hex: "#F5E6D3")
     
     var body: some View {
         VStack(spacing: 20) {
+            HStack {
+                // Back button
+                Button(action: { dismiss() }) {
+                    HStack(spacing: 8) {
+                        Image(systemName: "chevron.down")
+                    }
+                    .font(.system(size: 18, weight: .bold, design: .rounded))
+                    .foregroundColor(Color(hex: "#F5E6D3"))
+                    .cornerRadius(12)
+                    .shadow(color: Color.black.opacity(0.1), radius: 8, x: 0, y: 4)
+                    .padding(.top, 15)
+                    Spacer()
+                }
+            }
             Text("Choose Your Icon")
                 .font(.system(size: 34, weight: .bold))
                 .foregroundColor(Color(hex: "#F5E6D3"))
@@ -110,13 +125,13 @@ struct CustomProfileIconView: View {
                             .padding(.top)
                         
                         HStack(spacing: 20) {
-                            Button(action: { iconColor = .white }) {
+                            Button(action: { iconColor = Color(hex: "#F5E6D3") }) {
                                 Circle()
-                                    .fill(Color.white)
+                                    .fill(Color(hex: "#F5E6D3"))
                                     .frame(width: 50, height: 50)
                                     .overlay(
                                         Circle()
-                                            .stroke(iconColor == .white ? Color(hex: "4ADE80") : Color.gray, lineWidth: 5)
+                                            .stroke(iconColor == Color(hex: "#F5E6D3") ? Color(hex: "4ADE80") : Color.gray, lineWidth: 5)
                                     )
                             }
                             

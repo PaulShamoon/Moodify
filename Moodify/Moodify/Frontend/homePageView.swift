@@ -238,7 +238,7 @@ struct homePageView: View {
                                     .fill(Color(hex: "#1A2F2A")) // Dark green background
                                     .overlay(
                                         RoundedRectangle(cornerRadius: 20)
-                                            .stroke(Color.white.opacity(0.1), lineWidth: 1)
+                                            .stroke(Color(hex: "#F5E6D3").opacity(0.1), lineWidth: 1)
                                     )
                             )
                         }
@@ -382,7 +382,7 @@ struct homePageView: View {
                                 .stroke(
                                     LinearGradient(
                                         colors: [
-                                            Color.white.opacity(0.1),  // Subtle highlight
+                                            Color(hex: "#F5E6D3").opacity(0.1),  // Subtle highlight
                                             Color.clear,
                                             Color.black.opacity(0.1)   // Subtle shadow
                                         ],
@@ -1044,6 +1044,7 @@ struct ManualMoodSelector: View {
     
     @State private var selectedMood: String = ""
     @Environment(\.colorScheme) var colorScheme
+    @Environment(\.dismiss) var dismiss
     
     @State private var showMoodPreferenceSheet = false
     @State private var detectedMood = ""
@@ -1052,7 +1053,20 @@ struct ManualMoodSelector: View {
         NavigationView {
             ScrollView {
                 VStack(spacing: 20) {
-                    // Replace the navigation title with a custom title
+                    HStack {
+                        // Back button
+                        Button(action: { dismiss() }) {
+                            HStack(spacing: 8) {
+                                Image(systemName: "chevron.down")
+                            }
+                            .font(.system(size: 18, weight: .bold, design: .rounded))
+                            .foregroundColor(Color(hex: "#F5E6D3"))
+                            .cornerRadius(12)
+                            .shadow(color: Color.black.opacity(0.1), radius: 8, x: 0, y: 4)
+                            .padding(.top, 15)
+                            Spacer()
+                        }
+                    }
                     Text("How are you feeling?")
                         .font(.system(size: 32, weight: .bold))
                         .foregroundColor(Color(hex: "#F5E6D3")) // Same green as player

@@ -92,7 +92,7 @@ struct PlaylistCard: View {
                 Text(playlist.mood.prefix(1).capitalized + playlist.mood.dropFirst())
                     .font(.title2)
                     .bold()
-                    .foregroundColor(.white)
+                    .foregroundColor(Color(hex: "#F5E6D3"))
                 
                 Spacer()
                 
@@ -112,7 +112,7 @@ struct PlaylistCard: View {
                 }
             }
             
-            Divider().background(Color.white)
+            Divider().background(Color(hex: "#F5E6D3"))
             
             // ScrollView enables songs to be scrolled through
             ScrollView {

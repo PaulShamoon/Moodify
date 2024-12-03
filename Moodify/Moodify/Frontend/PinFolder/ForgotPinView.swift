@@ -66,12 +66,12 @@ struct ForgotPinView: View {
                 
                 Text("Your Security Question")
                     .font(.title2)
-                    .foregroundColor(.white)
+                    .foregroundColor(Color(hex: "#F5E6D3"))
                 
                 // Display the security question
                 Text(profile.personalSecurityQuestion ?? "No security question set")
                     .font(.headline)
-                    .foregroundColor(.white)
+                    .foregroundColor(Color(hex: "#F5E6D3"))
                 
                 // Security answer input with visibility toggle inside the input field
                 TextInputField(
@@ -83,7 +83,7 @@ struct ForgotPinView: View {
                 
                 Text("Enter your new 4 digit PIN")
                     .font(.title2)
-                    .foregroundColor(.white)
+                    .foregroundColor(Color(hex: "#F5E6D3"))
                 
                 // New PIN input with visibility toggle inside the input field
                 PinInputField(

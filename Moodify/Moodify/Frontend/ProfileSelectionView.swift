@@ -35,7 +35,7 @@ struct ProfileSelectionView: View {
                 VStack(spacing: 8) {
                     Text("Who's Listening?")
                         .font(.system(size: 32, weight: .bold))
-                        .foregroundColor(.white)
+                        .foregroundColor(Color(hex: "#F5E6D3"))
                         .foregroundStyle(
                             LinearGradient(
                                 colors: [
@@ -234,7 +234,7 @@ struct ProfileCard: View {
                 
                 Text(profile.name)
                     .font(.system(size: 18, weight: .semibold))
-                    .foregroundColor(.white)
+                    .foregroundColor(Color(hex: "#F5E6D3"))
                     .lineLimit(1)
             }
             .frame(width: 160, height: 170)

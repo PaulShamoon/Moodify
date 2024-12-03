@@ -69,7 +69,7 @@ struct MoodConfirmationSheet: View {
         VStack(spacing: 0) {
             /* Sheet drag indicator */
             RoundedRectangle(cornerRadius: 2.5)
-                .fill(Color.white.opacity(0.3))
+                .fill(Color(hex: "#F5E6D3").opacity(0.3))
                 .frame(width: 40, height: 5)
                 .padding(.top, 10)
             
@@ -93,18 +93,18 @@ struct MoodConfirmationSheet: View {
                     
                     Image(systemName: getMoodIcon(for: detectedMood))
                         .font(.system(size: 40))
-                        .foregroundColor(.white)
+                        .foregroundColor(Color(hex: "#F5E6D3"))
                 }
                 
                 /* Mood detection result text */
                 VStack(spacing: 8) {
                     Text("I detect that you're feeling")
                         .font(.system(size: 16, weight: .medium))
-                        .foregroundColor(.white.opacity(0.8))
+                        .foregroundColor(Color(hex: "#F5E6D3").opacity(0.8))
                     
                     Text(detectedMood.capitalized)
                         .font(.system(size: 34, weight: .bold))
-                        .foregroundColor(.white)
+                        .foregroundColor(Color(hex: "#F5E6D3"))
                 }
             }
             
@@ -122,7 +122,7 @@ struct MoodConfirmationSheet: View {
                 }) {
                     Text("Yes, that's right")
                         .font(.system(size: 17, weight: .semibold))
-                        .foregroundColor(.white)
+                        .foregroundColor(Color(hex: "#F5E6D3"))
                         .frame(maxWidth: .infinity)
                         .frame(height: 56)
                         .background(
@@ -136,7 +136,7 @@ struct MoodConfirmationSheet: View {
                         )
                         .overlay(
                             RoundedRectangle(cornerRadius: 16)
-                                .stroke(Color.white.opacity(0.2), lineWidth: 1)
+                                .stroke(Color(hex: "#F5E6D3").opacity(0.2), lineWidth: 1)
                         )
                 }
                 
@@ -150,16 +150,16 @@ struct MoodConfirmationSheet: View {
                 }) {
                     Text("No, retake mood")
                         .font(.system(size: 17, weight: .medium))
-                        .foregroundColor(.white.opacity(0.8))
+                        .foregroundColor(Color(hex: "#F5E6D3").opacity(0.8))
                         .frame(maxWidth: .infinity)
                         .frame(height: 56)
                         .background(
                             RoundedRectangle(cornerRadius: 16)
-                                .fill(Color.white.opacity(0.1))
+                                .fill(Color(hex: "#F5E6D3").opacity(0.1))
                         )
                         .overlay(
                             RoundedRectangle(cornerRadius: 16)
-                                .stroke(Color.white.opacity(0.2), lineWidth: 1)
+                                .stroke(Color(hex: "#F5E6D3").opacity(0.2), lineWidth: 1)
                         )
                 }
             }

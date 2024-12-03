@@ -13,7 +13,7 @@ struct AccountInfoView: View {
                 
                 Text("Account Information")
                     .font(.system(size: 34, weight: .bold, design: .rounded))
-                    .foregroundColor(.white)
+                    .foregroundColor(Color(hex: "#F5E6D3"))
                     .multilineTextAlignment(.center)
                     .frame(maxWidth: .infinity)
                 
@@ -51,7 +51,7 @@ struct AccountInfoView: View {
                             }) {
                                 Image(systemName: "pencil.circle.fill")
                                     .font(.system(size: 25))
-                                    .foregroundColor(.white)
+                                    .foregroundColor(Color(hex: "#F5E6D3"))
                                     .background(Circle().fill(Color.green))
                                     .frame(width: 30, height: 30)
                                     .contentShape(Circle())
@@ -60,7 +60,7 @@ struct AccountInfoView: View {
                             
                             Text(profile.name)
                                 .font(.system(size: 24, weight: .semibold, design: .rounded))
-                                .foregroundColor(.white)
+                                .foregroundColor(Color(hex: "#F5E6D3"))
                                 .offset(x: -25)
                         }
                         
@@ -160,9 +160,9 @@ struct AccountInfoView: View {
                             }) {
                                 HStack {
                                     Image(systemName: "chevron.backward")
-                                        .foregroundColor(.white)
+                                        .foregroundColor(Color(hex: "#F5E6D3"))
                                     Text("Back")
-                                        .foregroundColor(.white)
+                                        .foregroundColor(Color(hex: "#F5E6D3"))
                                 }
                             }
                         }
@@ -199,7 +199,7 @@ struct InfoRow: View {
             
             Text(value)
                 .font(.system(size: 16, weight: .medium))
-                .foregroundColor(.white)
+                .foregroundColor(Color(hex: "#F5E6D3"))
                 .lineLimit(1)
                 .truncationMode(.tail)
                 .frame(maxWidth: .infinity, alignment: .leading)
