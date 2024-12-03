@@ -14,9 +14,9 @@ To use Ngrok you need to create an account
 - Click "Sign up" in the top right corner
 - Enter your information and click "Sign up"
 - Verify your email if asked to do so
-- Fill out the questionairre
+- Fill out the questionnaire
 
-## Step 2. Grabing the Authtoken
+## Step 2. Grabbing the Authtoken
 Ngrok provides you with an Authtoken. This is used to authenticate the ngrok agent that you will download in step 3. Make sure to keep it handy, as we will use it in step 4.
 
 
@@ -52,7 +52,7 @@ struct homePageView: View {
 ```
 - Ensure you add /analyze to the end of the link, exactly as shown above
 
-## Step 7. Setting up + Running the Virtual Enviorment
+## Step 7. Setting up + Running the Virtual Environment
 - You must be in the flask folder/directory in order to build the virtual environment
 - Run this command in a seperate terminal to build the virtual env
 ```terminal
@@ -90,7 +90,7 @@ python3 flas.py
 ```
 
 ## Step 10. Final Result
-- Then you should have 2 sepearate terminals which should look like the following:
+- Then you should have 2 separate terminals which should look like the following:
     - One running Ngrok (top terminal)
     - The other running flas.py (bottom terminal)
 ![alt text](image-2.png)
@@ -105,7 +105,7 @@ In order for our application to use Spotify's iOS SDK and Web API, we need to cr
 - If you are a developer looking to test the application, but do not have
   a Spotify Premium account you can use the following developer account
     - Email: paulshamoon@yahoo.com
-    - Passowrd: Moodify2024
+    - Password: Moodify2024
     - NOTE: This account will deactivate on December 19th, 2024
 - After logging in, click the accounts name in the top right corner
 - Click "Dashboard"
@@ -123,7 +123,7 @@ In order for our application to use Spotify's iOS SDK and Web API, we need to cr
     - Click "Add"
 - Click "Save"
 
-## Step 2. Add the Cleint ID to Moodify
+## Step 2. Add the Client ID to Moodify
 - Open your developer app in Spotify's developer dashboard
 - Under "Basic Information" copy the "Client ID"
 - Open Moodify in Xcode
