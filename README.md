@@ -1,3 +1,5 @@
+Created By: Paul Shamoon
+
 # Setting Up the Ngrok Server
 Moodify uses Ngrok to host our application. 
 
@@ -96,7 +98,7 @@ python3 flas.py
 # Set up Spotify Services
 In order for our application to use Spotify's iOS SDK and Web API, we need to create a developer app and give our app the "Client ID"
 
-## Creating a Spotify developer account
+## Step 1. Creating a Spotify developer account
 - Go to this link: https://developer.spotify.com
 - Press login
 - Login with your Spotify Premium account
@@ -121,7 +123,7 @@ In order for our application to use Spotify's iOS SDK and Web API, we need to cr
     - Click "Add"
 - Click "Save"
 
-## Add the Cleint ID to Moodify
+## Step 2. Add the Cleint ID to Moodify
 - Open your developer app in Spotify's developer dashboard
 - Under "Basic Information" copy the "Client ID"
 - Open Moodify in Xcode
@@ -146,7 +148,7 @@ In order to run an application in developement through Xcode, you need to put yo
 
 
 # Installing the application
-## Sign your device:
+## Step 1. Sign your device:
 - Open the "Moodify" folder in Xcode
 - On the top of the file directory for Moodify in Xcode, click "Moodify"
     - Note: There are two Moodify folders, one for the project and one for it's contents. You
@@ -163,7 +165,7 @@ In order to run an application in developement through Xcode, you need to put yo
     - Click "Bundle Identifier"
     - Enter "Moodify"
 
-## Install the app:
+## Step 2. Install the app:
 - Connect your iOS device to your Mac through a compatible wire
 - In Xcode on the very top, click on where it says "iPhone" or "Any iOS Device (arm64)
     - From the dropdown, select the iOS device you connected
