@@ -83,7 +83,7 @@ struct PlaylistsView: View {
                             .frame(width: 100, height: 100)
                             .foregroundColor(.gray.opacity(0.5))
                         
-                        Text("No playlists found")
+                        Text("No playlists created yet, detect your mood to generate your past playlists here!")
                             .foregroundColor(.gray)
                             .padding()
                     }
@@ -130,7 +130,7 @@ struct PlaylistRowView: View {
                 Text(playlist.mood.capitalized)
                     .font(.headline)
                 Text("\(playlist.songs.count) songs")
-                    .font(.caption)
+                    .font(.headline)
                     .foregroundColor(.secondary)
             }
             
@@ -156,55 +156,30 @@ struct DetailedPlaylistView: View {
     @ObservedObject var playlistManager: PlaylistManager
 
     @Environment(\.presentationMode) var presentationMode
-    
+
     init(playlist: Playlist, spotifyController: SpotifyController) {
         self.playlist = playlist
         self._songs = State(initialValue: playlist.songs)
         self.spotifyController = spotifyController
         self.playlistManager = spotifyController.playlistManager
     }
-    
+
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
                 HStack {
-                    VStack(alignment: .leading) {
-                        Text(playlist.mood.capitalized)
-                            .font(.largeTitle)
-                            .fontWeight(.bold)
-                        Text("\(songs.count) Songs")
-                            .foregroundColor(.secondary)
-                    }
-                    
+                    headerView
                     Spacer()
-                    
-                    Button(action: {
-                        spotifyController.playlistManager.playPlaylist(playlist: playlist)
-                        presentationMode.wrappedValue.dismiss()
-                    }) {
-                        Image(systemName: "play.circle.fill")
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .frame(width: 60, height: 60)
-                            .foregroundColor(.green)
-                    }
+                    playButton
                 }
                 .padding()
-        
+                
+                Divider()
+                    .background(Color.white)
+                
                 LazyVStack(spacing: 15) {
-                    ForEach(songs) { song in
-                        SongRowWithSwipeActions(
-                            song: song,
-                            playlist: $playlist,
-                            songs: $songs,
-                            spotifyController: spotifyController
-                        )
-                        .transition(.asymmetric(insertion: .move(edge: .trailing),
-                                                removal: .slide))
-                    }
+                    songsList
                 }
-                .padding(.horizontal)
-                .animation(.spring(), value: songs)
             }
         }
         .navigationTitle("Playlist Details")
@@ -219,13 +194,73 @@ struct DetailedPlaylistView: View {
             }
         }
     }
+
+    private var headerView: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            VStack(alignment: .leading, spacing: 4) {
+                Text("Mood")
+                    .font(.title)
+                    .foregroundColor(.secondary)
+                Text(playlist.mood.capitalized)
+                    .font(.subheadline)
+                    .fontWeight(.bold)
+                    .foregroundColor(.primary)
+            }
+            
+            VStack(alignment: .leading, spacing: 4) {
+                Text("Genres")
+                    .font(.title)
+                    .foregroundColor(.secondary)
+                Text(playlist.genres.joined(separator: ", "))
+                    .font(.subheadline)
+                    .fontWeight(.semibold)
+                    .foregroundColor(.primary)
+            }
+            
+            Text("\(songs.count) Songs")
+                .font(.caption)
+                .foregroundColor(.secondary)
+        }
+        .padding()
+    }
+
+    private var playButton: some View {
+        Button(action: {
+            spotifyController.playlistManager.playPlaylist(playlist: playlist)
+            presentationMode.wrappedValue.dismiss()
+        }) {
+            Image(systemName: "play.circle.fill")
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+                .frame(width: 60, height: 60)
+                .foregroundColor(.green)
+        }
+    }
+
+    private var songsList: some View {
+        ForEach(songs) { song in
+            SongRowWithSwipeActions(
+                song: song,
+                playlist: $playlist,
+                songs: $songs,
+                spotifyController: spotifyController
+            )
+            .transition(.asymmetric(insertion: .move(edge: .trailing), removal: .slide))
+            Divider()
+                .background(Color.white)
+        }
+        .padding(.horizontal)
+        .animation(.spring(), value: songs)
+    }
 }
+
 
 struct SongRowWithSwipeActions: View {
     let song: Song
     @Binding var playlist: Playlist
     @Binding var songs: [Song]
     var spotifyController: SpotifyController
+    var onUpdate: ((Playlist, [Song]) -> Void)?
     
     @State private var offset: CGFloat = 0
     @State private var showMessage = false
@@ -257,7 +292,7 @@ struct SongRowWithSwipeActions: View {
                         }
                     }
                     .frame(width: geometry.size.width, height: 60)
-                    .background(actionType == .remove ? Color.red : Color.green)
+                    .background(actionType == .favorite ? song.isFavorited ? Color.gray : Color.yellow : Color.red)
                 }
                 
                 // Foreground Content with Gesture
@@ -332,6 +367,9 @@ struct SongRowWithSwipeActions: View {
                 playlist = mutablePlaylist
                 songs = mutablePlaylist.songs
                 
+                // Call the update callback
+                onUpdate?(mutablePlaylist, mutablePlaylist.songs)
+                
                 // Optionally show a message
                 showFavoriteMessage(isFavorite: song.isFavorited)
 
@@ -342,6 +380,9 @@ struct SongRowWithSwipeActions: View {
                 // Update the local playlist and songs
                 playlist = mutablePlaylist
                 songs = mutablePlaylist.songs
+                
+                // Call the update callback
+                onUpdate?(mutablePlaylist, mutablePlaylist.songs)
                 
                 // Show removal message
                 showRemovalMessage()
@@ -354,13 +395,6 @@ struct SongRowWithSwipeActions: View {
         messageColor = .green
         messageAlignment = .trailing
         showMessage = true
-        
-        // Hide message after 2 seconds
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-            withAnimation {
-                showMessage = false
-            }
-        }
     }
     
     private func showRemovalMessage() {
@@ -368,13 +402,6 @@ struct SongRowWithSwipeActions: View {
         messageColor = .red
         messageAlignment = .trailing
         showMessage = true
-        
-        // Hide message after 2 seconds
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-            withAnimation {
-                showMessage = false
-            }
-        }
     }
 }
 
