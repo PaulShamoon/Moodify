@@ -10,25 +10,40 @@ import SwiftUI
 struct TermsOfServiceView: View {
     @Binding var agreedToTerms: Bool
     @Environment(\.presentationMode) var presentationMode
+    let showBackButton: Bool
+    
+    // Default initializer with back button
+    init(agreedToTerms: Binding<Bool>) {
+        self._agreedToTerms = agreedToTerms
+        self.showBackButton = true
+    }
+    
+    // Additional initializer for menu navigation
+    init(agreedToTerms: Binding<Bool>, showBackButton: Bool) {
+        self._agreedToTerms = agreedToTerms
+        self.showBackButton = showBackButton
+    }
     
     var body: some View {
         VStack(spacing: 1) {
-            // Add back button at the top
-            HStack {
-                Button(action: {
-                    presentationMode.wrappedValue.dismiss()
-                }) {
-                    HStack(spacing: 8) {
-                        Image(systemName: "chevron.left")
-                        Text("Back")
+            // Only show back button if showBackButton is true
+            if showBackButton {
+                HStack {
+                    Button(action: {
+                        presentationMode.wrappedValue.dismiss()
+                    }) {
+                        HStack(spacing: 8) {
+                            Image(systemName: "chevron.left")
+                            Text("Back")
+                        }
+                        .foregroundColor(Color(hex: "#F5E6D3"))
+                        .font(.system(size: 16, weight: .medium))
                     }
-                    .foregroundColor(Color(hex: "#F5E6D3"))
-                    .font(.system(size: 16, weight: .medium))
+                    Spacer()
                 }
-                Spacer()
+                .padding(.top, 20)
+                .padding(.leading, 10)
             }
-            .padding(.top, 20)
-            .padding(.leading, 10)
             
             ScrollView {
                 VStack(alignment: .leading, spacing: 15) {
@@ -37,7 +52,7 @@ struct TermsOfServiceView: View {
                         .bold()
                         .padding(.bottom, 5)
                     
-                    Text("Last Updated: 11/13/2024")
+                    Text("Last Updated: 12/03/2024")
                         .font(.subheadline)
                         .foregroundColor(.gray)
                         .padding(.bottom, 20)

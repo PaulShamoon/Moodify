@@ -267,7 +267,8 @@ struct MenuView: View {
                             agreedToTerms: Binding(
                                 get: { profileManager.currentProfile?.hasAgreedToTerms ?? false },
                                 set: { profileManager.currentProfile?.hasAgreedToTerms = $0 }
-                            )
+                            ),
+                            showBackButton: false
                         )
                         .environmentObject(profileManager)
                         .navigationBarBackButtonHidden(true)
