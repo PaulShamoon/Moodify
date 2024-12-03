@@ -17,6 +17,7 @@ struct PlaylistsView: View {
     @EnvironmentObject var profileManager: ProfileManager
     @State private var searchText = ""
     @State private var selectedMood: String? = nil
+    @State private var refreshID = UUID()
     
     private var groupedPlaylists: [String: [Playlist]] {
         let allPlaylists = spotifyController.playlistManager.getUsersPlaylists(profile: profileManager.currentProfile!)
@@ -103,6 +104,14 @@ struct PlaylistsView: View {
             .navigationTitle("My Playlists")
         }
         .navigationViewStyle(StackNavigationViewStyle())
+        .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("RefreshPlaylists"))) { _ in
+            refreshID = UUID()
+        }
+        .id(refreshID) // Force refresh when this changes
+        .onAppear {
+            // Force a refresh of the playlists
+            refreshID = UUID()
+        }
     }
 }
 
@@ -143,13 +152,16 @@ struct DetailedPlaylistView: View {
     @State private var playlist: Playlist
     @State private var songs: [Song]
     var spotifyController: SpotifyController
-    
+    @EnvironmentObject var profileManager: ProfileManager
+    @ObservedObject var playlistManager: PlaylistManager
+
     @Environment(\.presentationMode) var presentationMode
     
     init(playlist: Playlist, spotifyController: SpotifyController) {
         self.playlist = playlist
         self._songs = State(initialValue: playlist.songs)
         self.spotifyController = spotifyController
+        self.playlistManager = spotifyController.playlistManager
     }
     
     var body: some View {
@@ -200,9 +212,11 @@ struct DetailedPlaylistView: View {
         .onChange(of: songs) { newSongs in
             // Sync changes back to the original playlist
             playlist.songs = newSongs
-            
-            // Optional: You might want to trigger a save or update here
-            // This depends on your exact requirements for syncing
+            if let index = playlistManager.playlists.firstIndex(where: { $0.id == playlist.id }) {
+                playlistManager.playlists[index].songs = newSongs
+                // Force parent view to update when dismissing
+                NotificationCenter.default.post(name: NSNotification.Name("RefreshPlaylists"), object: nil)
+            }
         }
     }
 }
