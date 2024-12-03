@@ -66,15 +66,22 @@ class OnboardingMoodViewModel: ObservableObject {
         }
     }
     
-    func handleDragEnd(gesture: DragGesture.Value, maxIndex: Int) {
-            let dragThreshold: CGFloat = 50
-            
-            if gesture.translation.width < -dragThreshold && currentIndex < maxIndex {
-                currentIndex += 1
-            } else if gesture.translation.width > dragThreshold && currentIndex > 0 {
-                currentIndex -= 1
-            }
-            
-            dragOffset = .zero
+    func handleDragEnd(gesture: DragGestureType, maxIndex: Int) {
+        let dragThreshold: CGFloat = 50
+        
+        if gesture.translation.width < -dragThreshold && currentIndex < maxIndex {
+            currentIndex += 1
+        } else if gesture.translation.width > dragThreshold && currentIndex > 0 {
+            currentIndex -= 1
         }
+        
+        dragOffset = .zero
+    }
 }
+
+protocol DragGestureType {
+    var translation: CGSize { get }
+}
+
+extension DragGesture.Value: DragGestureType {}
+

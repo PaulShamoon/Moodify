@@ -22,7 +22,7 @@ struct MenuView: View {
     @ObservedObject var spotifyController: SpotifyController
     
     @Namespace private var menuAnimation
-
+    
     private var hasPin: Bool {
         profileManager.currentProfile?.userPin != nil
     }
@@ -171,10 +171,10 @@ struct MenuView: View {
                                 }
                             }
                     }
-
+                    
                     // For GeneralMusicPreferencesView
                     .navigationDestination(isPresented: $showingMusicPreferences) {
-                        GeneralMusicPreferencesView(navigateToHomePage: .constant(false))
+                        GeneralMusicPreferencesView(navigateToHomePage: .constant(false), navigateToProfilePicture: .constant(false), navigateToMusicPreferences: .constant(false))
                             .environmentObject(profileManager)
                             .navigationBarBackButtonHidden(true)
                             .toolbar {
@@ -190,7 +190,7 @@ struct MenuView: View {
                                 }
                             }
                     }
-
+                    
                     // For PlaylistsView
                     .navigationDestination(isPresented: $showingPlaylists) {
                         PlaylistsView(spotifyController: spotifyController)
@@ -209,7 +209,7 @@ struct MenuView: View {
                                 }
                             }
                     }
-
+                    
                     // For PinSetupView (used twice)
                     .navigationDestination(isPresented: $showingPinSetup) {
                         PinSetupView(profile: profileManager.currentProfile)
@@ -245,7 +245,7 @@ struct MenuView: View {
                                 }
                             }
                     }
-
+                    
                     // For TermsOfServiceView
                     .navigationDestination(isPresented: $showingTOS) {
                         TermsOfServiceView(
@@ -269,7 +269,7 @@ struct MenuView: View {
                             }
                         }
                     }
-
+                    
                 }
                 .alert(isPresented: $showingAlert) {
                     switch activeAlert {
@@ -436,14 +436,37 @@ struct ProfileSection: View {
     
     var body: some View {
         VStack(spacing: 12) {
-            Image(systemName: "person.crop.circle.fill")
-                .font(.system(size: 60))
-                .foregroundColor(.blue)
-            
-            Text(profile.name)
-                .font(.title3.bold())
-            
-            Divider()
+            if let profilePictureData = profile.profilePicture,
+               let uiImage = UIImage(data: profilePictureData) {
+                // Display the saved profile picture
+                Image(uiImage: uiImage)
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: 100, height: 100)
+                    .clipShape(Circle())
+                    .overlay(
+                        Circle()
+                            .stroke(
+                                LinearGradient(
+                                    colors: [
+                                        Color(hex: "4ADE80"),
+                                        Color(hex: "22C55E")
+                                    ],
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                ),
+                                lineWidth: 3
+                            )
+                    )
+                    .shadow(color: Color(hex: "4ADE80").opacity(0.2), radius: 8, x: 0, y: 4)
+            } else {
+                // Fallback to default image
+                Image(systemName: "person.circle.fill")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 100, height: 100)
+                    .foregroundColor(Color(hex: "94A3BB"))
+            }
         }
         .padding()
     }

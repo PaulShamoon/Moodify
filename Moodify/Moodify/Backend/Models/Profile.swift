@@ -9,5 +9,6 @@ struct Profile: Identifiable, Codable, Equatable {
     var userPin: String?
     var personalSecurityQuestion: String?
     var securityQuestionAnswer: String?
+    var profilePicture: Data?
 }
 

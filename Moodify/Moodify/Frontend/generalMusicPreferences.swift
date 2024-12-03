@@ -4,6 +4,8 @@ struct GeneralMusicPreferencesView: View {
     @EnvironmentObject var profileManager: ProfileManager
     @State private var selectedGenres: Set<String> = []
     @Binding var navigateToHomePage: Bool
+    @Binding var navigateToProfilePicture: Bool
+    @Binding var navigateToMusicPreferences: Bool
     @State private var isPlaying = false
     @State private var isFirstTimeUser: Bool = true
     @State private var showError: Bool = false
@@ -11,10 +13,8 @@ struct GeneralMusicPreferencesView: View {
     @Environment(\.presentationMode) var presentationMode
     
     let genres = [
-        "Pop", "Hip-Hop", "Rock", "Electronic", "R&B", "Classical", "Jazz", "Dance", "K-Pop",
-        "Country", "Soul", "EDM", "Latin", "Reggae", "Lo-Fi", "Blues", "Funk", "Ambient",
-        "Techno", "Indie", "Disco", "Synth-Pop", "Garage", "Punk", "Acoustic", "Folk",
-        "World Music", "Film Scores", "Metal", "Opera", "Tango", "Bluegrass", "Samba"
+        "Pop", "Hip-Hop", "Rock", "Electronic", "R&B", "Classical", "Jazz", "Dance",
+        "Country"
     ]
     
     var sortedGenres: [String] {
@@ -34,36 +34,12 @@ struct GeneralMusicPreferencesView: View {
         case "Pop": return "star.fill"
         case "Hip-Hop": return "headphones"
         case "Rock": return "guitars"
-        case "Indie": return "music.microphone"
         case "Electronic": return "bolt"
         case "Jazz": return "music.quarternote.3"
         case "Dance": return "music.note"
         case "R&B": return "music.mic"
         case "Classical": return "music.note.list"
-        case "Reggae": return "music.quarternote.3"
-        case "Soul": return "music.note.tv"
         case "Country": return "guitars.fill"
-        case "Metal": return "guitars.fill"
-        case "Techno": return "music.note.tv"
-        case "Latin": return "music.mic"
-        case "Punk": return "guitars.fill"
-        case "Blues": return "music.quarternote.3"
-        case "Ambient": return "cloud.fill"
-        case "Acoustic": return "music.note"
-        case "Folk": return "guitars.fill"
-        case "K-Pop": return "music.note.house"
-        case "Lo-Fi": return "cloud.fill"
-        case "EDM": return "bolt"
-        case "Disco": return "music.note"
-        case "Funk": return "music.mic"
-        case "Garage": return "guitars.fill"
-        case "Synth-Pop": return "music.note"
-        case "Opera": return "music.note"
-        case "Bluegrass": return "guitars.fill"
-        case "Film Scores": return "film.fill"
-        case "World Music": return "globe"
-        case "Samba": return "music.note"
-        case "Tango": return "music.note"
         default: return "music.note"
         }
     }
@@ -182,7 +158,8 @@ struct GeneralMusicPreferencesView: View {
                             personalSecurityQuestion: currentProfile.personalSecurityQuestion,
                             securityQuestionAnswer: currentProfile.personalSecurityQuestion
                         )
-                        navigateToHomePage = true
+                        navigateToMusicPreferences = false
+                        navigateToProfilePicture = true
                         presentationMode.wrappedValue.dismiss()
                     }
                 }) {
@@ -241,7 +218,7 @@ extension Array {
 
 struct GeneralMusicPreferencesView_Previews: PreviewProvider {
     static var previews: some View {
-        GeneralMusicPreferencesView(navigateToHomePage: .constant(false))
+        GeneralMusicPreferencesView(navigateToHomePage: .constant(false), navigateToProfilePicture: .constant(false), navigateToMusicPreferences: .constant(true))
             .environmentObject(ProfileManager())
     }
 }
