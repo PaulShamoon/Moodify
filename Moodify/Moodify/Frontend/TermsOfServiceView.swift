@@ -9,28 +9,15 @@ import SwiftUI
 // TermsOfServicePage: Separate Page for TOS
 struct TermsOfServiceView: View {
     @Binding var agreedToTerms: Bool
-    @Environment(\.presentationMode) var presentationMode
+    @Environment(\.dismiss) var dismiss
     let showBackButton: Bool
-    
-    // Default initializer with back button
-    init(agreedToTerms: Binding<Bool>) {
-        self._agreedToTerms = agreedToTerms
-        self.showBackButton = true
-    }
-    
-    // Additional initializer for menu navigation
-    init(agreedToTerms: Binding<Bool>, showBackButton: Bool) {
-        self._agreedToTerms = agreedToTerms
-        self.showBackButton = showBackButton
-    }
     
     var body: some View {
         VStack(spacing: 1) {
-            // Only show back button if showBackButton is true
             if showBackButton {
                 HStack {
                     Button(action: {
-                        presentationMode.wrappedValue.dismiss()
+                        dismiss()
                     }) {
                         HStack(spacing: 8) {
                             Image(systemName: "chevron.left")
@@ -150,7 +137,7 @@ struct TermsOfServiceView: View {
             }
             Button(action: {
                 agreedToTerms = true
-                presentationMode.wrappedValue.dismiss()
+                dismiss()
             }) {
                 HStack(spacing: 12) {
                     Text(agreedToTerms ? "Done" : "Agree and Continue")
@@ -183,8 +170,11 @@ struct TermsOfServiceView: View {
 
 struct TermsOfServiceView_Previews: PreviewProvider {
     static var previews: some View {
-        TermsOfServiceView(agreedToTerms: .constant(false))
-            .previewLayout(.sizeThatFits)
-            .padding()
+        TermsOfServiceView(
+            agreedToTerms: .constant(false),
+            showBackButton: true
+        )
+        .previewLayout(.sizeThatFits)
+        .padding()
     }
 }

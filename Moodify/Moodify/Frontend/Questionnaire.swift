@@ -131,7 +131,13 @@ struct QuestionnaireView: View {
                     Text("I agree to the")
                         .foregroundColor(.gray)
                     
-                    NavigationLink(destination: TermsOfServiceView(agreedToTerms: $agreedToTerms)) {
+                    NavigationLink(destination: 
+                        TermsOfServiceView(
+                            agreedToTerms: $agreedToTerms,
+                            showBackButton: false
+                        )
+                        .tint(Color(hex: "#F5E6D3"))
+                    ) {
                         Text("Terms of Service")
                             .foregroundStyle(
                                 LinearGradient(
