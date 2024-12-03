@@ -26,10 +26,6 @@ struct TermsOfServiceView: View {
                         .foregroundColor(.gray)
                         .padding(.bottom, 20)
                     
-                    Text("Welcome to Moodify! By using our app, you agree to these Terms and Conditions. Please read them carefully as they outline your rights and obligations as a user of Moodify. If you do not agree to these terms, please do not use our app.")
-                        .padding(.bottom, 20)
-                    
-                    // Section 1
                     Text("1. Acceptance of Terms")
                         .font(.headline)
                     Text("By accessing or using the Moodify app, you agree to be bound by these Terms and Conditions. Moodify reserves the right to modify these terms at any time. Changes will be posted, and continued use of the app after such changes constitutes acceptance of the updated terms.")
@@ -108,6 +104,12 @@ struct TermsOfServiceView: View {
                     Text("9. Contact Information")
                         .font(.headline)
                     Text("If you have any questions or concerns about these Terms and Conditions, please contact us at hg5146@wayne.edu.")
+                        .padding(.bottom, 15)
+                    
+                    // Section 10
+                    Text("10. PIN Recovery and Profile Access")
+                        .font(.headline)
+                    Text("Moodify allows users to set a PIN for securing their profiles. If you forget your PIN, the only method of recovery is by correctly answering the security question set up. If the security question answer is forgotten, the profile remains inaccessible and cannot be deleted or recovered. It is your responsibility to remember your PIN and security question answer.")
                         .padding(.bottom, 15)
                     
                     Text("By agreeing, you acknowledge that you have read and understood these Terms and Conditions and agree to be bounded by them.")
