@@ -17,7 +17,9 @@ struct PinInputView: View {
     var body: some View {
         ZStack {
             backgroundColor.edgesIgnoringSafeArea(.all)
-            VStack {
+            
+            VStack(spacing: 0) {
+                // Back button header
                 HStack {
                     Button(action: {
                         presentationMode.wrappedValue.dismiss()
@@ -34,101 +36,99 @@ struct PinInputView: View {
                 .padding(.top, 20)
                 .padding(.leading, 10)
                 
-                if showError {
-                    Text("Incorrect PIN. Please try again.")
-                        .foregroundColor(.red)
-                        .font(.subheadline)
-                        .transition(.opacity)
-                        .padding(.top, 155)
-                }
-                Spacer()
-            }
-            .edgesIgnoringSafeArea(.top)
-            
-            VStack(spacing: 24) {
-                // Profile Header
-                VStack(spacing: 12) {
-                    Text("Enter your PIN")
-                        .font(.title)
-                        .foregroundColor(.white)
-                }
-                .padding(.top, 40)
-                
-                // PIN Display
-                HStack(spacing: 20) {
-                    ForEach(0..<4) { index in
-                        Circle()
-                            .stroke(accentColor, lineWidth: 2)
-                            .background(
-                                Circle()
-                                    .fill(enteredPin.count > index ? accentColor : .clear)
-                            )
-                            .frame(width: 20, height: 20)
+                // Main content
+                VStack(spacing: 24) {
+                    // Title and error message
+                    VStack(spacing: 16) {
+                        Text("Enter your PIN")
+                            .font(.system(size: 32, weight: .bold))
+                            .foregroundColor(Color(hex: "#F5E6D3"))
+                        
+                        if showError {
+                            Text("Incorrect PIN. Please try again.")
+                                .foregroundColor(.red)
+                                .font(.subheadline)
+                                .transition(.opacity)
+                        }
                     }
-                }
-                .padding(.vertical, 32)
-                
-                // Custom Number Pad
-                VStack(spacing: 16) {
-                    ForEach(0..<3) { row in
+                    .padding(.top, 40)
+                    
+                    // PIN Display
+                    HStack(spacing: 20) {
+                        ForEach(0..<4) { index in
+                            Circle()
+                                .stroke(Color(hex: "22C55E"), lineWidth: 2)
+                                .background(
+                                    Circle()
+                                        .fill(enteredPin.count > index ? Color(hex: "22C55E") : .clear)
+                                )
+                                .frame(width: 20, height: 20)
+                        }
+                    }
+                    .padding(.vertical, 32)
+                    
+                    // Custom Number Pad
+                    VStack(spacing: 16) {
+                        ForEach(0..<3) { row in
+                            HStack(spacing: 24) {
+                                ForEach(1...3, id: \.self) { col in
+                                    let number = row * 3 + col
+                                    NumberButton(number: "\(number)") {
+                                        appendPin(number: "\(number)")
+                                    }
+                                }
+                            }
+                        }
+                        
                         HStack(spacing: 24) {
-                            ForEach(1...3, id: \.self) { col in
-                                let number = row * 3 + col
-                                NumberButton(number: "\(number)") {
-                                    appendPin(number: "\(number)")
+                            // Empty space for alignment
+                            Color.clear
+                                .frame(width: 72, height: 72)
+                            
+                            NumberButton(number: "0") {
+                                appendPin(number: "0")
+                            }
+                            
+                            // Delete button
+                            NumberButton(number: "DEL", isSpecial: true) {
+                                if !enteredPin.isEmpty {
+                                    enteredPin.removeLast()
+                                    showError = false
                                 }
                             }
                         }
                     }
+                    .padding(.horizontal)
                     
-                    HStack(spacing: 24) {
-                        // Empty space for alignment
-                        Color.clear
-                            .frame(width: 72, height: 72)
-                        
-                        NumberButton(number: "0") {
-                            appendPin(number: "0")
-                        }
-                        
-                        // Delete button
-                        NumberButton(number: "DEL", isSpecial: true) {
-                            if !enteredPin.isEmpty {
-                                enteredPin.removeLast()
-                                showError = false
-                            }
-                        }
-                    }
-                }
-                .padding(.horizontal)
-                
-                // Forgot PIN Button
-                Button(action: {
-                    showingForgotPin = true
-                }) {
-                    Text("Forgot PIN?")
-                        .font(.system(size: 18, weight: .bold, design: .rounded))
-                        .foregroundColor(Color(hex: "#F5E6D3"))
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 16)
-                        .background(
-                            LinearGradient(
-                                colors: [Color(hex: "1A2F2A"), Color(hex: "243B35")],
-                                startPoint: .leading,
-                                endPoint: .trailing
+                    // Forgot PIN Button
+                    Button(action: {
+                        showingForgotPin = true
+                    }) {
+                        Text("Forgot PIN?")
+                            .font(.system(size: 18, weight: .bold, design: .rounded))
+                            .foregroundColor(Color(hex: "#F5E6D3"))
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 16)
+                            .background(
+                                LinearGradient(
+                                    colors: [Color(hex: "1A2F2A"), Color(hex: "243B35")],
+                                    startPoint: .leading,
+                                    endPoint: .trailing
+                                )
                             )
-                        )
-                        .cornerRadius(35)
-                        .shadow(
-                            color: Color.black.opacity(0.2),
-                            radius: 10,
-                            x: 0,
-                            y: 5
-                        )
+                            .cornerRadius(35)
+                            .shadow(
+                                color: Color.black.opacity(0.2),
+                                radius: 10,
+                                x: 0,
+                                y: 5
+                            )
+                    }
+                    .padding(.horizontal, 20)
+                    .padding(.bottom, 30)
                 }
-                .padding(.horizontal, 20)
-                .padding(.bottom, 30)
+                .padding()
             }
-            .padding()
         }
         .sheet(isPresented: $showingForgotPin) {
             ForgotPinView(navigateBackToSelection: $navigateBackToSelection, profile: profile)
