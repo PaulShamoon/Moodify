@@ -5,7 +5,7 @@ Moodify uses Ngrok to host our application.
 instructions will be specific to hosting it on a local physical machine
 - The Ngrok server must be running in order to use the facial mood detection feature of Moodify
 
-## Create an account
+## Step 1. Create an account
 To use Ngrok you need to create an account
 
 - Go to https://ngrok.com/
@@ -14,30 +14,84 @@ To use Ngrok you need to create an account
 - Verify your email if asked to do so
 - Fill out the questionairre
 
-## Grabing the Authtoken
-Ngrok provides you with an Authtoken. This is used to authenticate the ngrok agent that you downloaded
+## Step 2. Grabing the Authtoken
+Ngrok provides you with an Authtoken. This is used to authenticate the ngrok agent that you will download in step 3. Make sure to keep it handy, as we will use it in step 4.
 
 
-## Download Ngrok
+## Step 3. Download Ngrok
 - Go to this link: https://ngrok.com/download
-- Click "macOS"
-- Click the "Download" tab
-- Click "Download" towards the right of the page 
+- Click your respective "OS" Agent (e.g. macOS, Windows, Linux...) 
+- Download Ngrok through whichever method you prefer
 
-## Set Up and Run the Virtual Enviorment
-Kidd: talk about how to setup and run the virtual enviorment
+## Step 4. Configuring your authtoken
+- After downloading Ngrok, From Step 2. grab your authtoken and configure it with ngrok through the terminal by running this command
+```terminal
+ngrok config add-authtoken <token>
+```
 
-## Install the needed Packages
-Kidd: describe what packages need to be installed in the virtual env
+## Step 5. Setting up Ngrok in the Terminal
+- Run this command in the terminal to run ngrok
+```terminal
+ngrok http 8080
+```
+- It should look like this
+![alt text](image-1.png)
+- Everytime you run ngrok again, you have to grab the new url and put it in the "homePageView.swift".
 
-## Setup the flask.py file
-Kidd: describe how to setup the flask.py file
+- This is the new url to be used from the previous example https://58db-23-117-48-87.ngrok.free.app
 
-## Running the Server
-Kidd: describe how to actually run the server
+## Step 6. Updating homePageView.swift
+- Update this line in homePageView.swift based on what your url is (we're using the example from step 5. in this case)
+```swift
+struct homePageView: View {
+    ...
+    let backendURL = "https://58db-23-117-48-87.ngrok-free.app/analyze"
+    ...
+```
+- Ensure you add /analyze to the end of the link, exactly as shown above
 
-## Set the correct url in Moodify
-Kidd: Describe how to copy the url from ngrok and where you need to go in moodify and paste it
+## Step 7. Setting up + Running the Virtual Enviorment
+- You must be in the flask folder/directory in order to build the virtual environment
+- Run this command in a seperate terminal to build the virtual env
+```terminal
+python3 -m venv deepface-env
+```
+
+- Run this command in the flask folder to activate the virtual env
+```terminal
+source deepface-env/bin/activate
+```
+
+- It should look like this
+![alt text](image.png)
+
+## Step 8. Install the needed Packages in the virtual environment
+- Install flask
+```terminal
+pip install flask
+```
+
+- Install deepface
+```terminal
+pip install deepface
+```
+
+- Install tf-keras
+```terminal
+pip install tf-keras
+```
+
+## Step 9. Running the flas.py file
+- Run this command for the flask file (Note: flask.py doesn't work as a filename since it interferes with the flask library)
+```terminal
+python3 flas.py
+```
+
+## Step 10. Final Result
+- Then you should have 2 sepearate terminals which should look like the following:
+    - One running Ngrok (top terminal)
+    - The other running flas.py (bottom terminal)
+![alt text](image-2.png)
 
 # Set up Spotify Services
 In order for our application to use Spotify's iOS SDK and Web API, we need to create a developer app and give our app the "Client ID"
@@ -122,89 +176,3 @@ In order to run an application in developement through Xcode, you need to put yo
     - Press on the email associated with your Apple ID that you used to sign your device
     - Press "Trust"
     - Press "Allow
-
-
-# Kidd: Old readme instructions, should be deleted after updating the above sections
-Once you create an account, grab your auth token here and add the authtoken
-![alt text](image-3.png)
-
-
-## Setting up flask code
-The flask code is located in the Flask folder. 
-
-Filename: flas.py
-
-```py
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8080)
-```
-Note: if you change the port, make sure to change it here too
-
-## Running emotion detector server side
-Run these commands in the terminal to setup emotion detection on the server side
-
-### Setup ngrok server
-you can use any port, but in this case 8080 is used
-```terminal
-ngrok http 8080
-```
-It should look like this
-![alt text](image-1.png)
-Everytime you run ngrok again, you have to grab the new url and put it in the homePageView.swift
-
-In the example of the picture above: is the new url to be used
-
-https://58db-23-117-48-87.ngrok.free.app
-
-### Updating homePageView
-
-Then you also have to update this line in homePageView.swift
-
-```swift
-struct homePageView: View {
-    ...
-    let backendURL = "https://a46d-2601-406-4d00-7af0-d964-735f-448-6a6a.ngrok-free.app/analyze"
-    ...
-```
-
-Ensure you add /analyze to the end of the link, exactly as shown above
-
-### Setup virtual env
-#### Run this command in the flask folder to build the virtual env
-```terminal
-python3 -m venv deepface-env
-```
-
-#### Run this command in the flask folder to activate the virtual env
-```terminal
-source deepface-env/bin/activate
-```
-
-#### It should look like this
-![alt text](image.png)
-
-### Install these dependencies in order to run the flask code
-
-```terminal
-pip install flask
-```
-
-```terminal
-pip install deepface
-```
-
-```terminal
-pip install tf-keras
-```
-
-### Run flask code
-```terminal
-python3 flas.py
-```
-
-## After following all the steps, your terminal should look like this
-Top terminal = ngrok http 8080
-Bottom terminal = python3 flas.py
-![alt text](image-2.png)
-
-And finally, moodify utilize flas.py to process the emotion detection 
