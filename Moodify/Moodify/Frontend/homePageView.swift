@@ -300,6 +300,16 @@ struct homePageView: View {
                             .font(.system(size: 24))
                         Text(isDetectingMood ? "Detecting..." : "Detect Mood")
                             .font(.system(size: 24, weight: .medium))
+                        
+                        // Info icon
+                        Button(action: {
+                            showTips = true
+                        }) {
+                            Image(systemName: "info.circle")
+                                .font(.system(size: 16)) // Slightly smaller than the camera icon
+                                .foregroundColor(milkyBeige)
+                        }
+                        .offset(x: -5) // Adjust this value to position the icon closer to "Mood"
                     }
                     .foregroundColor(milkyBeige)
                     .padding(.horizontal, 40)
