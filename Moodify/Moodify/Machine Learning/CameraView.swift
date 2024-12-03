@@ -38,13 +38,42 @@ struct CameraView: UIViewControllerRepresentable {
             self.parent = parent
         }
         
+        private enum FaceDetectionResult {
+            case noFace
+            case partialFace
+            case validFace
+        }
+        
         func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
             if let image = info[.originalImage] as? UIImage {
                 let fixedImage = fixOrientation(image: image, cameraDevice: picker.cameraDevice)
                 
-                /* Handles face detection errors by showing an alert and allowing users
-                 to retake their photo if no face is detected */
-                if !hasFace(in: fixedImage) {
+                let faceDetectionResult = hasFace(in: fixedImage)
+                
+                switch faceDetectionResult {
+                case .noFace:
+                    DispatchQueue.main.async {
+                        let alert = UIAlertController(
+                            title: "No Face Detected",
+                            message: "Please take a photo of your face for mood detection.",
+                            preferredStyle: .alert
+                        )
+                        
+                        alert.addAction(UIAlertAction(title: "Try Again", style: .default) { [weak self] _ in
+                            alert.dismiss(animated: true) {
+                                picker.dismiss(animated: true) {
+                                    self?.parent.image = nil
+                                    self?.parent.shouldRetakePhoto = true
+                                    self?.parent.presentationMode.wrappedValue.dismiss()
+                                }
+                            }
+                        })
+                        
+                        picker.present(alert, animated: true)
+                    }
+                    return
+                    
+                case .partialFace:
                     DispatchQueue.main.async {
                         let alert = UIAlertController(
                             title: "Face Not Fully Visible",
@@ -65,37 +94,37 @@ struct CameraView: UIViewControllerRepresentable {
                         picker.present(alert, animated: true)
                     }
                     return
-                }
-                
-                /* Handles image quality issues like poor lighting or low resolution
-                 by showing an alert with specific feedback */
-                if let qualityError = checkImageQuality(fixedImage) {
-                    DispatchQueue.main.async {
-                        let alert = UIAlertController(
-                            title: "Image Quality Issue",
-                            message: qualityError,
-                            preferredStyle: .alert
-                        )
-                        
-                        alert.addAction(UIAlertAction(title: "Try Again", style: .default) { [weak self] _ in
-                            picker.dismiss(animated: true) {
-                                self?.parent.image = nil
-                                self?.parent.shouldRetakePhoto = true
+                    
+                case .validFace:
+                    // Continue with quality checks
+                    if let qualityError = checkImageQuality(fixedImage) {
+                        DispatchQueue.main.async {
+                            let alert = UIAlertController(
+                                title: "Image Quality Issue",
+                                message: qualityError,
+                                preferredStyle: .alert
+                            )
+                            
+                            alert.addAction(UIAlertAction(title: "Try Again", style: .default) { [weak self] _ in
+                                picker.dismiss(animated: true) {
+                                    self?.parent.image = nil
+                                    self?.parent.shouldRetakePhoto = true
+                                    self?.parent.presentationMode.wrappedValue.dismiss()
+                                }
+                            })
+                            
+                            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel) { [weak self] _ in
                                 self?.parent.presentationMode.wrappedValue.dismiss()
-                            }
-                        })
-                        
-                        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel) { [weak self] _ in
-                            self?.parent.presentationMode.wrappedValue.dismiss()
-                        })
-                        
-                        picker.present(alert, animated: true)
+                            })
+                            
+                            picker.present(alert, animated: true)
+                        }
+                        return
                     }
-                    return
+                    
+                    parent.image = fixedImage
+                    parent.presentationMode.wrappedValue.dismiss()
                 }
-                
-                parent.image = fixedImage
-                parent.presentationMode.wrappedValue.dismiss()
             }
         }
         
@@ -117,8 +146,8 @@ struct CameraView: UIViewControllerRepresentable {
             return flippedImage ?? image
         }
         
-        private func hasFace(in image: UIImage) -> Bool {
-            guard let ciImage = CIImage(image: image) else { return false }
+        private func hasFace(in image: UIImage) -> FaceDetectionResult {
+            guard let ciImage = CIImage(image: image) else { return .noFace }
             
             let detector = CIDetector(ofType: CIDetectorTypeFace,
                                       context: nil,
@@ -126,19 +155,21 @@ struct CameraView: UIViewControllerRepresentable {
             
             let features = detector?.features(in: ciImage) as? [CIFaceFeature] ?? []
             
+            // First check if there's no face at all
             guard features.count == 1,
                   let face = features.first else {
-                return false
+                return .noFace
             }
             
+            // Check if face features are visible
             guard face.hasLeftEyePosition &&
                     face.hasRightEyePosition &&
                     face.hasMouthPosition else {
-                return false
+                return .partialFace
             }
             
+            // Rest of face position validation
             let imageHeight = ciImage.extent.height
-            
             let eyesY = max(face.leftEyePosition.y, face.rightEyePosition.y)
             let mouthY = face.mouthPosition.y
             let eyeMouthDistance = eyesY - mouthY
@@ -151,7 +182,7 @@ struct CameraView: UIViewControllerRepresentable {
             eyesY / imageHeight <= (1.0 - minTopSpaceRatio) &&
             mouthY / imageHeight >= minBottomSpaceRatio
             
-            return hasValidLayout
+            return hasValidLayout ? .validFace : .partialFace
         }
         
         private func checkImageQuality(_ image: UIImage) -> String? {
