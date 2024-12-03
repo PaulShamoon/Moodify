@@ -28,10 +28,11 @@ struct homePageView: View {
     @State private var showConnectToSpotifyButton = false // New state variable
     @State private var showResyncSpotifyButton = false // New state variable
     @State private var isMoodButtonAnimating = false
+    @State private var showTips = false
     
     
     // NOTE - this URL is temporary and needs to be updated each time from the backend side to detect mood properly
-    let backendURL = "/analyze"
+    let backendURL = "https://11f3-2601-406-4d00-7af0-e958-5ea9-8746-5e4c.ngrok-free.app/analyze"
     
     // Add this property to manage background color
     @State private var backgroundColors: [Color] = [
@@ -87,6 +88,19 @@ struct homePageView: View {
     
     // Define a constant for the milky beige color at the top of the struct
     let milkyBeige = Color(hex: "#F5E6D3")
+    
+    // Add these properties/methods near the top of the struct with other state variables
+    private var hasSeenMoodTips: Bool {
+        UserDefaults.standard.bool(forKey: "hasSeenMoodTips_\(profile.id)")
+    }
+    
+    // Replace the computed property with a method to update the tips state
+    private func updateHasSeenMoodTips(_ value: Bool) {
+        UserDefaults.standard.set(value, forKey: "hasSeenMoodTips_\(profile.id)")
+    }
+    
+    // Add these new state variables right after other @State variables
+    @State private var shouldRetakePhoto = false
     
     var body: some View {
         ZStack {
@@ -271,7 +285,15 @@ struct homePageView: View {
                 
                 // Detect Mood Button
                 Button(action: {
-                    checkCameraPermission()
+                    let impact = UIImpactFeedbackGenerator(style: .medium)
+                    impact.impactOccurred()
+                    
+                    if !hasSeenMoodTips {
+                        showTips = true
+                        updateHasSeenMoodTips(true)
+                    } else {
+                        checkCameraPermission()
+                    }
                 }) {
                     HStack {
                         Image(systemName: "camera")
@@ -383,7 +405,7 @@ struct homePageView: View {
                         showingAlert = true
                     }
                 }
-
+                
                 // Check if the access token is available and not expired
                 if spotifyController.accessToken != nil, !spotifyController.isAccessTokenExpired() {
                     if !spotifyController.isConnected {
@@ -454,20 +476,26 @@ struct homePageView: View {
             }
         }
         .sheet(isPresented: $showingCamera) {
-            CameraView(image: $capturedImage, isCameraDismissed: $isCameraDismissed)
-                .onDisappear {
-                    /*
-                     If user took a photo, analyze it
-                     If they didn't take a photo, reset everything to default state
-                     This prevents showing old mood when camera is closed
-                     */
-                    if let image = capturedImage {
-                        analyzeImage(image: image)
-                    } else {
-                        resetToDefaultState()
-                    }
-                    capturedImage = nil
+            CameraView(
+                image: $capturedImage,
+                isCameraDismissed: $isCameraDismissed,
+                shouldRetakePhoto: $shouldRetakePhoto
+            )
+            .onDisappear {
+                if let image = capturedImage {
+                    analyzeImage(image: image)
+                } else {
+                    resetToDefaultState()
                 }
+                capturedImage = nil
+            }
+        }
+        .onChange(of: shouldRetakePhoto) { newValue in
+            if newValue {
+                // Present the camera again
+                showingCamera = true
+                shouldRetakePhoto = false
+            }
         }
         .sheet(isPresented: $showMoodPreferenceSheet) {
             MoodPreferenceView(
@@ -516,6 +544,13 @@ struct homePageView: View {
             .presentationDetents([.height(400)])
             .presentationDragIndicator(.visible)
             .presentationBackground(.clear)
+        }
+        .sheet(isPresented: $showTips) {
+            MoodDetectionTipsView(isPresented: $showTips) {
+                checkCameraPermission()
+            }
+            .presentationDetents([.height(320)])
+            .presentationDragIndicator(.visible)
         }
     }
     
