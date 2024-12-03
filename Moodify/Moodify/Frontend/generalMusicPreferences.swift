@@ -51,11 +51,11 @@ struct GeneralMusicPreferencesView: View {
                            endPoint: .bottom)
             .edgesIgnoringSafeArea(.all)
             
-            VStack(spacing: 32) {
+            VStack(spacing: 0) {
                 // Title Section
-                VStack(spacing: 8) {
+                VStack(spacing: 12) {
                     Text("\(profileManager.currentProfile?.name ?? "User"),")
-                        .font(.system(size: 26, weight: .bold, design: .rounded))
+                        .font(.system(size: 24, weight: .light))
                         .foregroundStyle(
                             LinearGradient(
                                 colors: [Color(hex: "4ADE80"), Color(hex: "22C55E")],
@@ -64,17 +64,19 @@ struct GeneralMusicPreferencesView: View {
                             )
                         )
                         .multilineTextAlignment(.center)
+                        .padding(.top, 80)
                     
                     Text("Select your favorite genres")
-                        .font(.system(size: 18, weight: .medium, design: .rounded))
-                        .foregroundColor(Color(hex: "94A3B8"))
+                        .font(.system(size: 28, weight: .bold))
+                        .foregroundColor(Color(hex: "#F5E6D3"))
                         .multilineTextAlignment(.center)
+                        .padding(.top, 4)
                     
                     Text("The more genres you choose, the better your recommendations.")
-                        .font(.system(size: 14, weight: .regular, design: .rounded))
+                        .font(.system(size: 14, weight: .medium))
                         .foregroundStyle(
                             LinearGradient(
-                                colors: [Color.green.opacity(0.9), Color.green.opacity(0.6)],
+                                colors: [Color(hex: "4ADE80"), Color(hex: "22C55E")],
                                 startPoint: .leading,
                                 endPoint: .trailing
                             )
@@ -86,6 +88,7 @@ struct GeneralMusicPreferencesView: View {
                             RoundedRectangle(cornerRadius: 12)
                                 .fill(Color.white.opacity(0.05))
                         )
+                        .padding(.top, 8)
                 }
                 .padding(.horizontal)
                 
@@ -170,7 +173,7 @@ struct GeneralMusicPreferencesView: View {
                         Image(systemName: "arrow.right.circle.fill")
                             .font(.system(size: 20))
                     }
-                    .foregroundColor(.black)
+                    .foregroundColor(Color(hex: "#F5E6D3"))
                     .frame(maxWidth: .infinity)
                     .frame(height: 56)
                     .background(
@@ -178,12 +181,16 @@ struct GeneralMusicPreferencesView: View {
                             if selectedGenres.isEmpty {
                                 Color.gray.opacity(0.5)
                             } else {
-                                LinearGradient(gradient: Gradient(colors: [Color.green, Color.green.opacity(0.8)]), startPoint: .leading, endPoint: .trailing)
+                                LinearGradient(
+                                    colors: [Color(hex: "#1A2F2A"), Color(hex: "#243B35")],
+                                    startPoint: .leading,
+                                    endPoint: .trailing
+                                )
                             }
                         }
                     )
                     .cornerRadius(16)
-                    .shadow(color: selectedGenres.isEmpty ? .clear : Color.green.opacity(0.3),
+                    .shadow(color: selectedGenres.isEmpty ? .clear : Color(hex: "#243B35").opacity(0.3),
                             radius: 8, x: 0, y: 4)
                 }
                 .padding(.horizontal)

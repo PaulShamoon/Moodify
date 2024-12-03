@@ -8,45 +8,45 @@ import SwiftUI
 
 class OnboardingMoodViewModel: ObservableObject {
     @Published var currentIndex = 0
-    @Published var dragOffset: CGSize = .zero
+    @Published var dragOffset = CGSize.zero
     @Published var showGetStarted = false
     
-    let moods: [MoodOnboarding] = [
+    let moods = [
         MoodOnboarding(
             mood: Mood(
                 name: "Happy",
-                colors: [Color.yellow, Color.orange],
-                darkColors: [Color.yellow.opacity(0.8), Color.orange.opacity(0.7)],
+                colors: [.yellow, .orange],
+                darkColors: [.yellow.opacity(0.6), .orange.opacity(0.6)],
                 icon: "sun.max.fill"
             ),
-            message: "Discover music that lifts your spirits and keeps you energized."
-        ),
-        MoodOnboarding(
-            mood: Mood(
-                name: "Chill",
-                colors: [Color.blue.opacity(0.8), Color.cyan],
-                darkColors: [Color.blue.opacity(0.9), Color.cyan.opacity(0.7)],
-                icon: "headphones"
-            ),
-            message: "Find calming music to ease your mind and help you relax."
-        ),
-        MoodOnboarding(
-            mood: Mood(
-                name: "Angry",
-                colors: [Color.red, Color.orange],
-                darkColors: [Color.red.opacity(0.9), Color.orange.opacity(0.7)],
-                icon: "flame.fill"
-            ),
-            message: "Channel your anger with powerful and intense music."
+            message: "Discover music that\nbrings joy and keeps\nyou energized"
         ),
         MoodOnboarding(
             mood: Mood(
                 name: "Sad",
-                colors: [Color.purple, Color.indigo],
-                darkColors: [Color.purple.opacity(0.9), Color.indigo.opacity(0.7)],
-                icon: "cloud.drizzle.fill"
+                colors: [.blue, .purple],
+                darkColors: [.blue.opacity(0.6), .purple.opacity(0.6)],
+                icon: "cloud.rain.fill"
             ),
-            message: "When you're feeling low, find comforting music to lift you up."
+            message: "Find melodies that\ncomfort and help you\nfeel understood"
+        ),
+        MoodOnboarding(
+            mood: Mood(
+                name: "Angry",
+                colors: [.red, .orange],
+                darkColors: [.red.opacity(0.6), .orange.opacity(0.6)],
+                icon: "flame.fill"
+            ),
+            message: "Release tension with\npowerful tracks that\nmatch your energy"
+        ),
+        MoodOnboarding(
+            mood: Mood(
+                name: "Chill",
+                colors: [.mint, .blue],
+                darkColors: [.mint.opacity(0.6), .blue.opacity(0.6)],
+                icon: "leaf.fill"
+            ),
+            message: "Find peaceful tunes\nthat help you relax\nand unwind"
         )
     ]
     

@@ -106,10 +106,27 @@ struct PinInputView: View {
                     showingForgotPin = true
                 }) {
                     Text("Forgot PIN?")
-                        .font(.subheadline)
-                        .foregroundColor(accentColor)
+                        .font(.system(size: 18, weight: .bold, design: .rounded))
+                        .foregroundColor(.black)
+                        .frame(maxWidth: .infinity)
                         .padding(.vertical, 16)
+                        .background(
+                            LinearGradient(
+                                colors: [Color(hex: "4ADE80"), Color(hex: "22C55E")],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
+                        .cornerRadius(35)
+                        .shadow(
+                            color: Color(hex: "4ADE80").opacity(0.3),
+                            radius: 10,
+                            x: 0,
+                            y: 5
+                        )
                 }
+                .padding(.horizontal, 20)
+                .padding(.bottom, 30)
             }
             .padding()
         }
@@ -154,12 +171,24 @@ struct NumberButton: View {
         Button(action: action) {
             ZStack {
                 Circle()
-                    .fill(Color(white: 0.2))
+                    .fill(
+                        LinearGradient(
+                            colors: [Color(hex: "1A2F2A"), Color(hex: "243B35")],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
                     .frame(width: buttonSize, height: buttonSize)
+                    .shadow(
+                        color: Color.black.opacity(0.2),
+                        radius: 10,
+                        x: 0,
+                        y: 5
+                    )
                 
                 Text(number)
-                    .font(.system(size: isSpecial ? 20 : 32, weight: .medium))
-                    .foregroundColor(.white)
+                    .font(.system(size: isSpecial ? 20 : 32, weight: .bold, design: .rounded))
+                    .foregroundColor(Color(hex: "#F5E6D3"))
             }
         }
         .buttonStyle(NumberButtonStyle())
@@ -173,3 +202,4 @@ struct NumberButtonStyle: ButtonStyle {
             .animation(.easeInOut(duration: 0.1), value: configuration.isPressed)
     }
 }
+

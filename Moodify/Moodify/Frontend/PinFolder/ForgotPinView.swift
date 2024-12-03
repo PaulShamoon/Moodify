@@ -28,8 +28,19 @@ struct ForgotPinView: View {
                             Image(systemName: "chevron.left")
                             Text("Back")
                         }
-                        .foregroundColor(.white)
-                        .font(.system(size: 16, weight: .medium))
+                        .font(.system(size: 18, weight: .bold, design: .rounded))
+                        .foregroundColor(Color(hex: "#F5E6D3"))
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 12)
+                        .background(
+                            LinearGradient(
+                                colors: [Color(hex: "1A2F2A"), Color(hex: "243B35")],
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            )
+                        )
+                        .cornerRadius(12)
+                        .shadow(color: Color.black.opacity(0.1), radius: 8, x: 0, y: 4)
                     }
                     Spacer()
                 }
@@ -47,8 +58,8 @@ struct ForgotPinView: View {
             
             VStack(spacing: 30) {
                 Text("Forgot PIN")
-                    .font(.title)
-                    .foregroundColor(.green)
+                    .font(.system(size: 34, weight: .bold, design: .rounded))
+                    .foregroundColor(Color(hex: "#F5E6D3"))
                     .padding(.top)
                 
                 Spacer()
@@ -92,13 +103,27 @@ struct ForgotPinView: View {
                 
                 Button(action: resetPin) {
                     Text("Reset PIN")
-                        .font(.headline)
+                        .font(.system(size: 18, weight: .bold, design: .rounded))
                         .foregroundColor(.black)
-                        .padding()
-                        .background(Color.green)
-                        .cornerRadius(10)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 16)
+                        .background(
+                            LinearGradient(
+                                colors: [Color(hex: "4ADE80"), Color(hex: "22C55E")],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
+                        .cornerRadius(35)
+                        .shadow(
+                            color: Color(hex: "4ADE80").opacity(0.3),
+                            radius: 10,
+                            x: 0,
+                            y: 5
+                        )
                 }
-                .padding()
+                .padding(.horizontal, 20)
+                .padding(.bottom, 30)
                 
                 Spacer()
             }
@@ -185,15 +210,22 @@ struct TextInputField: View {
                     TextField(placeholder, text: $text)
                 }
             }
+            .font(.system(size: 16, weight: .medium, design: .rounded))
+            .foregroundColor(Color(hex: "#F5E6D3"))
             .keyboardType(.alphabet)
             .textContentType(.oneTimeCode)
+            
             Button(action: toggleVisibility) {
                 Image(systemName: isSecure ? "eye" : "eye.slash")
-                    .foregroundColor(.gray)
+                    .foregroundColor(Color(hex: "#F5E6D3").opacity(0.7))
+                    .font(.system(size: 16, weight: .medium))
             }
         }
         .padding()
-        .background(Color(.systemGray6))
-        .cornerRadius(10)
+        .background(
+            RoundedRectangle(cornerRadius: 12)
+                .fill(Color(hex: "1A2F2A"))
+                .shadow(color: Color.black.opacity(0.1), radius: 8, x: 0, y: 4)
+        )
     }
 }

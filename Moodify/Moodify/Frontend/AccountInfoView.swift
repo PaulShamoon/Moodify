@@ -76,12 +76,13 @@ struct AccountInfoView: View {
                             
                             InfoRow(
                                 icon: "music.note.list",
-                                title: "Favorite Genres",
+                                title: "Genres",
                                 value: profile.favoriteGenres.isEmpty ?
                                     "Not Set" :
                                     profile.favoriteGenres.joined(separator: ", ")
                             )
                         }
+                        .padding(.horizontal, 16)
                     }
                     .padding(20)
                     .background(
@@ -90,28 +91,32 @@ struct AccountInfoView: View {
                     )
                     .shadow(color: .black.opacity(0.2), radius: 10, x: 0, y: 5)
                     
-                    NavigationLink(
-                        destination: QuestionnaireView(
+                    NavigationLink {
+                        QuestionnaireView(
                             isEditingProfile: .constant(true),
                             navigateToMusicPreferences: .constant(true),
                             isCreatingNewProfile: .constant(false)
                         )
                         .environmentObject(profileManager)
                         .navigationBarBackButtonHidden(true)
-                    ) {
-                        HStack {
+                    } label: {
+                        HStack(spacing: 12) {
                             Image(systemName: "pencil.circle.fill")
-                                .font(.title2)
                             Text("Edit Profile")
-                                .font(.system(size: 18, weight: .semibold, design: .rounded))
+                                .font(.system(size: 18, weight: .bold, design: .rounded))
                         }
-                        .foregroundColor(.green)
+                        .foregroundColor(Color(hex: "#F5E6D3"))
                         .frame(maxWidth: .infinity)
-                        .padding()
+                        .padding(.vertical, 16)
                         .background(
-                            RoundedRectangle(cornerRadius: 15)
-                                .fill(Color.green.opacity(0.2))
+                            LinearGradient(
+                                colors: [Color(hex: "4ADE80"), Color(hex: "22C55E")],
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            )
                         )
+                        .cornerRadius(12)
+                        .shadow(color: Color(hex: "4ADE80").opacity(0.3), radius: 8, x: 0, y: 4)
                     }
                     .padding(.top, 10)
                 } else {
@@ -174,21 +179,24 @@ struct InfoRow: View {
     let value: String
     
     var body: some View {
-        HStack(alignment: .center, spacing: 12) {
+        HStack(spacing: 12) {
             Image(systemName: icon)
                 .font(.system(size: 22))
                 .foregroundColor(.green)
                 .frame(width: 30)
             
-            VStack(alignment: .leading, spacing: 4) {
-                Text(title)
-                    .font(.system(size: 14, weight: .medium))
-                    .foregroundColor(.gray)
-                
-                Text(value)
-                    .font(.system(size: 16, weight: .medium))
-                    .foregroundColor(.white)
-            }
+            Text(title)
+                .font(.system(size: 14, weight: .medium))
+                .foregroundColor(.gray)
+                .frame(width: 80, alignment: .leading)
+            
+            Text(value)
+                .font(.system(size: 16, weight: .medium))
+                .foregroundColor(.white)
+                .lineLimit(1)
+                .truncationMode(.tail)
+                .frame(maxWidth: .infinity, alignment: .leading)
         }
+        .frame(maxWidth: .infinity)
     }
 }

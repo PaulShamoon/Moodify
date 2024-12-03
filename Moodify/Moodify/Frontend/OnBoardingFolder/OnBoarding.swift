@@ -7,6 +7,9 @@
 
 import SwiftUI
 
+// Add this near the top of the file, before the OnboardingView struct
+let milkyBeige = Color(hex: "#F5E6D3")
+
 /**
  * OnboardingView
  * A SwiftUI view that manages the onboarding flow with multiple pages and animations.
@@ -20,7 +23,7 @@ struct OnboardingView: View {
     @State private var showMoodView = false
     private let totalPages = 3
     var onCompletion: () -> Void
-
+    
     var body: some View {
         ZStack {
             if showMoodView {
@@ -40,7 +43,7 @@ struct OnboardingView: View {
             
             VStack {
                 Spacer()
-
+                
                 /* TabView for swipeable onboarding pages */
                 TabView(selection: $currentPage) {
                     OnboardingPageView(
@@ -64,13 +67,13 @@ struct OnboardingView: View {
                 .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
                 
                 Spacer()
-
+                
                 /* Page indicator dots */
                 HStack(spacing: 8) {
                     ForEach(0..<totalPages) { index in
                         Circle()
-                            .fill(index == currentPage ? Color.green : Color.white.opacity(0.3))
-                            .frame(width: 10, height: 10)
+                            .fill(index == currentPage ? Color(hex: "#2A4840") : Color.white.opacity(0.3))
+                            .frame(width: 12, height: 12)
                             .scaleEffect(index == currentPage ? 1.2 : 1.0)
                             .animation(.spring(response: 0.3, dampingFraction: 0.7), value: currentPage)
                     }
@@ -88,14 +91,21 @@ struct OnboardingView: View {
                     }
                 }) {
                     Text(currentPage < totalPages - 1 ? "Next" : "Continue")
-                        .font(.headline)
-                        .foregroundColor(.black)
-                        .fontWeight(.bold)
+                        .font(.system(size: 18, weight: .bold, design: .rounded))
+                        .foregroundColor(Color(hex: "#F5E6D3"))
                         .padding()
                         .frame(width: 180)
-                        .background(Color.green)
-                        .cornerRadius(12)
-                        .shadow(color: Color.green.opacity(0.5), radius: 10, x: 0, y: 10)
+                        .background(
+                            RoundedRectangle(cornerRadius: 35)
+                                .fill(
+                                    LinearGradient(
+                                        colors: [Color(hex: "4ADE80"), Color(hex: "22C55E")],
+                                        startPoint: .topLeading,
+                                        endPoint: .bottomTrailing
+                                    )
+                                )
+                                .shadow(color: Color(hex: "4ADE80").opacity(0.3), radius: 10, x: 0, y: 5)
+                        )
                 }
                 .padding(.bottom, 50)
             }
@@ -125,23 +135,24 @@ struct OnboardingPageView: View {
                 .resizable()
                 .aspectRatio(contentMode: .fit)
                 .frame(width: 120, height: 120)
-                .foregroundColor(.white)
+                .foregroundColor(milkyBeige)
                 .shadow(radius: 10)
                 .padding(.bottom, 20)
             
             /* Title text */
             Text(title)
-                .font(.system(size: 28, weight: .bold, design: .rounded))
-                .foregroundColor(.white)
+                .font(.system(size: 32, weight: .bold, design: .rounded))
+                .foregroundColor(milkyBeige)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 30)
             
             /* Description text */
             Text(description)
-                .font(.system(size: 16, weight: .medium, design: .rounded))
-                .foregroundColor(.white.opacity(0.8))
+                .font(.system(size: 18, weight: .regular))
+                .foregroundColor(milkyBeige.opacity(0.9))
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 30)
+                .lineSpacing(4)
             
             Spacer()
         }

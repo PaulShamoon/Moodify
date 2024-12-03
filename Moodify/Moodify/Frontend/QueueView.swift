@@ -162,12 +162,23 @@ struct CustomHeader: View {
     var body: some View {
         HStack {
             Button(action: { dismiss() }) {
-                Image(systemName: "chevron.down")
-                    .font(.title2)
-                    .foregroundColor(.white)
-                    .padding(12)
-                    .background(.ultraThinMaterial)
-                    .clipShape(Circle())
+                HStack(spacing: 8) {
+                    Image(systemName: "chevron.left")
+                    Text("Back")
+                }
+                .font(.system(size: 18, weight: .bold, design: .rounded))
+                .foregroundColor(Color(hex: "#F5E6D3"))
+                .padding(.horizontal, 16)
+                .padding(.vertical, 12)
+                .background(
+                    LinearGradient(
+                        colors: [Color(hex: "1A2F2A"), Color(hex: "243B35")],
+                        startPoint: .leading,
+                        endPoint: .trailing
+                    )
+                )
+                .cornerRadius(12)
+                .shadow(color: Color.black.opacity(0.1), radius: 8, x: 0, y: 4)
             }
             
             Spacer()

@@ -45,20 +45,20 @@ struct OnboardingMoodView: View {
     private var header: some View {
         VStack(spacing: 16) {
             Text("Let's Explore Your Moods")
-                .font(.system(size: 48))
-                .foregroundColor(.white)
+                .font(.system(size: 42, weight: .bold, design: .rounded))
+                .foregroundColor(Color(hex: "#F5E6D3"))
                 .padding(.top, 60)
-                .shadow(color: .black.opacity(0.4), radius: 5, x: 0, y: 3)
+                .shadow(color: .black.opacity(0.2), radius: 2, x: 0, y: 1)
                 .lineLimit(1)
                 .minimumScaleFactor(0.7)
                 .padding()
             
             Text("Swipe through the cards to explore different moods")
-                .font(.system(size: 18, weight: .medium, design: .rounded))
-                .foregroundColor(.white.opacity(0.9))
+                .font(.system(size: 20, weight: .medium, design: .rounded))
+                .foregroundColor(Color(hex: "#F5E6D3").opacity(0.9))
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 40)
-                .shadow(color: .black.opacity(0.2), radius: 3, x: 0, y: 1)
+                .shadow(color: .black.opacity(0.1), radius: 1, x: 0, y: 1)
         }
     }
     
@@ -106,18 +106,17 @@ struct OnboardingMoodView: View {
             onCompletion()
         }) {
             Text("Skip to Account Setup")
-                .font(.system(size: 16, design: .rounded))
-                .italic()
-                .foregroundStyle(.white.opacity(0.8))
+                .font(.system(size: 18, weight: .medium, design: .rounded))
+                .foregroundColor(Color(hex: "#F5E6D3").opacity(0.9))
                 .padding(.vertical, 12)
-                .padding(.horizontal, 20)
+                .padding(.horizontal, 24)
                 .background(
                     Capsule()
                         .fill(.ultraThinMaterial)
                         .shadow(color: .black.opacity(0.2), radius: 4, x: 0, y: 2)
                         .overlay(
                             Capsule()
-                                .strokeBorder(.white.opacity(0.4), lineWidth: 0.8)
+                                .strokeBorder(Color(hex: "#F5E6D3").opacity(0.4), lineWidth: 1)
                         )
                 )
         }

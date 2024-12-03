@@ -22,15 +22,15 @@ struct CustomProfileIconView: View {
     var body: some View {
         VStack(spacing: 20) {
             Text("Choose Your Icon")
-                .font(.system(size: 28, weight: .bold, design: .rounded))
-                .foregroundColor(.white)
+                .font(.system(size: 34, weight: .bold))
+                .foregroundColor(Color(hex: "#F5E6D3"))
             
             // Preview
             ZStack {
                 Circle()
                     .fill(selectedColor)
                     .frame(width: 180, height: 180)
-                    .overlay(Circle().stroke(Color.green, lineWidth: 4))
+                    .overlay(Circle().stroke(Color(hex: "4ADE80"), lineWidth: 4))
                     .shadow(radius: 10)
                 
                 Image(systemName: selectedIcon)
@@ -45,8 +45,8 @@ struct CustomProfileIconView: View {
             ScrollView {
                 VStack(spacing: 20) {
                     Text("Select Icon")
-                        .font(.system(size: 20, weight: .bold, design: .rounded))
-                        .foregroundColor(.white)
+                        .font(.system(size: 24, weight: .bold))
+                        .foregroundColor(Color(hex: "#F5E6D3"))
                         .frame(maxWidth: .infinity)
                     
                     LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 15), count: 4), spacing: 15) {
@@ -61,19 +61,18 @@ struct CustomProfileIconView: View {
                                             .aspectRatio(contentMode: .fit)
                                             .padding(15)
                                             .foregroundColor(iconColor)
-
                                     )
                                     .overlay(
                                         Circle()
-                                            .stroke(selectedIcon == icon ? Color.white : Color.gray, lineWidth: 5)
+                                            .stroke(selectedIcon == icon ? Color(hex: "#F5E6D3") : Color.gray, lineWidth: 5)
                                     )
                             }
                         }
                     }
                     
                     Text("Select Background Color")
-                        .font(.system(size: 20, weight: .bold, design: .rounded))
-                        .foregroundColor(.white)
+                        .font(.system(size: 24, weight: .bold))
+                        .foregroundColor(Color(hex: "#F5E6D3"))
                         .frame(maxWidth: .infinity)
                         .padding(.top)
                     
@@ -85,7 +84,7 @@ struct CustomProfileIconView: View {
                                     .frame(height: 50)
                                     .overlay(
                                         Circle()
-                                            .stroke(selectedColor == color ? Color.white : Color.gray, lineWidth: 5)
+                                            .stroke(selectedColor == color ? Color(hex: "#F5E6D3") : Color.gray, lineWidth: 5)
                                     )
                             }
                         }
@@ -94,8 +93,8 @@ struct CustomProfileIconView: View {
                     // Icon Color Selection
                     VStack(spacing: 10) {
                         Text("Icon Color")
-                            .font(.system(size: 20, weight: .bold, design: .rounded))
-                            .foregroundColor(.white)
+                            .font(.system(size: 24, weight: .bold))
+                            .foregroundColor(Color(hex: "#F5E6D3"))
                             .frame(maxWidth: .infinity)
                             .padding(.top)
                         
@@ -106,7 +105,7 @@ struct CustomProfileIconView: View {
                                     .frame(width: 50, height: 50)
                                     .overlay(
                                         Circle()
-                                            .stroke(iconColor == .white ? Color.green : Color.gray, lineWidth: 5)
+                                            .stroke(iconColor == .white ? Color(hex: "4ADE80") : Color.gray, lineWidth: 5)
                                     )
                             }
                             
@@ -116,7 +115,7 @@ struct CustomProfileIconView: View {
                                     .frame(width: 50, height: 50)
                                     .overlay(
                                         Circle()
-                                            .stroke(iconColor == .black ? Color.green : Color.gray, lineWidth: 5)
+                                            .stroke(iconColor == .black ? Color(hex: "4ADE80") : Color.gray, lineWidth: 5)
                                     )
                             }
                         }
@@ -135,10 +134,16 @@ struct CustomProfileIconView: View {
                     Image(systemName: "arrow.right.circle.fill")
                         .font(.system(size: 20))
                 }
-                .foregroundColor(.black)
+                .foregroundColor(Color(hex: "#F5E6D3"))
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 16)
-                .background(Color.green)
+                .background(
+                    LinearGradient(
+                        colors: [Color(hex: "#1A2F2A"), Color(hex: "#243B35")],
+                        startPoint: .leading,
+                        endPoint: .trailing
+                    )
+                )
                 .cornerRadius(12)
             }
             .padding(.horizontal)
