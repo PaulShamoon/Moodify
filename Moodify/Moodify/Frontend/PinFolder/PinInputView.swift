@@ -11,8 +11,6 @@ struct PinInputView: View {
     var onPinEntered: (String) -> Void
     
     private let backgroundColor = Color.black
-    private let accentColor = Color.green
-    private let secondaryColor = Color(white: 0.2)
     
     var body: some View {
         ZStack {

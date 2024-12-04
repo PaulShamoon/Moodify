@@ -65,7 +65,6 @@ class PlaylistManager: ObservableObject {
         return playlists.filter { $0.profileId == profile.id }
     }
     
-    
     /*
      Method to queue all songs in the passed in playlist
      
@@ -149,7 +148,6 @@ class PlaylistManager: ObservableObject {
         savePlaylists()
     }
 
-    
     /*
      Method to remove a song from a playlist
      

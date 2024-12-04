@@ -36,7 +36,7 @@
 		6E9DDAFB2CD2B57E00C17DCB /* QueueView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E9DDAFA2CD2B57900C17DCB /* QueueView.swift */; };
 		6EA2E3B62CDAF29500B4E6C8 /* Playlist.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EA2E3B52CDAF29200B4E6C8 /* Playlist.swift */; };
 		6EA2E3B82CDAF29E00B4E6C8 /* PlaylistManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EA2E3B72CDAF29B00B4E6C8 /* PlaylistManager.swift */; };
-		6EA2E3BD2CDC8DEF00B4E6C8 /*  PlaylistsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EA2E3BC2CDC8DDC00B4E6C8 /*  PlaylistsView.swift */; };
+		6EA2E3BD2CDC8DEF00B4E6C8 /* PlaylistsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EA2E3BC2CDC8DDC00B4E6C8 /* PlaylistsView.swift */; };
 		6EA47A6C2C9E50D3006FB5C6 /* Moodify.plist in Resources */ = {isa = PBXBuildFile; fileRef = 6EA47A6B2C9E50D3006FB5C6 /* Moodify.plist */; };
 		6EA47A702C9E5199006FB5C6 /* SpotifyController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EA47A6F2C9E5199006FB5C6 /* SpotifyController.swift */; };
 		6EA47A772C9E52D4006FB5C6 /* SpotifyiOS.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6EA47A752C9E52C7006FB5C6 /* SpotifyiOS.xcframework */; };
@@ -125,7 +125,7 @@
 		6E9DDAFA2CD2B57900C17DCB /* QueueView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueueView.swift; sourceTree = "<group>"; };
 		6EA2E3B52CDAF29200B4E6C8 /* Playlist.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Playlist.swift; sourceTree = "<group>"; };
 		6EA2E3B72CDAF29B00B4E6C8 /* PlaylistManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistManager.swift; sourceTree = "<group>"; };
-		6EA2E3BC2CDC8DDC00B4E6C8 /*  PlaylistsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = " PlaylistsView.swift"; sourceTree = "<group>"; };
+		6EA2E3BC2CDC8DDC00B4E6C8 /* PlaylistsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistsView.swift; sourceTree = "<group>"; };
 		6EA47A6B2C9E50D3006FB5C6 /* Moodify.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Moodify.plist; sourceTree = "<group>"; };
 		6EA47A6F2C9E5199006FB5C6 /* SpotifyController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpotifyController.swift; sourceTree = "<group>"; };
 		6EA47A752C9E52C7006FB5C6 /* SpotifyiOS.xcframework */ = {isa = PBXFileReference; expectedSignature = "AppleDeveloperProgram:2FNC3A47ZF:Spotify"; lastKnownFileType = wrapper.xcframework; path = SpotifyiOS.xcframework; sourceTree = "<group>"; };
@@ -258,7 +258,7 @@
 				6EE6C3302CE3B6330026D489 /* OnBoardingFolder */,
 				6EE6C32F2CE3B55C0026D489 /* PinFolder */,
 				89AF8CBE2CFCFE0A00E3BFCE /* ProfilePictureFolder */,
-				6EA2E3BC2CDC8DDC00B4E6C8 /*  PlaylistsView.swift */,
+				6EA2E3BC2CDC8DDC00B4E6C8 /* PlaylistsView.swift */,
 				698E01112CFE5DC2005AEE0C /* TipsSheetView.swift */,
 				69221DBF2CFB9E9800BA7BDD /* ParticleSystem.swift */,
 				69221DC12CFBA24800BA7BDD /* MoodConfirmation.swift */,
@@ -498,7 +498,7 @@
 				6982AB7A2CDD9B4F005F9750 /* OnboardingMood.swift in Sources */,
 				693E71572CEB7A0500446CF7 /* onBoardingViewModel.swift in Sources */,
 				6934A10F2C8FDA840086CC91 /* ConnectToSpotify.swift in Sources */,
-				6EA2E3BD2CDC8DEF00B4E6C8 /*  PlaylistsView.swift in Sources */,
+				6EA2E3BD2CDC8DEF00B4E6C8 /* PlaylistsView.swift in Sources */,
 				89B1EC0E2CC9BDBA0041F9EE /* PinInputView.swift in Sources */,
 				6EA2E3B62CDAF29500B4E6C8 /* Playlist.swift in Sources */,
 				89FA8A432C9A6F39005480D8 /* generalMusicPreferences.swift in Sources */,
@@ -702,7 +702,6 @@
 				);
 				MARKETING_VERSION = 1.0;
 				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_BUNDLE_IDENTIFIER = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -741,7 +740,6 @@
 				);
 				MARKETING_VERSION = 1.0;
 				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_BUNDLE_IDENTIFIER = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;

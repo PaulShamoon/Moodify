@@ -32,7 +32,7 @@ struct homePageView: View {
     
     
     // NOTE - this URL is temporary and needs to be updated each time from the backend side to detect mood properly
-    let backendURL = "https://3579-2601-406-4d00-7af0-3198-12da-177c-26ec.ngrok-free.app/analyze"
+    let backendURL = "/analyze"
     
     // Add this property to manage background color
     @State private var backgroundColors: [Color] = [
