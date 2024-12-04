@@ -153,18 +153,47 @@ struct DetailedPlaylistView: View {
                     }
                 )
                 
-                // Pagination Indicator
+                // Pagination Controls
                 if totalPages > 1 {
-                    HStack(spacing: 8) {
-                        ForEach(0..<totalPages, id: \.self) { page in
-                            Circle()
-                                .fill(currentPage == page ?
-                                    Color(hex: "4ADE80") :
-                                    Color(hex: "#F5E6D3").opacity(0.3))
-                                .frame(width: 8, height: 8)
+                    HStack {
+                        if currentPage > 0 {
+                            PaginationButton(direction: .previous) {
+                                withAnimation {
+                                    currentPage -= 1
+                                }
+                            }
+                        } else {
+                            Text("      ")
+                        }
+                        
+                        Spacer()
+                        
+                        // Pagination Indicator
+                        if totalPages > 1 {
+                            HStack(spacing: 8) {
+                                ForEach(0..<totalPages, id: \.self) { page in
+                                    Circle()
+                                        .fill(currentPage == page ?
+                                            Color(hex: "4ADE80") :
+                                            Color(hex: "#F5E6D3").opacity(0.3))
+                                        .frame(width: 8, height: 8)
+                                }
+                            }
+                            .padding(.vertical)
+                        }
+                        
+                        Spacer()
+                        if currentPage < totalPages - 1 {
+                            PaginationButton(direction: .next) {
+                                withAnimation {
+                                    currentPage += 1
+                                }
+                            }
+                        } else {
+                            Text("                       ")
                         }
                     }
-                    .padding(.vertical)
+                    .padding()
                 }
                 
                 // Songs List
@@ -177,30 +206,6 @@ struct DetailedPlaylistView: View {
                             spotifyController: spotifyController
                         )
                     }
-                }
-                
-                // Pagination Controls
-                if totalPages > 1 {
-                    HStack {
-                        if currentPage > 0 {
-                            PaginationButton(direction: .previous) {
-                                withAnimation {
-                                    currentPage -= 1
-                                }
-                            }
-                        }
-                        
-                        Spacer()
-                        
-                        if currentPage < totalPages - 1 {
-                            PaginationButton(direction: .next) {
-                                withAnimation {
-                                    currentPage += 1
-                                }
-                            }
-                        }
-                    }
-                    .padding()
                 }
             }
             .padding()
@@ -236,49 +241,7 @@ struct DetailedPlaylistView: View {
         }
     }
     
-    
-    
-    private var headerView: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            VStack(alignment: .leading, spacing: 4) {
-                Text("Mood")
-                    .font(.title)
-                    .foregroundColor(.secondary)
-                Text(playlist.mood.capitalized)
-                    .font(.subheadline)
-                    .fontWeight(.bold)
-                    .foregroundColor(.primary)
-            }
-            
-            VStack(alignment: .leading, spacing: 4) {
-                Text("Genres")
-                    .font(.title)
-                    .foregroundColor(.secondary)
-                Text(playlist.genres.joined(separator: ", "))
-                    .font(.subheadline)
-                    .fontWeight(.semibold)
-                    .foregroundColor(.primary)
-            }
-            
-            Text("\(songs.count) Songs")
-                .font(.caption)
-                .foregroundColor(.secondary)
-        }
-        .padding()
-    }
-    
-    private var playButton: some View {
-        Button(action: {
-            spotifyController.playlistManager.playPlaylist(playlist: playlist)
-            presentationMode.wrappedValue.dismiss()
-        }) {
-            Image(systemName: "play.circle.fill")
-                .resizable()
-                .aspectRatio(contentMode: .fit)
-                .frame(width: 60, height: 60)
-                .foregroundColor(.green)
-        }
-    }
+
     
 }
 
@@ -369,6 +332,11 @@ struct PlaylistHeaderCard: View {
     let onPlay: () -> Void
     
     var body: some View {
+        VStack {
+            Text("Press and hold songs for editing")
+                .font(.system(size: 20, design: .rounded))
+                .foregroundColor(Color(hex: "#F5E6D3"))
+        }
         VStack(alignment: .leading, spacing: 15) {
             HStack {
                 VStack(alignment: .leading, spacing: 8) {
