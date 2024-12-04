@@ -48,7 +48,8 @@ struct MoodifyApp: App {
                             QuestionnaireView(
                                 isEditingProfile: $isEditingProfile,
                                 navigateToMusicPreferences: $navigateToMusicPreferences,
-                                isCreatingNewProfile: $isCreatingNewProfile
+                                isCreatingNewProfile: $isCreatingNewProfile,
+                                isCreatingProfile: $isCreatingProfile
                             )
                             .environmentObject(profileManager)
                         }

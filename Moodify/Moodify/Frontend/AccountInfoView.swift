@@ -95,7 +95,8 @@ struct AccountInfoView: View {
                         QuestionnaireView(
                             isEditingProfile: .constant(true),
                             navigateToMusicPreferences: .constant(true),
-                            isCreatingNewProfile: .constant(false)
+                            isCreatingNewProfile: .constant(false),
+                            isCreatingProfile: .constant(false)
                         )
                         .environmentObject(profileManager)
                         .navigationBarBackButtonHidden(true)

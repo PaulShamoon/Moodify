@@ -43,7 +43,7 @@ class SpotifyController: NSObject, ObservableObject, SPTAppRemotePlayerStateDele
     var retryCount = 0
     
     // Unique Spotify client ID
-    private let spotifyClientID = "3dfaae404a2f4847a2ff7d707f7154f4"
+    private let spotifyClientID = ""
     
     // Redirect URL after authorization
     private let spotifyRedirectURL = URL(string: "spotify-ios-quick-start://spotify-login-callback")!
