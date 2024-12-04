@@ -330,13 +330,9 @@ struct PlaylistHeaderCard: View {
     let playlist: Playlist
     let songsCount: Int
     let onPlay: () -> Void
+    @State private var showTooltip = false
     
     var body: some View {
-        VStack {
-            Text("Press and hold songs for editing")
-                .font(.system(size: 20, design: .rounded))
-                .foregroundColor(Color(hex: "#F5E6D3"))
-        }
         VStack(alignment: .leading, spacing: 15) {
             HStack {
                 VStack(alignment: .leading, spacing: 8) {
@@ -376,7 +372,35 @@ struct PlaylistHeaderCard: View {
             Text("\(songsCount) Songs")
                 .font(.system(size: 14, design: .rounded))
                 .foregroundColor(Color(hex: "#F5E6D3").opacity(0.7))
+            //tootlip
+            VStack {
+                Spacer()
+                
+                HStack {
+                    Button(action: {
+                        showTooltip.toggle()
+                    }) {
+                        Image(systemName: "info.circle")
+                            .foregroundStyle(
+                                LinearGradient(
+                                    colors: [Color(hex: "4ADE80"), Color(hex: "22C55E")],
+                                    startPoint: .leading,
+                                    endPoint: .trailing
+                                )
+                            )
+                            .font(.system(size: 14, weight: .medium))
+                    }
+                    if showTooltip == true {
+                        Text("Tap and hold on songs to bring up editing options")
+                            .font(.system(size: 14, design: .rounded))
+                            .foregroundColor(Color(hex: "#F5E6D3"))
+                            .padding(8)
+                    }
+                    Spacer()
+                }
+            }
         }
+        
         .padding()
         .background(
             RoundedRectangle(cornerRadius: 15)
