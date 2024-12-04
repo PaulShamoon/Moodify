@@ -63,7 +63,7 @@ struct PinSetupView: View {
     private var headerView: some View {
         Text(profile?.userPin == nil ? "Create Your PIN" : "Change PIN")
             .font(.system(size: 28, weight: .bold, design: .rounded))
-            .foregroundColor(.primary)
+            .foregroundColor(Color(hex: "#F5E6D3"))
             .padding(.top)
     }
     

@@ -32,13 +32,7 @@ struct ForgotPinView: View {
                         .foregroundColor(Color(hex: "#F5E6D3"))
                         .padding(.horizontal, 16)
                         .padding(.vertical, 12)
-                        .background(
-                            LinearGradient(
-                                colors: [Color(hex: "1A2F2A"), Color(hex: "243B35")],
-                                startPoint: .leading,
-                                endPoint: .trailing
-                            )
-                        )
+
                         .cornerRadius(12)
                         .shadow(color: Color.black.opacity(0.1), radius: 8, x: 0, y: 4)
                     }

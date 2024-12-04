@@ -34,23 +34,25 @@ struct TermsOfServiceView: View {
             
             ScrollView {
                 VStack(alignment: .leading, spacing: 15) {
-                    Text("Moodify Terms and Conditions")
+                    Text("Moodify Temrs of Service")
                         .font(.title)
                         .bold()
                         .padding(.bottom, 5)
+                        .foregroundColor(Color(hex: "#F5E6D3"))
+
                     
                     Text("Last Updated: 12/03/2024")
                         .font(.subheadline)
                         .foregroundColor(.gray)
                         .padding(.bottom, 20)
                     
-                    Text("Welcome to Moodify! By using our app, you agree to these Terms and Conditions. Please read them carefully as they outline your rights and obligations as a user of Moodify. If you do not agree to these terms, please do not use our app.")
+                    Text("Welcome to Moodify! By using our app, you agree to these Temrs of Service. Please read them carefully as they outline your rights and obligations as a user of Moodify. If you do not agree to these terms, please do not use our app.")
                         .padding(.bottom, 20)
                     
                     // Section 1
                     Text("1. Acceptance of Terms")
                         .font(.headline)
-                    Text("By accessing or using the Moodify app, you agree to be bound by these Terms and Conditions. Moodify reserves the right to modify these terms at any time. Changes will be posted, and continued use of the app after such changes constitutes acceptance of the updated terms.")
+                    Text("By accessing or using the Moodify app, you agree to be bound by these Temrs of Service. Moodify reserves the right to modify these terms at any time. Changes will be posted, and continued use of the app after such changes constitutes acceptance of the updated terms.")
                         .padding(.bottom, 15)
                     
                     // Section 2
@@ -113,7 +115,7 @@ struct TermsOfServiceView: View {
                     // Section 7
                     Text("7. Termination")
                         .font(.headline)
-                    Text("Moodify reserves the right to suspend or terminate your access to the app at any time, without prior notice, for any reason, including breach of these Terms and Conditions.")
+                    Text("Moodify reserves the right to suspend or terminate your access to the app at any time, without prior notice, for any reason, including breach of these Temrs of Service.")
                         .padding(.bottom, 15)
                     
                     // Section 8
@@ -125,10 +127,10 @@ struct TermsOfServiceView: View {
                     // Section 9
                     Text("9. Contact Information")
                         .font(.headline)
-                    Text("If you have any questions or concerns about these Terms and Conditions, please contact us at hg5146@wayne.edu.")
+                    Text("If you have any questions or concerns about these Temrs of Service, please contact us at hg5146@wayne.edu.")
                         .padding(.bottom, 15)
                     
-                    Text("By agreeing, you acknowledge that you have read and understood these Terms and Conditions and agree to be bounded by them.")
+                    Text("By agreeing, you acknowledge that you have read and understood these Temrs of Service and agree to be bounded by them.")
                         .padding(.bottom, 20)
                         .fontWeight(.bold)
                 }

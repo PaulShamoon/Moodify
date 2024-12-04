@@ -165,7 +165,6 @@ struct CustomHeader: View {
             Button(action: { dismiss() }) {
                 HStack(spacing: 8) {
                     Image(systemName: "chevron.down")
-                    Text("Back")
                 }
                 .font(.system(size: 18, weight: .bold, design: .rounded))
                 .foregroundColor(Color(hex: "#F5E6D3"))
