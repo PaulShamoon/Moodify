@@ -11,6 +11,7 @@ struct TermsOfServiceView: View {
     @Binding var agreedToTerms: Bool
     @Environment(\.dismiss) var dismiss
     let showBackButton: Bool
+    @Environment(\.presentationMode) var presentationMode
     
     var body: some View {
         VStack(spacing: 1) {
@@ -173,6 +174,7 @@ struct TermsOfServiceView: View {
             .padding(.horizontal)
             .padding(.bottom, 20)
         }
+        .navigationBarBackButtonHidden(true)
     }
 }
 

@@ -134,7 +134,7 @@ struct QuestionnaireView: View {
                     NavigationLink(destination: 
                         TermsOfServiceView(
                             agreedToTerms: $agreedToTerms,
-                            showBackButton: false
+                            showBackButton: true
                         )
                         .tint(Color(hex: "#F5E6D3"))
                     ) {

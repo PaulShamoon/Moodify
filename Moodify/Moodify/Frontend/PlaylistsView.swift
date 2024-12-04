@@ -120,7 +120,6 @@ struct DetailedPlaylistView: View {
     var spotifyController: SpotifyController
     @EnvironmentObject var profileManager: ProfileManager
     @ObservedObject var playlistManager: PlaylistManager
-    
     @Environment(\.presentationMode) var presentationMode
     @State private var currentPage = 0
     private let songsPerPage = 10
@@ -214,8 +213,20 @@ struct DetailedPlaylistView: View {
             )
             .edgesIgnoringSafeArea(.all)
         )
-        .navigationTitle("Playlist Details")
-        .navigationBarTitleDisplayMode(.inline)
+        .navigationBarBackButtonHidden(true)
+         .navigationBarItems(leading:
+             Button(action: {
+                 // Pop the current view
+                 presentationMode.wrappedValue.dismiss()
+             }) {
+                 HStack {
+                     Image(systemName: "chevron.left")
+                         .foregroundColor(Color(hex: "#F5E6D3"))
+                     Text("Back")
+                         .foregroundColor(Color(hex: "#F5E6D3"))
+                 }
+             }
+         )
         .onChange(of: songs) { newSongs in
             playlist.songs = newSongs
             if let index = playlistManager.playlists.firstIndex(where: { $0.id == playlist.id }) {
