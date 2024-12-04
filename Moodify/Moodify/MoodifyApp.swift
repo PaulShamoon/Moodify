@@ -49,7 +49,7 @@ struct MoodifyApp: App {
                                 isEditingProfile: $isEditingProfile,
                                 navigateToMusicPreferences: $navigateToMusicPreferences,
                                 isCreatingNewProfile: $isCreatingNewProfile,
-                                isCreatingProfile: $isCreatingProfile
+                                hasCompletedQuestionnaire: $hasCompletedQuestionnaire
                             )
                             .environmentObject(profileManager)
                         }
@@ -59,8 +59,7 @@ struct MoodifyApp: App {
                                 profile: currentProfile,
                                 navigateToHomePage: $navigateToHomePage,
                                 isCreatingNewProfile: $isCreatingNewProfile,
-                                navigateToMusicPreferences: $navigateToMusicPreferences,
-                                isCreatingProfile: $isCreatingProfile
+                                navigateToMusicPreferences: $navigateToMusicPreferences, isCreatingProfile: $isCreatingProfile
                             )
                             .environmentObject(profileManager)
                         } else {

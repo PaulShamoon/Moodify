@@ -7,7 +7,7 @@ struct QuestionnaireView: View {
     @Binding var isEditingProfile: Bool
     @Binding var navigateToMusicPreferences: Bool
     @Binding var isCreatingNewProfile: Bool
-    @Binding var isCreatingProfile: Bool
+    @Binding var hasCompletedQuestionnaire: Bool
     @Environment(\.presentationMode) var presentationMode
     @State private var showingTOS = false
     @State private var showingTooltip = false
@@ -113,7 +113,7 @@ struct QuestionnaireView: View {
             }
             .font(.system(size: 36, weight: .bold, design: .rounded))
             
-            Text(isCreatingNewProfile || isCreatingProfile ? "Create Your Profile" : "Edit Your Profile")
+            Text(isCreatingNewProfile || !hasCompletedQuestionnaire ? "Create Your Profile" : "Edit Your Profile")
                 .font(.system(size: 24, weight: .medium))
                 .foregroundColor(Color(hex: "#F5E6D3"))
                 .padding(.top, 5)
@@ -352,12 +352,12 @@ struct QuestionnaireView_Previews: PreviewProvider {
         let navigateToMusicPreferences = Binding.constant(false)
         let isCreatingNewProfile = Binding.constant(true)
         let isEditingProfile = Binding.constant(false)
-        let isCreatingProfile = Binding.constant(false)
+        let hasCompletedQuestionnaire = Binding.constant(false)
 
         QuestionnaireView(
             isEditingProfile: isEditingProfile, navigateToMusicPreferences: navigateToMusicPreferences,
             isCreatingNewProfile: isCreatingNewProfile,
-            isCreatingProfile: isCreatingProfile
+            hasCompletedQuestionnaire: hasCompletedQuestionnaire
         )
         .environmentObject(profileManager)
     }
