@@ -20,7 +20,7 @@ struct CropView: View {
             VStack(spacing: 20) {
                 Text("Adjust Your Photo")
                     .font(.system(size: 24, weight: .bold, design: .rounded))
-                    .foregroundColor(.white)
+                    .foregroundColor(Color(hex: "#F5E6D3"))
                 
                 Spacer()
                 
@@ -98,7 +98,7 @@ struct CropView: View {
                         
                         // Circle outline
                         Circle()
-                            .strokeBorder(Color.white, lineWidth: 1)
+                            .strokeBorder(Color(hex: "#F5E6D3"), lineWidth: 1)
                             .frame(width: size, height: size)
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -110,7 +110,7 @@ struct CropView: View {
                     Button(action: { isCropping = false }) {
                         Text("Cancel")
                             .font(.system(size: 18, weight: .semibold, design: .rounded))
-                            .foregroundColor(.white)
+                            .foregroundColor(Color(hex: "#F5E6D3"))
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 16)
                             .background(Color(white: 0.2))

@@ -5,45 +5,112 @@ import SwiftUI
  connect their Spotify account to the application
  
  Created by Paul Shamoon on 9/12/24.
- Updated by [Assistant] on 11/04/24
+ Updated by Nazanin on 12/03/24
  */
 struct ConnectToSpotifyView: View {
     @ObservedObject var spotifyController: SpotifyController
-    @Environment(\.dismiss) var dismiss // Environment property to handle view dismissal
+    @Environment(\.dismiss) var dismiss
     @AppStorage("hasConnectedSpotify") private var hasConnectedSpotify = false
+    
+    // Add animation state
+    @State private var isAnimating = false
 
     var body: some View {
-        VStack(spacing: 20) {
-            Text("Choose your streaming provider to continue")
-                .font(.title2)
-                .multilineTextAlignment(.center) // Centers the text
-                .padding(.bottom, 10)
+        ZStack {
+            LinearGradient(
+                gradient: Gradient(colors: [
+                    Color.black,
+                    Color(hex: "0A2F23"),
+                    Color(hex: "0A2F23")
+                ]),
+                startPoint: .top,
+                endPoint: .bottom
+            )
+            .ignoresSafeArea()
             
-            Button(action: {
-                print("button pressed")
-                spotifyController.initializeSpotifyConnection()
-            }) {
-                HStack(spacing: 0) {
-                    Text("Connect with")
-                        .font(.headline)
-                    
-                    Image("SpotifyLogo")
-                        .resizable()
-                        .frame(width: 45, height: 45)
-                        .aspectRatio(contentMode: .fit)
-                    
-                    Text("Spotify")
-                        .font(.headline)
+            Circle()
+                .fill(Color.green.opacity(0.1))
+                .frame(width: 200, height: 200)
+                .blur(radius: 20)
+                .offset(x: -50, y: -100)
+                .scaleEffect(isAnimating ? 1.2 : 0.8)
+            
+            Circle()
+                .fill(Color.green.opacity(0.1))
+                .frame(width: 300, height: 300)
+                .blur(radius: 20)
+                .offset(x: 50, y: 100)
+                .scaleEffect(isAnimating ? 0.8 : 1.2)
+            
+            // Main content
+            VStack(spacing: 30) {
+                Spacer()
+                
+                Image("SpotifyLogo")
+                    .resizable()
+                    .frame(width: 120, height: 120)
+                    .aspectRatio(contentMode: .fit)
+                    .shadow(color: Color(hex: "22C55E").opacity(0.3), radius: 10, x: 0, y: 5)
+                    .padding(.bottom, 20)
+                
+                Button(action: {
+                    print("button pressed")
+                    spotifyController.initializeSpotifyConnection()
+                }) {
+                    HStack(spacing: 12) {
+                        Text("Connect with Spotify")
+                            .font(.system(size: 18, weight: .bold, design: .rounded))
+                            .lineLimit(1)
+                    }
+                    .foregroundColor(Color(hex: "#F5E6D3"))
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 16)
+                    .background(
+                        LinearGradient(
+                            gradient: Gradient(colors: [
+                                Color(hex: "#1A2F2A"),
+                                Color(hex: "#243B35"),
+                                Color.black.opacity(0.7) //darker shade for better blending
+                            ]),
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    .cornerRadius(12)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 12)
+                            .stroke(LinearGradient(
+                                gradient: Gradient(colors: [
+                                    Color(hex: "22C55E").opacity(0.4),
+                                    Color(hex: "0A2F23").opacity(0.8)
+                                ]),
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            ), lineWidth: 1.5)
+                    )
+                    .shadow(
+                        color: Color(hex: "#243B35").opacity(0.3),
+                        radius: 8,
+                        x: 0,
+                        y: 4
+                    )
                 }
-                .padding()
-                .background(Color.green)
-                .foregroundColor(Color.black)
-                .cornerRadius(10)
+                .padding(.horizontal, 40)
+                
+                Spacer()
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+        }
+        .onAppear {
+            withAnimation(
+                Animation
+                    .easeInOut(duration: 2)
+                    .repeatForever(autoreverses: true)
+            ) {
+                isAnimating = true
             }
         }
-        .padding()
-        
-         // We can access the url when spotify redirects us to Moodify
+        // We can access the url when spotify redirects us to Moodify
         .onOpenURL { url in
             print("Received Spotify redirect URL")
             spotifyController.setAccessToken(from: url)
@@ -65,4 +132,9 @@ struct ConnectToSpotifyView: View {
             }
         }
     }
+}
+
+#Preview("Connect to Spotify View") {
+    ConnectToSpotifyView(spotifyController: SpotifyController())
+        .preferredColorScheme(.dark)
 }

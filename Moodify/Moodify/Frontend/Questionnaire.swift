@@ -66,7 +66,7 @@ struct QuestionnaireView: View {
         }
         .background(
             LinearGradient(
-                gradient: Gradient(colors: [Color.black, Color(white: 0.1)]),
+                gradient: Gradient(colors: [Color(hex: "#1A2F2A"), Color(hex: "#243B35")]),
                 startPoint: .top,
                 endPoint: .bottom
             )
@@ -92,7 +92,7 @@ struct QuestionnaireView: View {
                             Image(systemName: "chevron.left")
                             Text("Back")
                         }
-                        .foregroundColor(.white)
+                        .foregroundColor(Color(hex: "#F5E6D3"))
                         .font(.system(size: 16, weight: .medium))
                     }
                     Spacer()
@@ -101,15 +101,21 @@ struct QuestionnaireView: View {
             
             HStack(spacing: 0) {
                 Text("M")
-                    .foregroundColor(.green)
+                    .foregroundStyle(
+                        LinearGradient(
+                            colors: [Color(hex: "4ADE80"), Color(hex: "22C55E")],
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        )
+                    )
                 Text("oodify")
-                    .foregroundColor(Color(red: 0.96, green: 0.87, blue: 0.70))
+                    .foregroundColor(Color(hex: "#F5E6D3"))
             }
             .font(.system(size: 36, weight: .bold, design: .rounded))
             
             Text(isCreatingNewProfile ? "Create Your Profile" : "Edit Your Profile")
                 .font(.system(size: 24, weight: .medium))
-                .foregroundColor(.white)
+                .foregroundColor(Color(hex: "#F5E6D3"))
                 .padding(.top, 5)
         }
     }
@@ -120,14 +126,26 @@ struct QuestionnaireView: View {
                 HStack(spacing: 12) {
                     Toggle("", isOn: $agreedToTerms)
                         .labelsHidden()
-                        .toggleStyle(SwitchToggleStyle(tint: .green))
+                        .toggleStyle(SwitchToggleStyle(tint: Color(hex: "4ADE80")))
                     
                     Text("I agree to the")
                         .foregroundColor(.gray)
                     
-                    NavigationLink(destination: TermsOfServiceView(agreedToTerms: $agreedToTerms)) {
+                    NavigationLink(destination: 
+                        TermsOfServiceView(
+                            agreedToTerms: $agreedToTerms,
+                            showBackButton: false
+                        )
+                        .tint(Color(hex: "#F5E6D3"))
+                    ) {
                         Text("Terms of Service")
-                            .foregroundColor(.green)
+                            .foregroundStyle(
+                                LinearGradient(
+                                    colors: [Color(hex: "4ADE80"), Color(hex: "22C55E")],
+                                    startPoint: .leading,
+                                    endPoint: .trailing
+                                )
+                            )
                             .underline()
                     }
                 }
@@ -149,20 +167,27 @@ struct QuestionnaireView: View {
                 Image(systemName: "arrow.right")
                     .font(.system(size: 16, weight: .semibold))
             }
-            .foregroundColor(.black)
+            .foregroundColor(Color(hex: "#F5E6D3"))
             .frame(maxWidth: .infinity)
             .padding(.vertical, 16)
             .background(
-                LinearGradient(
-                    gradient: Gradient(colors: [Color.green, Color.green.opacity(0.8)]),
-                    startPoint: .leading,
-                    endPoint: .trailing
-                )
+                RoundedRectangle(cornerRadius: 15)
+                    .fill(
+                        LinearGradient(
+                            colors: [Color(hex: "#1A2F2A"), Color(hex: "#243B35")],
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        )
+                    )
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 15)
+                            .stroke(Color(hex: "#F5E6D3").opacity(0.1), lineWidth: 1)
+                    )
             )
-            .cornerRadius(15)
-            .shadow(color: Color.green.opacity(0.3), radius: 10, x: 0, y: 5)
+            .shadow(color: Color(hex: "#243B35").opacity(0.3), radius: 10, x: 0, y: 5)
         }
-        .padding(.top, 10)
+        .padding(.horizontal)
+        .padding(.vertical, 10)
     }
     
     private func submitForm() {
@@ -232,8 +257,8 @@ struct FormCard<Content: View>: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
             Text(title)
-                .font(.system(size: 20, weight: .bold))
-                .foregroundColor(.white)
+                .font(.system(size: 20, weight: .bold, design: .rounded))
+                .foregroundColor(Color(hex: "#F5E6D3"))
             
             content
         }
@@ -266,20 +291,26 @@ struct FormField<Content: View>: View {
         VStack(alignment: .leading, spacing: 10) {
             HStack {
                 Text(title)
-                    .font(.system(size: 16, weight: .medium))
-                    .foregroundColor(.gray)
+                    .font(.system(size: 16, weight: .medium, design: .rounded))
+                    .foregroundColor(Color(hex: "#F5E6D3").opacity(0.7))
                 
                 Button(action: { showingTooltip.toggle() }) {
                     Image(systemName: "info.circle")
-                        .foregroundColor(.green)
-                        .font(.system(size: 14))
+                        .foregroundStyle(
+                            LinearGradient(
+                                colors: [Color(hex: "4ADE80"), Color(hex: "22C55E")],
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            )
+                        )
+                        .font(.system(size: 14, weight: .medium))
                 }
             }
             
             if showingTooltip {
                 Text(tooltip)
-                    .font(.system(size: 14))
-                    .foregroundColor(.gray)
+                    .font(.system(size: 14, weight: .regular, design: .rounded))
+                    .foregroundColor(Color(hex: "#F5E6D3").opacity(0.7))
                     .padding(.bottom, 5)
             }
             
@@ -287,7 +318,7 @@ struct FormField<Content: View>: View {
             
             if let error = error {
                 Text(error)
-                    .font(.system(size: 14))
+                    .font(.system(size: 14, weight: .medium, design: .rounded))
                     .foregroundColor(.red)
             }
         }
@@ -302,11 +333,12 @@ struct CustomTextField: View {
     var body: some View {
         HStack {
             Image(systemName: icon)
-                .foregroundColor(.gray)
+                .foregroundColor(Color(hex: "#F5E6D3").opacity(0.7))
                 .frame(width: 20)
             
             TextField(placeholder, text: $text)
-                .foregroundColor(.white)
+                .font(.system(size: 16, weight: .regular, design: .rounded))
+                .foregroundColor(Color(hex: "#F5E6D3"))
         }
         .padding()
         .background(Color(white: 0.2))

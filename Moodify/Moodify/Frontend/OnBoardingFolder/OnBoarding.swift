@@ -7,6 +7,9 @@
 
 import SwiftUI
 
+// Add this near the top of the file, before the OnboardingView struct
+let milkyBeige = Color(hex: "#F5E6D3")
+
 /**
  * OnboardingView
  * A SwiftUI view that manages the onboarding flow with multiple pages and animations.
@@ -20,7 +23,7 @@ struct OnboardingView: View {
     @State private var showMoodView = false
     private let totalPages = 3
     var onCompletion: () -> Void
-
+    
     var body: some View {
         ZStack {
             if showMoodView {
@@ -35,12 +38,20 @@ struct OnboardingView: View {
     
     private var mainOnboardingContent: some View {
         ZStack {
-            AnimatedDarkBackground()
-                .ignoresSafeArea()
+            LinearGradient(
+                gradient: Gradient(colors: [
+                    Color.black,
+                    Color(hex: "0A2F23"),
+                    Color(hex: "0A2F23")
+                ]),
+                startPoint: .top,
+                endPoint: .bottom
+            )
+            .ignoresSafeArea()
             
             VStack {
                 Spacer()
-
+                
                 /* TabView for swipeable onboarding pages */
                 TabView(selection: $currentPage) {
                     OnboardingPageView(
@@ -64,13 +75,13 @@ struct OnboardingView: View {
                 .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
                 
                 Spacer()
-
+                
                 /* Page indicator dots */
                 HStack(spacing: 8) {
                     ForEach(0..<totalPages) { index in
                         Circle()
-                            .fill(index == currentPage ? Color.green : Color.white.opacity(0.3))
-                            .frame(width: 10, height: 10)
+                            .fill(index == currentPage ? Color(hex: "22C55E") : Color(hex: "94A3B8").opacity(0.3))
+                            .frame(width: 12, height: 12)
                             .scaleEffect(index == currentPage ? 1.2 : 1.0)
                             .animation(.spring(response: 0.3, dampingFraction: 0.7), value: currentPage)
                     }
@@ -87,15 +98,28 @@ struct OnboardingView: View {
                         }
                     }
                 }) {
-                    Text(currentPage < totalPages - 1 ? "Next" : "Continue")
-                        .font(.headline)
-                        .foregroundColor(.black)
-                        .fontWeight(.bold)
-                        .padding()
-                        .frame(width: 180)
-                        .background(Color.green)
-                        .cornerRadius(12)
-                        .shadow(color: Color.green.opacity(0.5), radius: 10, x: 0, y: 10)
+                    HStack(spacing: 12) {
+                        Text(currentPage < totalPages - 1 ? "Next" : "Continue")
+                            .font(.system(size: 18, weight: .bold, design: .rounded))
+                            .lineLimit(1)
+                    }
+                    .foregroundColor(Color(hex: "#F5E6D3"))
+                    .frame(maxWidth: 180)
+                    .padding(.vertical, 16)
+                    .background(
+                        LinearGradient(
+                            colors: [Color(hex: "#1A2F2A"), Color(hex: "#243B35")],
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        )
+                    )
+                    .cornerRadius(12)
+                    .shadow(
+                        color: Color(hex: "#243B35").opacity(0.3),
+                        radius: 8,
+                        x: 0,
+                        y: 4
+                    )
                 }
                 .padding(.bottom, 50)
             }
@@ -125,61 +149,46 @@ struct OnboardingPageView: View {
                 .resizable()
                 .aspectRatio(contentMode: .fit)
                 .frame(width: 120, height: 120)
-                .foregroundColor(.white)
+                .foregroundStyle(
+                    LinearGradient(
+                        colors: [
+                            Color(hex: "4ADE80"),
+                            Color(hex: "22C55E")
+                        ],
+                        startPoint: .leading,
+                        endPoint: .trailing
+                    )
+                )
                 .shadow(radius: 10)
                 .padding(.bottom, 20)
             
             /* Title text */
             Text(title)
-                .font(.system(size: 28, weight: .bold, design: .rounded))
-                .foregroundColor(.white)
+                .font(.system(size: 32, weight: .bold))
+                .foregroundStyle(
+                    LinearGradient(
+                        colors: [
+                            Color(hex: "4ADE80"),
+                            Color(hex: "22C55E")
+                        ],
+                        startPoint: .leading,
+                        endPoint: .trailing
+                    )
+                )
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 30)
             
             /* Description text */
             Text(description)
-                .font(.system(size: 16, weight: .medium, design: .rounded))
-                .foregroundColor(.white.opacity(0.8))
+                .font(.subheadline)
+                .foregroundColor(Color(hex: "94A3B8"))
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 30)
+                .lineSpacing(4)
             
             Spacer()
         }
         .padding()
-    }
-}
-
-/**
- * AnimatedDarkBackground
- * Creates an animated gradient background with floating circles.
- * Features:
- * - Gradient background
- * - Animated floating circles
- * - Random circle sizes and animation durations
- */
-struct AnimatedDarkBackground: View {
-    @State private var animate = false
-    
-    var body: some View {
-        ZStack {
-            LinearGradient(gradient: Gradient(colors: [Color.hex("#1A1A2E"), Color.hex("#16213E"), Color.hex("#0F3460")]),
-                           startPoint: .topLeading,
-                           endPoint: .bottomTrailing)
-            
-            /* Animated floating circles */
-            ForEach(0..<15) { _ in
-                Circle()
-                    .fill(Color.white.opacity(0.05))
-                    .frame(width: CGFloat.random(in: 50...120), height: CGFloat.random(in: 50...120))
-                    .position(x: CGFloat.random(in: 0...UIScreen.main.bounds.width),
-                              y: CGFloat.random(in: 0...UIScreen.main.bounds.height))
-                    .offset(y: animate ? -50 : 50)
-                    .animation(Animation.easeInOut(duration: Double.random(in: 4...8)).repeatForever(autoreverses: true))
-            }
-        }
-        .onAppear {
-            animate = true
-        }
     }
 }
 

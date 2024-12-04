@@ -19,34 +19,67 @@ struct MoodCardOnboardingView: View {
     
     var body: some View {
         ZStack {
+            // Background gradient
             RoundedRectangle(cornerRadius: 25)
                 .fill(LinearGradient(
                     gradient: Gradient(colors: moodOnboarding.mood.colors),
                     startPoint: .topLeading,
                     endPoint: .bottomTrailing
                 ))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 25)
+                        .fill(Color.black.opacity(0.15))
+                )
                 .frame(width: 300, height: 400)
                 .shadow(color: .black.opacity(0.3), radius: 10, x: 0, y: 5)
             
-            VStack(spacing: 20) {
+            // Content
+            VStack(spacing: 0) {
+                // Top spacing
+                Spacer()
+                    .frame(height: 50)
+                
+                // Icon
                 Image(systemName: moodOnboarding.mood.icon)
                     .font(.system(size: 60))
                     .foregroundColor(.white)
+                    .shadow(color: .black.opacity(0.2), radius: 2, x: 0, y: 2)
                 
+                // Spacing between icon and title
+                Spacer()
+                    .frame(height: 30)
+                
+                // Title
                 Text(moodOnboarding.mood.name)
-                    .font(.title)
+                    .font(.system(size: 38, weight: .bold, design: .rounded))
+                    .foregroundColor(.white)
+                    .shadow(color: .black.opacity(0.2), radius: 2, x: 0, y: 2)
+                
+                // Spacing between title and description
+                Spacer()
+                    .frame(height: 30)
+                
+                // Description with background
+                Text(moodOnboarding.message)
+                    .font(.system(size: 24, weight: .medium, design: .rounded))
                     .foregroundColor(.white)
                     .multilineTextAlignment(.center)
+                    .lineSpacing(8)
+                    .padding(.horizontal, 32)
+                    .padding(.vertical, 16)
+                    .frame(maxWidth: 260) // Fixed width for consistent alignment
+                    .background(
+                        RoundedRectangle(cornerRadius: 15)
+                            .fill(Color.black.opacity(0.15))
+                            .blur(radius: 5)
+                    )
+                    .shadow(color: .black.opacity(0.3), radius: 4, x: 0, y: 3)
                 
-                Text(moodOnboarding.message)
-                    .font(.body)
-                    .foregroundColor(.white.opacity(0.8))
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal, 40)
-                    .fixedSize(horizontal: false, vertical: true)
+                // Bottom spacing
+                Spacer()
+                    .frame(height: 50)
             }
-            .padding(.horizontal, 20)
-            .frame(width: 280)
+            .frame(width: 300) // Match parent width
         }
     }
 }
@@ -96,7 +129,7 @@ struct AnimatedGradientBackground: View {
                     darkColors: [.yellow.opacity(0.6), .orange.opacity(0.6)],
                     icon: "sun.max.fill"
                 ),
-                message: "Feel the joy and energy with upbeat tunes!"
+                message: "Discover music that\nlifts your spirits and\nkeeps you energized."
             )
         )
     }
@@ -118,7 +151,7 @@ struct AnimatedGradientBackground: View {
                         darkColors: [.blue.opacity(0.6), .purple.opacity(0.6)],
                         icon: "cloud.moon.fill"
                     ),
-                    message: "Relax and unwind with soothing melodies."
+                    message: "Find comfort in melodies\nthat understand and\nsupport your feelings."
                 )
             )
         }

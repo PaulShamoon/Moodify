@@ -56,7 +56,7 @@ struct QueueView: View {
                 VStack(alignment: .leading) {
                     Text("COMING UP NEXT")
                         .font(.caption.bold())
-                        .foregroundColor(.white.opacity(0.7))
+                        .foregroundColor(Color(hex: "#F5E6D3").opacity(0.7))
                         .padding(.horizontal)
                         .padding(.top, 12)
                         .padding(.bottom, 8)
@@ -100,16 +100,16 @@ struct MoodSection: View {
         VStack(alignment: .leading, spacing: 16) {
             Text("CURRENT MOOD")
                 .font(.caption.bold())
-                .foregroundColor(.white.opacity(0.7))
+                .foregroundColor(Color(hex: "#F5E6D3").opacity(0.7))
             
             HStack {
                 Image(systemName: getMoodIcon())
                     .font(.title)
-                    .foregroundColor(.white)
+                    .foregroundColor(Color(hex: "#F5E6D3"))
                 
                 Text(spotifyController.currentMood)
                     .font(.title2.bold())
-                    .foregroundColor(.white)
+                    .foregroundColor(Color(hex: "#F5E6D3"))
                 
                 Spacer()
                 // Mood indicator pill
@@ -119,7 +119,7 @@ struct MoodSection: View {
                     : "Playing \(spotifyController.currentPlaylist!.mood) playlist"
                 )
                 .font(.caption)
-                .foregroundColor(.white)
+                .foregroundColor(Color(hex: "#F5E6D3"))
                 .padding(.horizontal, 12)
                 .padding(.vertical, 6)
                 .background(
@@ -161,31 +161,41 @@ struct CustomHeader: View {
     
     var body: some View {
         HStack {
+            // Back button
             Button(action: { dismiss() }) {
-                Image(systemName: "chevron.down")
-                    .font(.title2)
-                    .foregroundColor(.white)
-                    .padding(12)
-                    .background(.ultraThinMaterial)
-                    .clipShape(Circle())
+                HStack(spacing: 8) {
+                    Image(systemName: "chevron.down")
+                }
+                .font(.system(size: 18, weight: .bold, design: .rounded))
+                .foregroundColor(Color(hex: "#F5E6D3"))
+                .padding(.horizontal, 16)
+                .padding(.vertical, 12)
+                .cornerRadius(12)
+                .shadow(color: Color.black.opacity(0.1), radius: 8, x: 0, y: 4)
             }
             
-            Spacer()
-            
+            // Center text with fixed width
             Text("Mood Queue")
                 .font(.title3.bold())
-                .foregroundColor(.white)
+                .foregroundColor(Color(hex: "#F5E6D3"))
+                .frame(maxWidth: .infinity)
+                .multilineTextAlignment(.center)
             
-            Spacer()
-            
+            // Trash button with fixed width to match back button
             Button(action: { spotifyController.clearCurrentQueue() }) {
                 Image(systemName: "trash")
                     .font(.title2)
-                    .foregroundColor(.white)
+                    .foregroundColor(Color(hex: "C85C37"))
                     .padding(12)
                     .background(.ultraThinMaterial)
                     .clipShape(Circle())
+                    .overlay(
+                        Circle()
+                            .stroke(Color(hex: "C85C37").opacity(0.5), lineWidth: 2)
+                    )
+                    .shadow(color: Color(hex: "C85C37").opacity(0.5), radius: 4, x: 0, y: 0)
             }
+            .frame(width: 85)  // Match the approximate width of back button
         }
         .padding()
         .background(.ultraThinMaterial)
@@ -200,7 +210,7 @@ struct NowPlayingCard: View {
         VStack(alignment: .leading, spacing: 16) {
             Text("NOW PLAYING")
                 .font(.caption.bold())
-                .foregroundColor(.white.opacity(0.7))
+                .foregroundColor(Color(hex: "#F5E6D3").opacity(0.7))
             
             HStack(spacing: 16) {
                 // Album art
@@ -215,17 +225,17 @@ struct NowPlayingCard: View {
                         .frame(width: 60, height: 60)
                         .overlay(
                             Image(systemName: "music.note")
-                                .foregroundColor(.white)
+                                .foregroundColor(Color(hex: "#F5E6D3"))
                         )
                 }
                 
                 VStack(alignment: .leading, spacing: 4) {
                     Text(spotifyController.currentTrackName)
                         .font(.title3.bold())
-                        .foregroundColor(.white)
+                        .foregroundColor(Color(hex: "#F5E6D3"))
                     Text(spotifyController.currentAlbumName)
                         .font(.subheadline)
-                        .foregroundColor(.white.opacity(0.7))
+                        .foregroundColor(Color(hex: "#F5E6D3").opacity(0.7))
                 }
                 Spacer()
             }
@@ -253,7 +263,7 @@ struct QueueSection: View {
         VStack(alignment: .leading, spacing: 16) {
             Text("COMING UP NEXT")
                 .font(.caption.bold())
-                .foregroundColor(.white.opacity(0.7))
+                .foregroundColor(Color(hex: "#F5E6D3").opacity(0.7))
                 .padding(.horizontal)
             
             if spotifyController.currentQueue.isEmpty {
@@ -276,13 +286,13 @@ struct EmptyQueueView: View {
         VStack(spacing: 12) {
             Image(systemName: "music.note.list")
                 .font(.system(size: 40))
-                .foregroundColor(.white.opacity(0.6))
+                .foregroundColor(Color(hex: "#F5E6D3").opacity(0.6))
             Text("Your queue is empty")
                 .font(.headline)
-                .foregroundColor(.white.opacity(0.8))
+                .foregroundColor(Color(hex: "#F5E6D3").opacity(0.8))
             Text("Add some songs to get the party started!")
                 .font(.subheadline)
-                .foregroundColor(.white.opacity(0.6))
+                .foregroundColor(Color(hex: "#F5E6D3").opacity(0.6))
         }
         .frame(maxWidth: .infinity)
         .padding(30)
@@ -306,10 +316,10 @@ struct QueueItemView: View {
                 VStack(alignment: .leading, spacing: 4) {
                     Text(song.trackName)
                         .font(.system(size: 16, weight: .semibold))
-                        .foregroundColor(.white)
+                        .foregroundColor(Color(hex: "#F5E6D3"))
                     Text(song.artistName)
                         .font(.system(size: 14))
-                        .foregroundColor(.white.opacity(0.7))
+                        .foregroundColor(Color(hex: "#F5E6D3").opacity(0.7))
                 }
                 Spacer()
             }
@@ -317,7 +327,7 @@ struct QueueItemView: View {
             .padding(.horizontal, 16)
             .background(
                 RoundedRectangle(cornerRadius: 12)
-                    .fill(.white.opacity(isHovered ? 0.15 : 0.1))
+                    .fill(Color(hex: "#F5E6D3").opacity(isHovered ? 0.15 : 0.1))
             )
             .padding(.horizontal)
         }

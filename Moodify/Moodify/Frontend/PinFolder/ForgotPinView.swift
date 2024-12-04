@@ -28,8 +28,13 @@ struct ForgotPinView: View {
                             Image(systemName: "chevron.left")
                             Text("Back")
                         }
-                        .foregroundColor(.white)
-                        .font(.system(size: 16, weight: .medium))
+                        .font(.system(size: 18, weight: .bold, design: .rounded))
+                        .foregroundColor(Color(hex: "#F5E6D3"))
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 12)
+
+                        .cornerRadius(12)
+                        .shadow(color: Color.black.opacity(0.1), radius: 8, x: 0, y: 4)
                     }
                     Spacer()
                 }
@@ -47,20 +52,20 @@ struct ForgotPinView: View {
             
             VStack(spacing: 30) {
                 Text("Forgot PIN")
-                    .font(.title)
-                    .foregroundColor(.green)
+                    .font(.system(size: 34, weight: .bold, design: .rounded))
+                    .foregroundColor(Color(hex: "#F5E6D3"))
                     .padding(.top)
                 
                 Spacer()
                 
                 Text("Your Security Question")
                     .font(.title2)
-                    .foregroundColor(.white)
+                    .foregroundColor(Color(hex: "#F5E6D3"))
                 
                 // Display the security question
                 Text(profile.personalSecurityQuestion ?? "No security question set")
                     .font(.headline)
-                    .foregroundColor(.white)
+                    .foregroundColor(Color(hex: "#F5E6D3"))
                 
                 // Security answer input with visibility toggle inside the input field
                 TextInputField(
@@ -72,7 +77,7 @@ struct ForgotPinView: View {
                 
                 Text("Enter your new 4 digit PIN")
                     .font(.title2)
-                    .foregroundColor(.white)
+                    .foregroundColor(Color(hex: "#F5E6D3"))
                 
                 // New PIN input with visibility toggle inside the input field
                 PinInputField(
@@ -92,13 +97,27 @@ struct ForgotPinView: View {
                 
                 Button(action: resetPin) {
                     Text("Reset PIN")
-                        .font(.headline)
-                        .foregroundColor(.black)
-                        .padding()
-                        .background(Color.green)
-                        .cornerRadius(10)
+                        .font(.system(size: 18, weight: .bold, design: .rounded))
+                        .foregroundColor(Color(hex: "#F5E6D3"))
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 16)
+                        .background(
+                            LinearGradient(
+                                colors: [Color(hex: "1A2F2A"), Color(hex: "243B35")],
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            )
+                        )
+                        .cornerRadius(35)
+                        .shadow(
+                            color: Color.black.opacity(0.2),
+                            radius: 10,
+                            x: 0,
+                            y: 5
+                        )
                 }
-                .padding()
+                .padding(.horizontal, 20)
+                .padding(.bottom, 30)
                 
                 Spacer()
             }
@@ -163,6 +182,7 @@ struct ForgotPinView: View {
             )
 
             print("PIN reset successfully for profile: \(profileManager.profiles[profileIndex].name)")
+            profileManager.currentProfile = nil
             navigateBackToSelection = true // Navigate back to the selection page
         } else {
             errorMessage = "Profile not found. Please try again."
@@ -185,15 +205,22 @@ struct TextInputField: View {
                     TextField(placeholder, text: $text)
                 }
             }
+            .font(.system(size: 16, weight: .medium, design: .rounded))
+            .foregroundColor(Color(hex: "#F5E6D3"))
             .keyboardType(.alphabet)
             .textContentType(.oneTimeCode)
+            
             Button(action: toggleVisibility) {
                 Image(systemName: isSecure ? "eye" : "eye.slash")
-                    .foregroundColor(.gray)
+                    .foregroundColor(Color(hex: "#F5E6D3").opacity(0.7))
+                    .font(.system(size: 16, weight: .medium))
             }
         }
         .padding()
-        .background(Color(.systemGray6))
-        .cornerRadius(10)
+        .background(
+            RoundedRectangle(cornerRadius: 12)
+                .fill(Color(hex: "1A2F2A"))
+                .shadow(color: Color.black.opacity(0.1), radius: 8, x: 0, y: 4)
+        )
     }
 }

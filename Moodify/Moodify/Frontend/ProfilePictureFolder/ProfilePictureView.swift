@@ -33,8 +33,8 @@ struct ProfilePictureView: View {
     var body: some View {
         VStack(spacing: 24) {
             Text("Set a Profile Picture")
-                .font(.system(size: 28, weight: .bold, design: .rounded))
-                .foregroundColor(.white)
+                .font(.system(size: 34, weight: .bold))
+                .foregroundColor(Color(hex: "#F5E6D3"))
             
             ZStack {
                 if let image = currentImage {
@@ -43,7 +43,7 @@ struct ProfilePictureView: View {
                         .scaledToFill()
                         .frame(width: 180, height: 180)
                         .clipShape(Circle())
-                        .overlay(Circle().stroke(Color.green, lineWidth: 4))
+                        .overlay(Circle().stroke(Color(hex: "4ADE80"), lineWidth: 4))
                         .shadow(radius: 10)
                 } else {
                     Circle()
@@ -52,13 +52,12 @@ struct ProfilePictureView: View {
                         .overlay(
                             Image(systemName: "person.fill")
                                 .font(.system(size: 60))
-                                .foregroundColor(.white.opacity(0.7))
+                                .foregroundColor(Color(hex: "#F5E6D3").opacity(0.7))
                         )
                 }
                 
                 if currentImage != nil {
                     Button(action: {
-                        // Load the current image into originalImage before cropping
                         if originalImage == nil {
                             originalImage = currentImage
                         }
@@ -68,13 +67,14 @@ struct ProfilePictureView: View {
                             .font(.system(size: 20))
                             .padding(12)
                             .background(Color.black.opacity(0.6))
-                            .foregroundColor(.white)
+                            .foregroundColor(Color(hex: "#F5E6D3"))
                             .clipShape(Circle())
                     }
                     .offset(x: 70, y: 70)
                 }
             }
             .padding(.vertical, 20)
+            
             HStack(spacing: 16) {
                 Button(action: {
                     sourceType = .photoLibrary
@@ -85,64 +85,77 @@ struct ProfilePictureView: View {
                         Text("Choose from Library")
                     }
                     .font(.system(size: 18, weight: .bold, design: .rounded))
-                    .foregroundColor(.black)
+                    .foregroundColor(Color(hex: "#F5E6D3"))
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 16)
-                    .background(Color.green)
+                    .background(
+                        LinearGradient(
+                            colors: [Color(hex: "#1A2F2A"), Color(hex: "#243B35")],
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        )
+                    )
                     .cornerRadius(12)
                 }
                 
                 Button(action: {
-                    showIconPicker = true  // Add this state variable
+                    showIconPicker = true
                 }) {
                     HStack {
                         Image(systemName: "person.circle.fill")
                         Text("Choose an Icon Instead")
                     }
                     .font(.system(size: 18, weight: .bold, design: .rounded))
-                    .foregroundColor(.black)
+                    .foregroundColor(Color(hex: "#F5E6D3"))
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 16)
-                    .background(Color.green)
+                    .background(
+                        LinearGradient(
+                            colors: [Color(hex: "#1A2F2A"), Color(hex: "#243B35")],
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        )
+                    )
                     .cornerRadius(12)
                 }
             }
-            
             .padding(.horizontal)
             
             Spacer()
             
             if currentImage != nil {
                 Button(action: saveAndDismiss) {
-                    HStack{
+                    HStack {
                         Text("Save Profile Picture")
                             .font(.system(size: 18, weight: .bold, design: .rounded))
                         
                         Image(systemName: "arrow.right.circle.fill")
                             .font(.system(size: 20))
                     }
-                    .foregroundColor(.black)
+                    .foregroundColor(Color(hex: "#F5E6D3"))
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 16)
-                    .background(Color.green)
+                    .background(
+                        LinearGradient(
+                            colors: [Color(hex: "#1A2F2A"), Color(hex: "#243B35")],
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        )
+                    )
                     .cornerRadius(12)
                 }
                 .padding(.horizontal)
                 .padding(.bottom, 30)
             } else {
-                Button(action:{
-                    skipWithRandomIcon()
-                }
-                ) {
-                    HStack{
+                Button(action: skipWithRandomIcon) {
+                    HStack {
                         Text("Skip")
                             .font(.system(size: 18, weight: .bold, design: .rounded))
                         
                         Image(systemName: "arrow.right.circle.fill")
                             .font(.system(size: 20))
                     }
-                    .font(.system(size: 18, weight: .semibold, design: .rounded))
-                    .foregroundColor(.black)
+                    .foregroundColor(Color(hex: "#F5E6D3"))
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 16)
                     .background(Color.gray.opacity(0.5))

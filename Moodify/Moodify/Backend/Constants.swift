@@ -358,8 +358,6 @@ let happySongs: [String: [String]] = [
     "hip-hop": [
         // "Can't Stop the Feeling!" by Justin Timberlake
         "1WkMMavIMc4JZ8cfMmxHkI",
-        // "Uptown Funk" by Mark Ronson ft. Bruno Mars
-        "32OlwWuMpZ6b0aN2RZOeMS",
         // "Happy" by Pharrell Williams
         "60nZcImufyMA1MKQY3dcCH",
         // "Good as Hell" by Lizzo

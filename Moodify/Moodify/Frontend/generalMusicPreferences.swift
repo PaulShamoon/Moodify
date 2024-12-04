@@ -28,7 +28,7 @@ struct GeneralMusicPreferencesView: View {
     }
     
     @State private var currentPage = 0
-
+    
     func genreIcon(for genre: String) -> String {
         switch genre {
         case "Pop": return "star.fill"
@@ -51,11 +51,11 @@ struct GeneralMusicPreferencesView: View {
                            endPoint: .bottom)
             .edgesIgnoringSafeArea(.all)
             
-            VStack(spacing: 32) {
+            VStack(spacing: 0) {
                 // Title Section
-                VStack(spacing: 8) {
+                VStack(spacing: 12) {
                     Text("\(profileManager.currentProfile?.name ?? "User"),")
-                        .font(.system(size: 26, weight: .bold, design: .rounded))
+                        .font(.system(size: 24, weight: .bold))
                         .foregroundStyle(
                             LinearGradient(
                                 colors: [Color(hex: "4ADE80"), Color(hex: "22C55E")],
@@ -64,14 +64,15 @@ struct GeneralMusicPreferencesView: View {
                             )
                         )
                         .multilineTextAlignment(.center)
+                        .padding(.top, 80)
                     
                     Text("Select your favorite genres")
-                        .font(.system(size: 18, weight: .medium, design: .rounded))
-                        .foregroundColor(Color(hex: "94A3B8"))
+                        .font(.system(size: 28, weight: .medium))
+                        .foregroundColor(Color(hex: "#F5E6D3"))
                         .multilineTextAlignment(.center)
-                    
+                        .padding(.top, 20)
                     Text("The more genres you choose, the better your recommendations.")
-                        .font(.system(size: 14, weight: .regular, design: .rounded))
+                        .font(.system(size: 18, weight: .regular, design: .rounded))
                         .foregroundStyle(
                             LinearGradient(
                                 colors: [Color.green.opacity(0.9), Color.green.opacity(0.6)],
@@ -80,14 +81,17 @@ struct GeneralMusicPreferencesView: View {
                             )
                         )
                         .multilineTextAlignment(.center)
+                        .lineLimit(nil)
+                        .fixedSize(horizontal: false, vertical: true)
                         .padding(.horizontal, 16)
                         .padding(.vertical, 10)
                         .background(
                             RoundedRectangle(cornerRadius: 12)
-                                .fill(Color.white.opacity(0.05))
+                                .fill(Color(hex: "#F5E6D3").opacity(0.05))
                         )
+                        .frame(maxWidth: .infinity) // Ensures it adjusts to parent width
                 }
-                .padding(.horizontal)
+//                .padding(.horizontal)
                 
                 // Genre Pages
                 TabView(selection: $currentPage) {
@@ -104,7 +108,7 @@ struct GeneralMusicPreferencesView: View {
                                         RoundedRectangle(cornerRadius: 12)
                                             .fill(selectedGenres.contains(genre) ?
                                                   LinearGradient(gradient: Gradient(colors: [Color.green, Color.green.opacity(0.7)]), startPoint: .topLeading, endPoint: .bottomTrailing) :
-                                                    LinearGradient(gradient: Gradient(colors: [Color.white.opacity(0.1), Color.white.opacity(0.05)]), startPoint: .topLeading, endPoint: .bottomTrailing))
+                                                    LinearGradient(gradient: Gradient(colors: [Color(hex: "#F5E6D3").opacity(0.1), Color(hex: "#F5E6D3").opacity(0.05)]), startPoint: .topLeading, endPoint: .bottomTrailing))
                                             .shadow(color: selectedGenres.contains(genre) ? Color.green.opacity(0.3) : Color.black.opacity(0.2), radius: 6, x: 0, y: 3)
                                         
                                         VStack(spacing: 8) {
@@ -114,7 +118,7 @@ struct GeneralMusicPreferencesView: View {
                                             
                                             Text(genre)
                                                 .font(.system(size: 14, weight: .semibold, design: .rounded))
-                                                .foregroundColor(selectedGenres.contains(genre) ? .black : .white)
+                                                .foregroundColor(selectedGenres.contains(genre) ? .black : Color(hex: "#F5E6D3"))
                                             
                                             if selectedGenres.contains(genre) {
                                                 Image(systemName: "checkmark.circle.fill")
@@ -170,7 +174,7 @@ struct GeneralMusicPreferencesView: View {
                         Image(systemName: "arrow.right.circle.fill")
                             .font(.system(size: 20))
                     }
-                    .foregroundColor(.black)
+                    .foregroundColor(Color(hex: "#F5E6D3"))
                     .frame(maxWidth: .infinity)
                     .frame(height: 56)
                     .background(
@@ -178,16 +182,21 @@ struct GeneralMusicPreferencesView: View {
                             if selectedGenres.isEmpty {
                                 Color.gray.opacity(0.5)
                             } else {
-                                LinearGradient(gradient: Gradient(colors: [Color.green, Color.green.opacity(0.8)]), startPoint: .leading, endPoint: .trailing)
+                                LinearGradient(
+                                    colors: [Color(hex: "#1A2F2A"), Color(hex: "#243B35")],
+                                    startPoint: .leading,
+                                    endPoint: .trailing
+                                )
                             }
                         }
                     )
                     .cornerRadius(16)
-                    .shadow(color: selectedGenres.isEmpty ? .clear : Color.green.opacity(0.3),
+                    .shadow(color: selectedGenres.isEmpty ? .clear : Color(hex: "#243B35").opacity(0.3),
                             radius: 8, x: 0, y: 4)
                 }
                 .padding(.horizontal)
-                .padding(.bottom, 20)
+                .padding(.top, 16) // Move the button closer to the grid
+                .padding(.bottom, 100) // Adjust bottom padding if necessary
             }
         }
         .onAppear {

@@ -63,7 +63,7 @@ struct PinSetupView: View {
     private var headerView: some View {
         Text(profile?.userPin == nil ? "Create Your PIN" : "Change PIN")
             .font(.system(size: 28, weight: .bold, design: .rounded))
-            .foregroundColor(.primary)
+            .foregroundColor(Color(hex: "#F5E6D3"))
             .padding(.top)
     }
     
@@ -149,31 +149,53 @@ struct PinSetupView: View {
     private var buttonSection: some View {
         HStack(spacing: 16) {
             if currentStep > 1 && profile?.userPin == nil {
-                Button(action: {
-                    // Reset showError when going back
-                    showError = false
-                    currentStep -= 1
-                    isPinFieldsDisabled = false // Re-enable PIN fields when going back
-                }) {
+                Button(action: { currentStep -= 1 }) {
                     Text("Back")
+                        .font(.system(size: 18, weight: .bold, design: .rounded))
+                        .foregroundColor(Color(hex: "#F5E6D3"))
                         .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(Color.gray.opacity(0.2))
-                        .foregroundColor(.primary)
-                        .cornerRadius(12)
+                        .padding(.vertical, 16)
+                        .background(
+                            LinearGradient(
+                                colors: [Color(hex: "1A2F2A"), Color(hex: "243B35")],
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            )
+                        )
+                        .cornerRadius(35)
+                        .shadow(
+                            color: Color.black.opacity(0.2),
+                            radius: 10,
+                            x: 0,
+                            y: 5
+                        )
                 }
             }
+            
             Button(action: handleNextStep) {
                 Text(getButtonTitle())
+                    .font(.system(size: 18, weight: .bold, design: .rounded))
+                    .foregroundColor(Color(hex: "#F5E6D3"))
                     .frame(maxWidth: .infinity)
-                    .font(.title2)
-                    .padding()
-                    .background(Color.green)
-                    .foregroundColor(.black)
-                    .cornerRadius(12)
+                    .padding(.vertical, 16)
+                    .background(
+                        LinearGradient(
+                            colors: [Color(hex: "1A2F2A"), Color(hex: "243B35")],
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        )
+                    )
+                    .cornerRadius(35)
+                    .shadow(
+                        color: Color.black.opacity(0.2),
+                        radius: 10,
+                        x: 0,
+                        y: 5
+                    )
             }
         }
-        .padding(.top)
+        .padding(.horizontal, 20)
+        .padding(.bottom, 30)
     }
     
     private var backButton: some View {
@@ -396,3 +418,4 @@ struct ErrorBanner: View {
         .cornerRadius(10)
     }
 }
+

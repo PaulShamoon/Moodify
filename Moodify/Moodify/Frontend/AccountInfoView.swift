@@ -13,7 +13,7 @@ struct AccountInfoView: View {
                 
                 Text("Account Information")
                     .font(.system(size: 34, weight: .bold, design: .rounded))
-                    .foregroundColor(.white)
+                    .foregroundColor(Color(hex: "#F5E6D3"))
                     .multilineTextAlignment(.center)
                     .frame(maxWidth: .infinity)
                 
@@ -51,7 +51,7 @@ struct AccountInfoView: View {
                             }) {
                                 Image(systemName: "pencil.circle.fill")
                                     .font(.system(size: 25))
-                                    .foregroundColor(.white)
+                                    .foregroundColor(Color(hex: "#F5E6D3"))
                                     .background(Circle().fill(Color.green))
                                     .frame(width: 30, height: 30)
                                     .contentShape(Circle())
@@ -60,7 +60,7 @@ struct AccountInfoView: View {
                             
                             Text(profile.name)
                                 .font(.system(size: 24, weight: .semibold, design: .rounded))
-                                .foregroundColor(.white)
+                                .foregroundColor(Color(hex: "#F5E6D3"))
                                 .offset(x: -25)
                         }
                         
@@ -76,12 +76,13 @@ struct AccountInfoView: View {
                             
                             InfoRow(
                                 icon: "music.note.list",
-                                title: "Favorite Genres",
+                                title: "Genres",
                                 value: profile.favoriteGenres.isEmpty ?
                                     "Not Set" :
                                     profile.favoriteGenres.joined(separator: ", ")
                             )
                         }
+                        .padding(.horizontal, 16)
                     }
                     .padding(20)
                     .background(
@@ -90,27 +91,38 @@ struct AccountInfoView: View {
                     )
                     .shadow(color: .black.opacity(0.2), radius: 10, x: 0, y: 5)
                     
-                    NavigationLink(
-                        destination: QuestionnaireView(
+                    NavigationLink {
+                        QuestionnaireView(
                             isEditingProfile: .constant(true),
                             navigateToMusicPreferences: .constant(true),
                             isCreatingNewProfile: .constant(false)
                         )
                         .environmentObject(profileManager)
                         .navigationBarBackButtonHidden(true)
-                    ) {
-                        HStack {
+                    } label: {
+                        HStack(spacing: 12) {
                             Image(systemName: "pencil.circle.fill")
-                                .font(.title2)
+                                .font(.system(size: 22, weight: .semibold))
                             Text("Edit Profile")
-                                .font(.system(size: 18, weight: .semibold, design: .rounded))
+                                .font(.system(size: 18, weight: .bold, design: .rounded))
+                                .lineLimit(1)
                         }
-                        .foregroundColor(.green)
+                        .foregroundColor(Color(hex: "#F5E6D3"))
                         .frame(maxWidth: .infinity)
-                        .padding()
+                        .padding(.vertical, 16)
                         .background(
-                            RoundedRectangle(cornerRadius: 15)
-                                .fill(Color.green.opacity(0.2))
+                            LinearGradient(
+                                colors: [Color(hex: "#1A2F2A"), Color(hex: "#243B35")],
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            )
+                        )
+                        .cornerRadius(12)
+                        .shadow(
+                            color: Color(hex: "#243B35").opacity(0.3),
+                            radius: 8,
+                            x: 0,
+                            y: 4
                         )
                     }
                     .padding(.top, 10)
@@ -148,9 +160,9 @@ struct AccountInfoView: View {
                             }) {
                                 HStack {
                                     Image(systemName: "chevron.backward")
-                                        .foregroundColor(.white)
+                                        .foregroundColor(Color(hex: "#F5E6D3"))
                                     Text("Back")
-                                        .foregroundColor(.white)
+                                        .foregroundColor(Color(hex: "#F5E6D3"))
                                 }
                             }
                         }
@@ -174,21 +186,24 @@ struct InfoRow: View {
     let value: String
     
     var body: some View {
-        HStack(alignment: .center, spacing: 12) {
+        HStack(spacing: 12) {
             Image(systemName: icon)
                 .font(.system(size: 22))
                 .foregroundColor(.green)
                 .frame(width: 30)
             
-            VStack(alignment: .leading, spacing: 4) {
-                Text(title)
-                    .font(.system(size: 14, weight: .medium))
-                    .foregroundColor(.gray)
-                
-                Text(value)
-                    .font(.system(size: 16, weight: .medium))
-                    .foregroundColor(.white)
-            }
+            Text(title)
+                .font(.system(size: 14, weight: .medium))
+                .foregroundColor(.gray)
+                .frame(width: 80, alignment: .leading)
+            
+            Text(value)
+                .font(.system(size: 16, weight: .medium))
+                .foregroundColor(Color(hex: "#F5E6D3"))
+                .lineLimit(1)
+                .truncationMode(.tail)
+                .frame(maxWidth: .infinity, alignment: .leading)
         }
+        .frame(maxWidth: .infinity)
     }
 }
