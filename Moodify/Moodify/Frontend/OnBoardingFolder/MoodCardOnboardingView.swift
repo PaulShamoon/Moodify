@@ -19,6 +19,7 @@ struct MoodCardOnboardingView: View {
     
     var body: some View {
         ZStack {
+            // Card Background
             RoundedRectangle(cornerRadius: 25)
                 .fill(LinearGradient(
                     gradient: Gradient(colors: moodOnboarding.mood.colors),
@@ -28,26 +29,44 @@ struct MoodCardOnboardingView: View {
                 .frame(width: 300, height: 400)
                 .shadow(color: .black.opacity(0.3), radius: 10, x: 0, y: 5)
             
-            VStack(spacing: 20) {
+            VStack(spacing: 24) {
                 Image(systemName: moodOnboarding.mood.icon)
-                    .font(.system(size: 60))
-                    .foregroundColor(.white)
+                    .font(.system(size: 70, weight: .bold))
+                    .foregroundColor(darkerShade(of: moodOnboarding.mood.colors))
+                    .shadow(color: .black.opacity(0.2), radius: 4, x: 0, y: 2)
                 
                 Text(moodOnboarding.mood.name)
-                    .font(.title)
-                    .foregroundColor(.white)
+                    .font(.system(size: 32, weight: .bold))
+                    .foregroundColor(Color(hex: "#F5E6D3"))
                     .multilineTextAlignment(.center)
+                    .shadow(color: .black.opacity(0.2), radius: 3, x: 0, y: 2)
                 
                 Text(moodOnboarding.message)
-                    .font(.body)
-                    .foregroundColor(.white.opacity(0.8))
+                    .font(.system(size: 20, weight: .semibold))
+                    .foregroundColor(Color(hex: "#F5E6D3"))
                     .multilineTextAlignment(.center)
-                    .padding(.horizontal, 40)
-                    .fixedSize(horizontal: false, vertical: true)
+                    .lineSpacing(4)
+                    .padding(.horizontal, 30)
+                    .frame(maxWidth: 240)
+                    .minimumScaleFactor(0.8)
+                    .shadow(color: .black.opacity(0.2), radius: 3, x: 0, y: 2)
+                    .padding(.top, 8)
             }
             .padding(.horizontal, 20)
             .frame(width: 280)
         }
+    }
+    
+    private func darkerShade(of colors: [Color]) -> Color {
+        let uiColors = colors.map { UIColor($0) }
+        let averageColor = uiColors.reduce(UIColor.black) { (result, color) -> UIColor in
+            var (r1, g1, b1, a1): (CGFloat, CGFloat, CGFloat, CGFloat) = (0, 0, 0, 0)
+            var (r2, g2, b2, a2): (CGFloat, CGFloat, CGFloat, CGFloat) = (0, 0, 0, 0)
+            result.getRed(&r1, green: &g1, blue: &b1, alpha: &a1)
+            color.getRed(&r2, green: &g2, blue: &b2, alpha: &a2)
+            return UIColor(red: (r1 + r2) / 2, green: (g1 + g2) / 2, blue: (b1 + b2) / 2, alpha: (a1 + a2) / 2)
+        }
+        return Color(averageColor).opacity(0.7)
     }
 }
 

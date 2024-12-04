@@ -35,7 +35,7 @@ struct ProfileSelectionView: View {
                 VStack(spacing: 8) {
                     Text("Who's Listening?")
                         .font(.system(size: 32, weight: .bold))
-                        .foregroundColor(.white)
+                        .foregroundColor(Color(hex: "#F5E6D3"))
                         .foregroundStyle(
                             LinearGradient(
                                 colors: [
@@ -85,31 +85,39 @@ struct ProfileSelectionView: View {
                         }
                     }
                 }) {
-                    HStack(spacing: 8) {
-                        Image(systemName: profileManager.profiles.count < maxProfiles ?  "plus.circle.fill" :  "x.circle.fill")
-                            .font(.title3)
-                        Text(profileManager.profiles.count < maxProfiles ?
-                             "Add New Profile" :
-                             "Max Profile Limit (6)")
-                            .font(.headline)
+                    HStack(spacing: 12) {
+                        Image(systemName: profileManager.profiles.count < maxProfiles ? "plus.circle.fill" : "x.circle.fill")
+                            .font(.system(size: 22, weight: .semibold))
+                        
+                        Text(profileManager.profiles.count < maxProfiles ? "Add New Profile" : "Max Profile Limit (6)")
+                            .font(.system(size: 18, weight: .bold, design: .rounded))
                             .lineLimit(1)
                     }
-                    .foregroundColor(.black)
-                    .frame(width: 220, height: 50)
+                    .foregroundColor(Color(hex: "#F5E6D3"))
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 16)
                     .background(
                         LinearGradient(
                             colors: profileManager.profiles.count < maxProfiles ?
-                                [Color(hex: "4ADE80"), Color(hex: "22C55E")] :
-                                [Color(hex: "94A3B8"), Color(hex: "64748B")],
+                                [Color(hex: "#1A2F2A"), Color(hex: "#243B35")] :
+                                [Color(hex: "#1A1A1A"), Color(hex: "#2D2D2D")],
                             startPoint: .leading,
                             endPoint: .trailing
                         )
                     )
-                    .clipShape(Capsule())
-                    .shadow(color: Color(hex: "4ADE80").opacity(0.3), radius: 8, x: 0, y: 4)
-                    .disabled(profileManager.profiles.count >= maxProfiles)
+                    .cornerRadius(12)
+                    .shadow(
+                        color: profileManager.profiles.count < maxProfiles ?
+                            Color(hex: "#243B35").opacity(0.3) :
+                            Color.black.opacity(0.2),
+                        radius: 8,
+                        x: 0,
+                        y: 4
+                    )
                 }
+                .padding(.horizontal, 20)
                 .padding(.bottom, 32)
+                .disabled(profileManager.profiles.count >= maxProfiles)
             }
         }
         .preferredColorScheme(.dark)
@@ -226,7 +234,7 @@ struct ProfileCard: View {
                 
                 Text(profile.name)
                     .font(.system(size: 18, weight: .semibold))
-                    .foregroundColor(.white)
+                    .foregroundColor(Color(hex: "#F5E6D3"))
                     .lineLimit(1)
             }
             .frame(width: 160, height: 170)

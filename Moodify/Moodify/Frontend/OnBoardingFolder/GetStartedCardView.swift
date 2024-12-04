@@ -20,11 +20,11 @@ struct GetStartedCard: View {
             VStack(spacing: 20) {
                 Text("Ready to Begin?")
                     .font(.system(size: 28, weight: .bold, design: .rounded))
-                    .foregroundColor(.white)
+                    .foregroundColor(Color(hex: "#F5E6D3"))
                 
                 Text("Tap the button to get started")
                     .font(.system(size: 16, weight: .medium, design: .rounded))
-                    .foregroundColor(.white.opacity(0.8))
+                    .foregroundColor(Color(hex: "#F5E6D3").opacity(0.8))
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, 20)
                 
@@ -38,12 +38,12 @@ struct GetStartedCard: View {
         ZStack {
             // Outer ring with rotating animation
             Circle()
-                .stroke(Color.white.opacity(0.3), lineWidth: 6)
+                .stroke(Color(hex: "#F5E6D3").opacity(0.3), lineWidth: 6)
                 .frame(width: 60, height: 60)
             
             // Animated circle that rotates
             Circle()
-                .stroke(Color.white, lineWidth: 4)
+                .stroke(Color(hex: "#F5E6D3"), lineWidth: 4)
                 .frame(width: 60, height: 60)
                 .rotationEffect(Angle(degrees: isAnimating ? 360 : 0))
                 .animation(
@@ -67,7 +67,7 @@ struct GetStartedCard: View {
                     .frame(width: 50, height: 50)
                     .overlay(
                         Image(systemName: "arrow.right.circle.fill")
-                            .foregroundColor(.white)
+                            .foregroundColor(Color(hex: "#F5E6D3"))
                             .font(.system(size: 24, weight: .bold))
                     )
                     .scaleEffect(scale)

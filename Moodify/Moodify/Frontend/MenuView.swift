@@ -61,14 +61,29 @@ struct MenuView: View {
         
         var color: Color {
             switch self {
-            case .account: return .blue
-            case .music: return .purple
-            case .playlists: return .yellow
-            case .user: return .green
-            case .addPin, .managePin, .changePin: return .orange
+            case .account: return Color(hex: "4ADE80")
+            case .music: return Color(hex: "4ADE80").opacity(0.9)
+            case .playlists: return Color(hex: "4ADE80").opacity(0.8)
+            case .user: return Color(hex: "4ADE80").opacity(0.7)
+            case .addPin, .managePin, .changePin: return Color(hex: "4ADE80").opacity(0.6)
             case .deletePin: return .red
-            case .tos: return .gray
+            case .tos: return Color(hex: "94A3BB")
             case .delete: return .red
+            }
+        }
+        
+        var iconColor: Color {
+            switch self {
+            case .account: return Color(hex: "4A6670")
+            case .music: return Color(hex: "796878")
+            case .playlists: return Color(hex: "C85C37")
+            case .user: return Color(hex: "687864")
+            case .addPin: return Color(hex: "D4B570")
+            case .managePin: return Color(hex: "739E82")
+            case .changePin: return Color(hex: "9B6B5D")
+            case .deletePin: return Color(hex: "8B4744")
+            case .tos: return Color(hex: "A39B8B")
+            case .delete: return Color(hex: "8B4744")
             }
         }
     }
@@ -164,9 +179,9 @@ struct MenuView: View {
                                         showingAccountInformation = false
                                     }) {
                                         Image(systemName: "chevron.backward")
-                                            .foregroundColor(.white)
+                                            .foregroundColor(Color(hex: "#F5E6D3"))
                                         Text("Back")
-                                            .foregroundColor(.white)
+                                            .foregroundColor(Color(hex: "#F5E6D3"))
                                     }
                                 }
                             }
@@ -183,9 +198,9 @@ struct MenuView: View {
                                         showingMusicPreferences = false
                                     }) {
                                         Image(systemName: "chevron.backward")
-                                            .foregroundColor(.white)
+                                            .foregroundColor(Color(hex: "#F5E6D3"))
                                         Text("Back")
-                                            .foregroundColor(.white)
+                                            .foregroundColor(Color(hex: "#F5E6D3"))
                                     }
                                 }
                             }
@@ -202,9 +217,9 @@ struct MenuView: View {
                                         showingPlaylists = false
                                     }) {
                                         Image(systemName: "chevron.backward")
-                                            .foregroundColor(.white)
+                                            .foregroundColor(Color(hex: "#F5E6D3"))
                                         Text("Back")
-                                            .foregroundColor(.white)
+                                            .foregroundColor(Color(hex: "#F5E6D3"))
                                     }
                                 }
                             }
@@ -221,9 +236,9 @@ struct MenuView: View {
                                         showingPinSetup = false
                                     }) {
                                         Image(systemName: "chevron.backward")
-                                            .foregroundColor(.white)
+                                            .foregroundColor(Color(hex: "#F5E6D3"))
                                         Text("Back")
-                                            .foregroundColor(.white)
+                                            .foregroundColor(Color(hex: "#F5E6D3"))
                                     }
                                 }
                             }
@@ -238,9 +253,9 @@ struct MenuView: View {
                                         showingChangePinView = false
                                     }) {
                                         Image(systemName: "chevron.backward")
-                                            .foregroundColor(.white)
+                                            .foregroundColor(Color(hex: "#F5E6D3"))
                                         Text("Back")
-                                            .foregroundColor(.white)
+                                            .foregroundColor(Color(hex: "#F5E6D3"))
                                     }
                                 }
                             }
@@ -252,7 +267,8 @@ struct MenuView: View {
                             agreedToTerms: Binding(
                                 get: { profileManager.currentProfile?.hasAgreedToTerms ?? false },
                                 set: { profileManager.currentProfile?.hasAgreedToTerms = $0 }
-                            )
+                            ),
+                            showBackButton: false
                         )
                         .environmentObject(profileManager)
                         .navigationBarBackButtonHidden(true)
@@ -262,9 +278,9 @@ struct MenuView: View {
                                     showingTOS = false
                                 }) {
                                     Image(systemName: "chevron.backward")
-                                        .foregroundColor(.white)
+                                        .foregroundColor(Color(hex: "#F5E6D3"))
                                     Text("Back")
-                                        .foregroundColor(.white)
+                                        .foregroundColor(Color(hex: "#F5E6D3"))
                                 }
                             }
                         }
@@ -389,6 +405,7 @@ struct PinManagementHeader: View {
             Text("Pin Management")
                 .font(.title.bold())
             
+            
             Spacer()
             
             Button {
@@ -482,25 +499,30 @@ struct MenuButton: View {
             HStack(spacing: 16) {
                 Image(systemName: tab.icon)
                     .font(.title3)
-                    .foregroundColor(tab.color)
+                    .foregroundColor(tab.iconColor)
                     .frame(width: 24)
                 
                 Text(tab.rawValue)
                     .font(.body)
+                    .foregroundColor(Color(hex: "#F5E6D3"))
                 
                 Spacer()
                 
                 if tab != .delete {
                     Image(systemName: "chevron.right")
                         .font(.caption)
-                        .foregroundColor(.gray)
+                        .foregroundColor(Color(hex: "94A3BB"))
                 }
             }
             .padding(.horizontal)
             .padding(.vertical, 12)
             .background(
                 RoundedRectangle(cornerRadius: 12)
-                    .fill(isSelected ? tab.color.opacity(0.1) : Color.clear)
+                    .fill(isSelected ? tab.color.opacity(0.15) : Color.clear)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 12)
+                            .stroke(isSelected ? tab.color.opacity(0.3) : Color.clear, lineWidth: 1)
+                    )
             )
             .contentShape(Rectangle())
         }

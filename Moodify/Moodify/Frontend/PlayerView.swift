@@ -32,7 +32,7 @@ struct PlayerView: View {
                             .frame(width: 80, height: 80)
                             .overlay(
                                 Image(systemName: "music.note")
-                                    .foregroundColor(.white.opacity(0.5))
+                                    .foregroundColor(Color(hex: "#F5E6D3").opacity(0.5))
                                     .font(.system(size: 24))
                             )
                     }
@@ -41,17 +41,17 @@ struct PlayerView: View {
                     VStack(alignment: .leading, spacing: 4) {
                         Text(spotifyController.currentTrackName)
                             .font(.title3.bold())
-                            .foregroundColor(.white)
+                            .foregroundColor(Color(hex: "#F5E6D3"))
                             .lineLimit(1)
                         
                         Text(spotifyController.currentArtistName)
                             .font(.subheadline)
-                            .foregroundColor(.white.opacity(0.7))
+                            .foregroundColor(Color(hex: "#F5E6D3").opacity(0.7))
                             .lineLimit(1)
                         
                         Text(spotifyController.currentAlbumName)
                             .font(.caption)
-                            .foregroundColor(.white.opacity(0.5))
+                            .foregroundColor(Color(hex: "#F5E6D3").opacity(0.5))
                             .lineLimit(1)
                     }
                     
@@ -63,31 +63,31 @@ struct PlayerView: View {
                     Button(action: { spotifyController.skipToPrevious() }) {
                         Image(systemName: "backward.end.fill")
                             .font(.title2)
-                            .foregroundColor(.white)
+                            .foregroundColor(Color(hex: "#F5E6D3"))
                     }
                     
                     Button(action: { spotifyController.seekForwardOrBackward(forward: false) }) {
                         Image(systemName: "gobackward.15")
                             .font(.title2)
-                            .foregroundColor(.white)
+                            .foregroundColor(Color(hex: "#F5E6D3"))
                     }
                     
                     Button(action: { spotifyController.togglePlayPause() }) {
                         Image(systemName: spotifyController.isPaused ? "play.circle.fill" : "pause.circle.fill")
                             .font(.system(size: 44))
-                            .foregroundColor(.white)
+                            .foregroundColor(Color(hex: "#F5E6D3"))
                     }
                     
                     Button(action: { spotifyController.seekForwardOrBackward(forward: true) }) {
                         Image(systemName: "goforward.15")
                             .font(.title2)
-                            .foregroundColor(.white)
+                            .foregroundColor(Color(hex: "#F5E6D3"))
                     }
 
                     Button(action: { spotifyController.skipToNext() }) {
                         Image(systemName: "forward.end.fill")
                             .font(.title2)
-                            .foregroundColor(.white)
+                            .foregroundColor(Color(hex: "#F5E6D3"))
                     }
                     
                     Spacer()
@@ -95,7 +95,7 @@ struct PlayerView: View {
                     Button(action: { navigateToQueue = true }) {
                         Image(systemName: "music.note.list")
                             .font(.title2)
-                            .foregroundColor(.white)
+                            .foregroundColor(Color(hex: "#F5E6D3"))
                     }
                     .sheet(isPresented: $navigateToQueue) {
                         QueueView(spotifyController: spotifyController)
